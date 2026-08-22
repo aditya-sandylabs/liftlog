@@ -96,3 +96,17 @@ beginner or an older lifter — treat the "to failure" column as optional until 
 movement is well grooved.
 
 Nothing here is medical or coaching advice; it is a logbook.
+
+## Credit
+
+The routine, the exercise instructions and the tutorial videos are the work of
+**Jeremy Ethier / Built With Science**, taken from the freely distributed
+*Upper/Lower Workout Routine (2024)* PDF. This repo is a personal logging tool
+built around that programme — it is not affiliated with or endorsed by Built
+With Science, and the training content remains theirs.
+
+- Original PDF and other free routines: <https://builtwithscience.com/freeworkouts/>
+- Video tutorials: <https://youtube.com/jeremyethier>
+
+If you want the programme itself, get it from the source above rather than from
+here.
