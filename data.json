@@ -1,0 +1,1173 @@
+{
+ "schemaVersion": 1,
+ "program": {
+  "name": "Built With Science — Upper/Lower",
+  "author": "Jeremy Ethier",
+  "source": "Built With Science Upper-Lower Workout Routine (2024).pdf",
+  "daysPerWeek": 4,
+  "schedule": [
+   "Upper Body 1",
+   "Lower Body 1",
+   "Rest",
+   "Upper Body 2",
+   "Lower Body 2",
+   "Rest",
+   "Rest"
+  ],
+  "rules": [
+   "Don't do 3 consecutive workouts in a row without any rest days.",
+   "Don't do 2 upper body or 2 lower body workouts in a row without rest in between.",
+   "Try your best to complete all 4 workouts per week."
+  ],
+  "glossary": {
+   "To failure + lengthened partials": "Once you can’t do any more full reps, continue the set with as many \"half reps\" as you can. These lengthened partials are highly stimulative for growth.",
+   "2-3 reps shy of failure": "Stop the set while you still have roughly 2-3 good reps left in the tank."
+  }
+ },
+ "templates": [
+  {
+   "id": "upper-1",
+   "name": "Upper Body 1",
+   "exercises": [
+    {
+     "id": "flat-dumbbell-press",
+     "name": "Flat Dumbbell Press",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure"
+     ],
+     "reps": "6-10",
+     "rest": "2-3 min",
+     "superset": null
+    },
+    {
+     "id": "db-chest-supported-row",
+     "name": "Dumbbell Chest Supported Row",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure"
+     ],
+     "reps": "8-12",
+     "rest": "2-3 min",
+     "superset": null
+    },
+    {
+     "id": "seated-mid-chest-cable-fly",
+     "name": "Seated Mid-Chest Cable Fly",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "lat-pulldown",
+     "name": "Lat Pulldown",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "8-12",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "cable-lateral-raise",
+     "name": "Cable Lateral Raise",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-20",
+     "rest": "1 min between arms",
+     "superset": null
+    },
+    {
+     "id": "behind-body-cable-curl",
+     "name": "Behind Body Cable Curl",
+     "sets": 2,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "cable-pushdown",
+     "name": "Cable Pushdown",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "2 min",
+     "superset": null
+    }
+   ]
+  },
+  {
+   "id": "lower-1",
+   "name": "Lower Body 1",
+   "exercises": [
+    {
+     "id": "barbell-back-squat",
+     "name": "Barbell Back Squat",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure"
+     ],
+     "reps": "6-10",
+     "rest": "2-3 min",
+     "superset": null
+    },
+    {
+     "id": "seated-leg-curl",
+     "name": "A1. Seated Leg Curl",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "Superset A",
+     "superset": "A"
+    },
+    {
+     "id": "seated-leg-extension",
+     "name": "A2. Seated Leg Extension",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "Superset A",
+     "superset": "A"
+    },
+    {
+     "id": "hyperextension",
+     "name": "Hyperextension",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure"
+     ],
+     "reps": "10-15",
+     "rest": "1.5-2 min",
+     "superset": null
+    },
+    {
+     "id": "standing-calf-raise",
+     "name": "Standing Weighted Calf Raise",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "1.5-2 min",
+     "superset": null
+    }
+   ]
+  },
+  {
+   "id": "upper-2",
+   "name": "Upper Body 2",
+   "exercises": [
+    {
+     "id": "low-incline-db-press",
+     "name": "Low Incline Dumbbell Press",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure"
+     ],
+     "reps": "6-10",
+     "rest": "2-3 min",
+     "superset": null
+    },
+    {
+     "id": "pull-up",
+     "name": "Pull-Up",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure"
+     ],
+     "reps": "6-10",
+     "rest": "2-3 min",
+     "superset": null
+    },
+    {
+     "id": "seated-mid-chest-cable-fly",
+     "name": "Seated Mid-Chest Cable Fly",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "seated-cable-row",
+     "name": "Seated Cable Row",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "8-12",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "db-lateral-raise",
+     "name": "Dumbbell Lateral Raise",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-20",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "incline-db-overhead-ext",
+     "name": "Incline Dumbbell Overhead Extension",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "incline-db-curl",
+     "name": "Incline Dumbbell Curl",
+     "sets": 2,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials"
+     ],
+     "reps": "8-12",
+     "rest": "2 min",
+     "superset": null
+    }
+   ]
+  },
+  {
+   "id": "lower-2",
+   "name": "Lower Body 2",
+   "exercises": [
+    {
+     "id": "barbell-hip-thrust",
+     "name": "Barbell Hip Thrust",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure"
+     ],
+     "reps": "10-15",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "barbell-rdl",
+     "name": "Barbell Romanian Deadlift",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure"
+     ],
+     "reps": "6-10",
+     "rest": "2-3 min",
+     "superset": null
+    },
+    {
+     "id": "front-foot-elev-reverse-lunge",
+     "name": "Front Foot Elevated Reverse Lunge",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "2-3 reps shy of failure",
+      "To failure"
+     ],
+     "reps": "6-10 per leg",
+     "rest": "2 min",
+     "superset": null
+    },
+    {
+     "id": "standing-calf-raise",
+     "name": "Standing Weighted Calf Raise",
+     "sets": 3,
+     "efforts": [
+      "2-3 reps shy of failure",
+      "To failure + lengthened partials",
+      "To failure + lengthened partials"
+     ],
+     "reps": "10-15",
+     "rest": "1.5-2 min",
+     "superset": null
+    }
+   ]
+  }
+ ],
+ "exercises": {
+  "flat-dumbbell-press": {
+   "id": "flat-dumbbell-press",
+   "name": "Flat Dumbbell Press",
+   "muscle": "Chest",
+   "video": "g14dhC5KYBM",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Grab a pair of dumbbells and sit on the edge of a flat bench. Kick up the dumbbells one at a time as you lay back on the bench to get them into position with your arms straight over your shoulders. Pull your shoulder blades down away from your ears and pinch them together to create a small space between your lower back and the bench. Firmly plant your feet on the ground."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core and then control the weight down by dropping your elbows to about a 45 to 60 degree angle from your torso. Allow your hands to naturally turn in slightly. Continue lowering until the weights reach around the level of your torso, or as low as is comfortable for you."
+    },
+    {
+     "heading": "Step 3",
+     "body": "Use your chest to push the weight back up until your arms are fully locked out and directly over your shoulders. Think about pulling your arms together as if you were trying to touch your biceps together to move the weight up."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Barbell Bench Press",
+     "video": "pCGVSBk0bIQ"
+    },
+    {
+     "name": "Flat Machine Chest Press",
+     "video": "sO8lFa9CidE"
+    },
+    {
+     "name": "Flat Smith Machine Chest Press",
+     "video": "3Z3C44SXSQE"
+    },
+    {
+     "name": "Seated Flat Cable Press",
+     "video": "hPpNTAEDnxM"
+    },
+    {
+     "name": "Neutral Grip DB Press*",
+     "video": "N-kUwH1uf9c"
+    }
+   ],
+   "sourcePage": 7
+  },
+  "db-chest-supported-row": {
+   "id": "db-chest-supported-row",
+   "name": "Dumbbell Chest Supported Row (Mid/Upper Back Focused)",
+   "muscle": "Back",
+   "video": "kNvy2_9Ji2w",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up an incline bench to an angle of about 30 degrees, typically the second notch up from the bottom. Grab a pair of dumbbells using a thumbless grip and lay your chest on the bench with your arms hanging down by your sides and palms facing each other. Plant the balls of your feet firmly into the ground with your legs fully straightened or slightly bent."
+    },
+    {
+     "heading": "Step 2",
+     "body": "To stabilize your body, bring your shoulders down and away from your ears, squeeze your glutes and flex your abs. Then, pull your elbows back behind your body at about a 45 to 60 degree angle away from your torso. Squeeze your shoulder blades together at the top position."
+    },
+    {
+     "heading": "Step 3",
+     "body": "Control the weight back down to the starting position instead of letting it just drop. Let your shoulder blades open up, reset, and then go into your next rep."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "Think about pulling with your elbows each rep in order to better activate your back."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": ") Barbell Row (mid/upper back)",
+     "video": "FTCmwlfZ29A"
+    },
+    {
+     "name": "Seated Cable Row (mid/upper back)",
+     "video": "Q-5V5T55giY"
+    },
+    {
+     "name": "Chest Supported Machine Row",
+     "video": "iDiVxqvHGWY"
+    }
+   ],
+   "sourcePage": 8
+  },
+  "seated-mid-chest-cable-fly": {
+   "id": "seated-mid-chest-cable-fly",
+   "name": "Seated Mid-Chest Cable Flyes",
+   "muscle": "Chest",
+   "video": "Y8E3dHNsSTU",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Move an adjustable bench over to the middle of a cable machine, positioned a couple of feet in front of it. Set the incline to one notch down from the highest position to about a 75 degree angle. Adjust the height of the cables around the level of your mid-chest. Grab each handle, sit on the bench, and get your arms into the starting position with your arms out to your sides and elbows bent. At this point your forearms should be lined up directly with the cable. Pull your shoulder blades down and back together. Plant your feet firmly on the ground."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Use your chest to bring your arms together with your arms straight in front of you. Think about squeezing your biceps in as if you were trying to bring them together to better engage your chest. Pause at the end position briefly, slowly control the weight back while bending your arms until your elbows reach the level of your torso, and then repeat for another rep."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Standing Mid-Chest Cable Fly",
+     "video": "fyFVaCP9J-8"
+    },
+    {
+     "name": "Pec-Deck Machine Fly",
+     "video": "rnV3y1P7894"
+    },
+    {
+     "name": "Dumbbell Fly",
+     "video": "WRn2hqy0gXU"
+    },
+    {
+     "name": "Banded Push-Ups",
+     "video": "dI7LVElfMOg"
+    }
+   ],
+   "sourcePage": 9
+  },
+  "lat-pulldown": {
+   "id": "lat-pulldown",
+   "name": "Lat Pulldown",
+   "muscle": "Back",
+   "video": "AvYZZhEl7Xk",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Adjust the height of the seat or knee pads so that your thighs are securely locked underneath, with your feet flat on the floor. Set your weight then stand up and grab the bar with an overhand grip just outside shoulder-width apart. Sit back down with your thighs under the pads. Tilt your upper back just slightly backwards."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Pull your elbows down until the bar reaches the level of your chin. Control the weight back up until your arms are almost fully straight, and then repeat for another rep."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "To better engage the back muscles, you can try using a thumbless grip and think about pulling with the elbows rather than with your hands."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "(Weighted) Pull-Ups",
+     "video": "w_yuTRQd6HA"
+    },
+    {
+     "name": "Kneeling One Arm Lat Pulldown",
+     "video": "PkA-D-Ld4tE"
+    },
+    {
+     "name": "3 Point Dumbbell Row",
+     "video": "hrBLmuQ_vq8"
+    },
+    {
+     "name": "Barbell Row (lat focus)",
+     "video": "tS5lKXxtNvE"
+    }
+   ],
+   "sourcePage": 10
+  },
+  "cable-lateral-raise": {
+   "id": "cable-lateral-raise",
+   "name": "Cable Lateral Raises",
+   "muscle": "Shoulders",
+   "video": "1muit9qEctY",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Attach a handle to the cable and move it to the bottom attachment. Face away from the cable and reach behind your body to grab the handle with one hand. Take a couple steps forward and then a small step sideways towards the direction of your working arm. You should end up with your hand by your thigh with the direction of the cable headed back behind your body."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core and squeeze your glutes. Keep your arms just slightly bent and raise your arm diagonally at about 15 to 30 degrees in front of your body. Raise until your arm reaches shoulder-height, control back down, and then repeat for more reps. Switch arms after you’ve rested for 30 seconds."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "To perform two arms at a time, grab the left cable with your right hand and right cable with your left hand. Turn so you face away from the cable and take a few steps forward. While keeping your arms just slightly bent, raise your arms into a wide Y position in front of you. Raise until your arms reach shoulder-height, control them back down, and then repeat for more reps."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Dumbbell Lateral Raise",
+     "video": "zcO3sgAeLA0"
+    },
+    {
+     "name": "Lying Incline Lateral Raise",
+     "video": "upEqeI0F73M"
+    },
+    {
+     "name": "Lean In Lateral Raise",
+     "video": "2q4kjTDg-vs"
+    },
+    {
+     "name": "Wide Grip BB Upright Row (last resort)",
+     "video": "6BTMVh9AnCw"
+    }
+   ],
+   "sourcePage": 11
+  },
+  "behind-body-cable-curl": {
+   "id": "behind-body-cable-curl",
+   "name": "Behind Body Cable Curls",
+   "muscle": "Biceps",
+   "video": "S2CNDlAY8kY",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Attach a handle to each cable and move it to the lowest position. Face away from the cable and grab the handle in each arm. Take a couple small steps forward and let your arms hang straight slightly behind your body and towards the direction of the cable."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core, pull your shoulders down and away from your ears, and then while keeping your elbows locked in position, curl your hands up towards your shoulders. As you do so, you should be curling up but also slightly inward to match the direction of the cable. Once your arms reach roughly the level of your chest, control the weight back down until your arms fully straighten, and then repeat for another rep."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "To perform this exercise one arm at a time, if you were curling your right arm for example, you’d stand in front and slightly to the left of the cable so that you can curl your arm straight up with the cable pulling your arm directly back at a straight angle."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Incline Dumbbell Curls",
+     "video": "3D56VDVkQnM"
+    },
+    {
+     "name": "Barbell Curl",
+     "video": "-ClfZ00zo8c"
+    }
+   ],
+   "sourcePage": 12
+  },
+  "cable-pushdown": {
+   "id": "cable-pushdown",
+   "name": "Cable Pushdowns (Elbow Friendly)",
+   "muscle": "Triceps",
+   "video": "MlfCS_7ZLXA",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set a pulley to the highest height. Use two rope attachments and pull them through so that the rope extends longer. Grab one rope in each hand and take two to three steps back from the pulley. From here, with a slight bend at your knees, bend your torso forward about 30 degrees. Bring your elbows down to your sides angled out just slightly and lock them there. Your hands should be around the level of your chest."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core, and then while keeping your elbows locked in place, use your triceps to extend your arms. You should feel as if you’re pulling the ropes down and out apart. Keep your elbows locked as you control your hands back up to about the height of your chest, and then go down for another rep."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "* Incline DB Overhead Extensions",
+     "video": "3d86xMhHROA"
+    },
+    {
+     "name": "Overhead Rope Extensions",
+     "video": "7yoTblFCUQM"
+    },
+    {
+     "name": "Incline Barbell Skullcrushers",
+     "video": "XgwPiPY4vCI"
+    },
+    {
+     "name": "Cross Cable Tricep Extensions",
+     "video": "Fua2QlXnn6Y"
+    }
+   ],
+   "sourcePage": 13
+  },
+  "barbell-back-squat": {
+   "id": "barbell-back-squat",
+   "name": "Barbell Back Squat",
+   "muscle": "Quads",
+   "video": "AWo-q7P-HZ0",
+   "tutorial": "Hj0dNZ9_LAE",
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Heads Up",
+     "body": "For the barbell back squat, since the exercise is quite technical, it is recommended that you watch the full exercise tutorial video. If needed, perform the exercise regression included in the video first if needed before performing the full barbell back squat."
+    },
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set a barbell in a rack at about the height of your mid-chest. Face the bar and grip it with your hands slightly wider than shoulder- width apart. Duck under the bar and place it over the back of your shoulders, letting it rest on your upper traps. Lift it out of the rack by extending your legs. Take one step back with one foot, one step back with the other one, and then use a third step to correct your stance into an even position. The optimal foot stance will vary, but first experiment with a stance that is just outside shoulder-width with your toes pointed outwards at about 15 degree angle."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Plant your feet firmly into the ground, pull the bar down into your upper back, and engage your core. Take a deep breath in through your nose, and then squat straight down by bending at your hips and knees. As you do so, the bar should remain over the level of your midfoot and the weight should be evenly distributed between your big toe, your little toe, and your heels. Your knees should also be bending slightly outwards in the same direction of your toes. Continue squatting down until your thighs reach at least parallel or slightly below. From here, while keeping your core engaged, exhale and reverse the movement by extending your legs, thinking about bringing the bar up towards the ceiling and exhaling as you do so. When done correctly, the bar should make an almost perfectly vertical path down and up each rep. Depending on your anatomy, your torso may end up more vertical or more bent over than others, which is normal as long as you’re following the tips and avoiding the common mistakes. ADDITIONAL TIPS: If you find it difficult to reach full depth, you can try elevating your heels onto weight plates to help with ankle mobility."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Quad-Focused Leg Press",
+     "video": "0nrW-q7-WRQ"
+    },
+    {
+     "name": "Smith Machine Squat",
+     "video": "zSVi51Jp3eI"
+    },
+    {
+     "name": "Barbell Back Box Squat*",
+     "video": "QryQO4VuPK8"
+    },
+    {
+     "name": "Weighted Step-Ups*",
+     "video": "Cjc3AgmdtlA"
+    },
+    {
+     "name": "Dumbbell Goblet Squat*",
+     "video": "nYDEYFXN2Rs"
+    },
+    {
+     "name": "Bulgarian Split Squat (quad focus)",
+     "video": "r9XtxWSTlcg"
+    }
+   ],
+   "sourcePage": 18
+  },
+  "seated-leg-curl": {
+   "id": "seated-leg-curl",
+   "name": "Seated Leg Curls",
+   "muscle": "Hamstrings",
+   "video": "81umRgyxIAU",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up your back rest so that when you sit down, your knees are aligned directly beside the pivot point of the machine. For most people, your knees should end up just past the edge of the seat. Next, adjust the height of your foot pad so that when you’re seated, your legs are in just a slightly bent position. The pad should also be resting just above the back of your heels."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Grab the handles on the side of the machine and pull up on them by engaging your lats. Brace your core, and then while keeping your toes pointed straight up, pull the weight as far down as you can using your hamstrings. Slowly control the weight back close to the starting position with your legs almost fully extended, and then repeat for another rep."
+    },
+    {
+     "heading": "Additional Tip",
+     "body": "Avoid fully extending your legs at the top position. The first 15 degrees or so of the movement actually involves more of the calves, so cut the range of motion short slightly by stopping each rep a little before your legs are completely straightened at the top position."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Lying Leg Curls",
+     "video": "aYy3alWRDmk"
+    },
+    {
+     "name": "Swiss Ball Leg Curls",
+     "video": "uRBpd65dbYs"
+    },
+    {
+     "name": "Dumbbell Lying Leg Curls",
+     "video": "Ot1MZipNLOQ"
+    }
+   ],
+   "sourcePage": 19
+  },
+  "seated-leg-extension": {
+   "id": "seated-leg-extension",
+   "name": "Seated Leg Extensions",
+   "muscle": "Quads",
+   "video": "nIalczfM8es",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up your back rest so that when you sit down, your knees are aligned directly beside the pivot point of the machine. For most people, your knees should end up just past the edge of the seat. Next, adjust the height of your foot pad so that when you’re seated, your legs are at a roughly 90 degree angle with the pad resting just above your ankle."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Grab the handles on the side of the machine and pull up on them by engaging your lats. Brace your core, and then while keeping your toes pointed straight up, use your quads to extend your legs straight forward. As you do so, keep your knees facing forward rather than rotating them in or outwards. Extend as far up as you can, pause briefly at the top, and then control the weight all the way back down to the starting position and repeat."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Sissy Squat",
+     "video": "3SeCC8ABZ_Q"
+    },
+    {
+     "name": "Heel Elevated Goblet Squat",
+     "video": "l9crMLuT4II"
+    },
+    {
+     "name": "Reverse Lunges*",
+     "video": "AUEGDvCrQJA"
+    }
+   ],
+   "sourcePage": 20
+  },
+  "hyperextension": {
+   "id": "hyperextension",
+   "name": "Hyperextensions (Back/Hamstring Focused)",
+   "muscle": "Lower Back",
+   "video": "RU5d2H_OmSc",
+   "tutorial": null,
+   "bodyweight": true,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Using a back extension machine, adjust the thigh pads so that when you lay on it, the top of the pads are just below the crease of your hips. Position your heels firmly against the foot pad and keep them planted as you perform the movement with your toes slightly pointed out. Cross your hands over your chest and move your torso to the starting position slightly below parallel to the ground with your back straight."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Tuck your chin to align your neck with your spine and brace your core. From here, lift your chest up to extend your upper back. Continue until your torso is in line with your lower body, or just slightly past it. Pause here for a second, and then reverse the motion to the starting position and repeat."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "Once you master the exercise without weight, you can load it. One option is to use a barbell either empty or with light weight. Grab the bar with a wider overhand grip about 1.5x shoulder width, and get into the starting position. Before lifting up, brace your core, pinch your shoulder blades back together, and then pull your shoulders down and away from your ears. From here, perform the same movement. Another option is to hold a dumbbell or weight plates in each arm with your arms straight. Choose what is most comfortable and convenient for you."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": ") Barbell Deadlift",
+     "video": "ZxwBq-vhzwU"
+    },
+    {
+     "name": "Sumo Deadlift*",
+     "video": "9rXKd-_DaRs"
+    },
+    {
+     "name": "Trap Bar Deadlift*",
+     "video": "5mnlJtf-7WM"
+    },
+    {
+     "name": "Dumbbell Romanian Deadlift",
+     "video": "Xu4DxwKWzl4"
+    },
+    {
+     "name": "Glute Focused Leg Press",
+     "video": "p13BNdwR93A"
+    }
+   ],
+   "sourcePage": 21
+  },
+  "standing-calf-raise": {
+   "id": "standing-calf-raise",
+   "name": "Standing Weighted Calf Raises (Barbell Or Dumbbell)",
+   "muscle": "Calves",
+   "video": "q2Eigaa9dKU",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "You can perform this movement either using a weighted barbell or with a pair of dumbbells in each hand. Grab a pair of dumbbells and place your feet about hip width apart facing forwards."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core and then push straight up onto your toes as far as you can, keeping most of the pressure on your big toes. Then, control your heel slowly back down until they touch the ground, and repeat. Once you get good at this, you can progress it by adding a small 5 or 10 lb weight plate under each of your toes and perform it on there. Once you get good at that, you can use a larger weight plate or an elevated platform for a greater range of motion. It can be hard to balance so just be cautious when performing this so you don’t fall over. The same also applies if you were using barbells."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Single Leg Weighted Calf Raise",
+     "video": "cRKA_Qdut7I"
+    },
+    {
+     "name": "Toes-Elevated Smith Machine Calf Raise",
+     "video": "_ChZv2iluM8"
+    },
+    {
+     "name": "Leg Press Calf Raise",
+     "video": "s8yUXsZrgE0"
+    }
+   ],
+   "sourcePage": 22
+  },
+  "low-incline-db-press": {
+   "id": "low-incline-db-press",
+   "name": "Low Incline Dumbbell Press",
+   "muscle": "Chest",
+   "video": "kpzUeELReEA",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up an incline bench to about 15 to 30 degrees, typically the first to second notch up from the bottom. Grab a pair of dumbbells and sit on the bench. Kick up the dumbbells one at a time to get them into position with your arms straight over your body. Pull your shoulder blades down away from your ears and pinch them together to create a small space between your lower back and the bench. Firmly plant your feet on the ground."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core and then control the weight down by dropping your elbows to about a 45 to 60 degree angle from your torso. Allow your hands to naturally turn in slightly. Continue lowering until the weights reach around the level of your chest, or as low as is comfortable for you."
+    },
+    {
+     "heading": "Step 3",
+     "body": "Use your chest to push the weight back up until your arms are fully locked out and directly over your shoulders. Think about pulling your arms together as if you were trying to touch your biceps together to move the weight up."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Incline Machine Chest Press",
+     "video": "abc1fisYB3w"
+    },
+    {
+     "name": "Low Incline Smith Machine Press",
+     "video": "R53nThQcdZo"
+    },
+    {
+     "name": "Low Incline Barbell Press",
+     "video": "jW4j7FoqudI"
+    },
+    {
+     "name": "Low Incline Cable Press",
+     "video": "6qV1WZ_z0u0"
+    },
+    {
+     "name": "(Banded) Decline Push-Ups",
+     "video": "LdahU9kB-u0"
+    }
+   ],
+   "sourcePage": 26
+  },
+  "pull-up": {
+   "id": "pull-up",
+   "name": "Pull-Ups",
+   "muscle": "Back",
+   "video": "w_yuTRQd6HA",
+   "tutorial": null,
+   "bodyweight": true,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Grip the bar using an overhand grip slightly wider than shoulder-width apart. From here, let your body hang and then begin stabilizing your body by bringing your feet together, flexing your quads and glutes and contracting your abs. You want to maintain this position as you pull."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Initiate the pull by first bringing your shoulders down and away from your ears. Then, pull your elbows down and back into your sides as if you were trying to pull them into your back pockets. As you do this, think about trying to bring your chest up towards the bar. Continue pulling- up until your chin is above the bar. From here, control yourself by letting your elbows move up and out until your arms are almost fully straightened, and then continue into your next rep."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Lat Pulldown",
+     "video": "AvYZZhEl7Xk"
+    },
+    {
+     "name": "Kneeling One Arm Lat Pulldown",
+     "video": "PkA-D-Ld4tE"
+    },
+    {
+     "name": "3 Point Dumbbell Row",
+     "video": "hrBLmuQ_vq8"
+    },
+    {
+     "name": "Barbell Row (lat focus)",
+     "video": "tS5lKXxtNvE"
+    }
+   ],
+   "sourcePage": 27
+  },
+  "seated-cable-row": {
+   "id": "seated-cable-row",
+   "name": "Seated Cable Row (Mid/Upper Back Focused)",
+   "muscle": "Back",
+   "video": "Q-5V5T55giY",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Once you’ve found the attachment, get into the starting position with your knees slightly bent on the pad and back straight."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core and bring your shoulders down and away from your ears. Pull your elbows back behind your body at about a 45 to 60 degree angle away while squeezing your shoulder blades together."
+    },
+    {
+     "heading": "Step 3",
+     "body": "Control the weight back down to the starting position, letting your shoulder blades open up, and then go into your next rep. You can let your upper body round forward to fully open up your back, as long as your core remains tight and your lower back doesn’t round excessively."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "You can use the V-bar attachment, but a better option would be a wider handle setup so that your elbows can flare outwards as you pull. If you don’t have access to any of that, you can try putting two handles over a lat pulldown attachment and twist them to lock them in place."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": ") Barbell Row (mid/upper back focused)",
+     "video": "FTCmwlfZ29A"
+    },
+    {
+     "name": "DB Chest Supported Row (mid/upper back)",
+     "video": "kNvy2_9Ji2w"
+    },
+    {
+     "name": "Chest Supported Machine Row",
+     "video": "iDiVxqvHGWY"
+    }
+   ],
+   "sourcePage": 29
+  },
+  "db-lateral-raise": {
+   "id": "db-lateral-raise",
+   "name": "Dumbbell Lateral Raises",
+   "muscle": "Shoulders",
+   "video": "zcO3sgAeLA0",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Grab a pair of dumbbells and stand with your feet about shoulder width apart and knees slightly bent. Lean your torso forward about 15 degrees."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Brace your core. While keeping your arms just slightly bent, raise your hands out in front of you. As you do so, raise your arms in a Y position in front of you. This is about 15 to 30 degrees in front of your body. Raise the weight until your arms reach shoulder-height, control them back down until your hands are down in front of your thighs, and then repeat for more reps."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "To better help with muscle activation, you can try using a thumbless grip and rather than thinking about raising the weight up, think about raising the weight out as if you were pushing your hands out towards the walls."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Cable Lateral Raise",
+     "video": "1muit9qEctY"
+    },
+    {
+     "name": "Lying Incline Lateral Raise",
+     "video": "upEqeI0F73M"
+    },
+    {
+     "name": "Lean In Lateral Raise",
+     "video": "2q4kjTDg-vs"
+    },
+    {
+     "name": "Wide Grip BB Upright Row (last resort)",
+     "video": "6BTMVh9AnCw"
+    }
+   ],
+   "sourcePage": 30
+  },
+  "incline-db-overhead-ext": {
+   "id": "incline-db-overhead-ext",
+   "name": "Incline Dumbbell Overhead Extensions",
+   "muscle": "Triceps",
+   "video": "3d86xMhHROA",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up an adjustable bench to an incline of about 45 degrees, which is typically 2-3 notches up from the bottom position. Grab a pair of dumbbells and lay your back onto the bench with your arms straight over your shoulders and palms facing in towards each other. Brace your core, flatten your lower back against the bench, and then while keeping your arms straight, move them back until they are parallel with your torso and lock them in this position."
+    },
+    {
+     "heading": "Step 2 — Execution",
+     "body": "Keep your elbows locked and then bend your forearms back behind your head as far as you can. Extend your forearms straight without moving your elbows to get back into the starting position and then repeat for more reps."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Overhead Rope Extensions",
+     "video": "7yoTblFCUQM"
+    },
+    {
+     "name": "Cable Pushdowns*",
+     "video": "MlfCS_7ZLXA"
+    },
+    {
+     "name": "Incline Barbell Skullcrushers",
+     "video": "XgwPiPY4vCI"
+    },
+    {
+     "name": "Cross Cable Tricep Extensions",
+     "video": "Fua2QlXnn6Y"
+    }
+   ],
+   "sourcePage": 31
+  },
+  "incline-db-curl": {
+   "id": "incline-db-curl",
+   "name": "Incline Dumbbell Curls",
+   "muscle": "Biceps",
+   "video": "3D56VDVkQnM",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up an incline bench to just a slight angle back of about 60 degrees, which is typically 2 to 3 notches down from the top position. Grab a pair of dumbbells and lay your back on the bench with your arms hanging straight down by your sides with your palms facing in and your feet planted firmly on the ground."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Pull your shoulders down and away from your ears and brace your core. While keeping both of your elbows locked into place, curl the weight up towards your shoulders. As you do so, rotate your palms so that they face up towards the ceiling at the top position. Lower the weight back down to the starting position letting your wrists rotate back into a neutral position. Once your arms fully straighten, repeat for another rep."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Behind Body Cable Curls",
+     "video": "S2CNDlAY8kY"
+    },
+    {
+     "name": "Barbell Curl",
+     "video": "-ClfZ00zo8c"
+    }
+   ],
+   "sourcePage": 32
+  },
+  "barbell-hip-thrust": {
+   "id": "barbell-hip-thrust",
+   "name": "Barbell Hip Thrust",
+   "muscle": "Glutes",
+   "video": "_vBMijiZoxE",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Heads Up",
+     "body": "For the barbell hip thrust, since the exercise is quite technical, it is recommended that you watch the exercise tutorial video."
+    },
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Grab a bench or any soft elevated platform that’s about the height of your knees or shins. If needed, put a pair of heavy weight plates behind it to prevent it from sliding back as you perform the movement. Next, grab a barbell, and load each side with weight, ideally using the bigger bumper plates if your gym has those available. If you’re new to this movement, use just the barbell with no weight at first. You’ll also want to use a thick pad or towel and wrap it around the middle of the barbell for comfort. Lay down with your upper back against the bench and the bar sitting over your hips and your hands holding the bar with an overhand grip just outside your legs. From here, set your feet. You want them positioned such that at the top of the hip thrust your knees are bent at a 90 degree angle and your shins are vertical straight on top of your feet. Try a few reps without weight to find the sweet spot position for you. Once you’ve found the right distance, set your feet at about shoulder-width apart or slightly wider, with your toes pointed out at a slight angle."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Tuck your chin down and brace your core. Before initiating the thrust, squeeze your glutes. Then, while keeping your head and hips in a straight line, continue squeezing your glutes as you push through your heels to drive your hips forward to the top position, moving the weight straight up. At the top position, keep your core braced and pause for a second or two while continuing to squeeze your glutes. Control the weight back down by slowly lowering your butt down towards the ground, stopping at about halfway up from the bottom position and then repeating for another rep."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Smith Machine Hip Thrust",
+     "video": "srYETmyq3_c"
+    },
+    {
+     "name": "(Weighted) Single Leg Hip Thrusts",
+     "video": "FKD9-qezw08"
+    },
+    {
+     "name": "Hyperextensions (glute focus)",
+     "video": "bsXgCaIIwCg"
+    },
+    {
+     "name": "Reverse Hyperextensions",
+     "video": "yRvF177yb88"
+    }
+   ],
+   "sourcePage": 36
+  },
+  "barbell-rdl": {
+   "id": "barbell-rdl",
+   "name": "Barbell Romanian Deadlift",
+   "muscle": "Hamstrings",
+   "video": "Q-2telZDPRw",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Set up the bar in the rack to the level of your mid- thigh. You can also deadlift the bar off the floor up to the starting position. Take a roughly shoulder-width overhand grip just outside your thighs. Take 3 steps back from the rack and use a shoulder width stance with your feet pointed slightly outwards at about a 15 degree angle. At this point your legs should be just inside your hands."
+    },
+    {
+     "heading": "Step 2",
+     "body": "Engage your lats and contract your abs. Take a deep breath in through your nose and start the descent by pushing your hips straight back. Keep just a very slight bend at your knees and keep the bar as close to your body as possible, ideally right above the middle of your feet. Lower the bar only until the point where you can’t push your hips back without your lower back starting to round, usually at knee level or mid-shin level."
+    },
+    {
+     "heading": "Step 3",
+     "body": "Keep your core braced and then exhale as you reverse the motion by pushing your hips forward while keeping the bar centered over your mid-foot. Once your legs are fully straight, repeat for another rep. Spend about 2-3 seconds on slowly controlling the weight down, and then about 1 second to bring the weight back up."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "To better engage the hamstrings, you can think about pulling the floor back with your heels as you come up."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Dumbbell Romanian Deadlift",
+     "video": "Xu4DxwKWzl4"
+    },
+    {
+     "name": "Hyperextensions (back/hamstring)",
+     "video": "RU5d2H_OmSc"
+    }
+   ],
+   "sourcePage": 37
+  },
+  "front-foot-elev-reverse-lunge": {
+   "id": "front-foot-elev-reverse-lunge",
+   "name": "Front Foot Elevated Reverse Lunges",
+   "muscle": "Quads",
+   "video": "JySEdVXPUM8",
+   "tutorial": null,
+   "bodyweight": false,
+   "steps": [
+    {
+     "heading": "Step 1 — Setup",
+     "body": "Grab a pair of dumbbells and stand with your feet together on a small elevated platform like a weight plate. Brace your core."
+    },
+    {
+     "heading": "Step 2",
+     "body": "While keeping your front leg planted on the platform, take a long step backwards with your other leg and sink down into a lunge position by driving the knee of your back leg towards the ground. Keep your back neutral and lean your torso forward slightly by about 20 degrees to better engage the glutes. Continue descending until your back knee almost touches the ground. Pause briefly in this position, and then push through the heel of your front leg to drive your hips forward, raising your body up back into the starting position with your feet together. Take your next step back with the other leg and continue alternating until you finish the desired number of reps on each leg."
+    },
+    {
+     "heading": "Additional Tips",
+     "body": "Avoid relying too much on your back leg to push your body up. Instead, after taking your step back, think of your back leg as a kickstand for balance and don’t rely on it too much to kick yourself back up."
+    }
+   ],
+   "alternatives": [
+    {
+     "name": "Bulgarian Split Squat (glute focus)",
+     "video": "sqadB2rroz0"
+    },
+    {
+     "name": "Reverse Lunges*",
+     "video": "AUEGDvCrQJA"
+    },
+    {
+     "name": "Weighted Step-Ups*",
+     "video": "Cjc3AgmdtlA"
+    },
+    {
+     "name": "Single-Leg Leg Press",
+     "video": "hdioTTf8qdw"
+    }
+   ],
+   "sourcePage": 38
+  }
+ }
+}
