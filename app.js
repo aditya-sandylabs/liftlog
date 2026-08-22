@@ -695,7 +695,11 @@ function openExerciseSheet(exId, ctx = {}) {
     ${steps ? `<h3 class="sec">How to</h3>${steps}` : ''}
     ${alts ? `<h3 class="sec">Alternatives</h3><div class="alt-list">${alts}</div>` : ''}
     <h3 class="sec">History</h3>
-    ${exerciseHistoryHTML(ex.exerciseId)}`);
+    ${/* Use exId, not ex.exerciseId: `ex` here comes from resolveExercise(),
+          i.e. the data.json record, which keys its identifier as `id`.
+          `exerciseId` only exists on active-workout entries, so reading it
+          here yielded undefined and every exercise reported "no history". */
+      exerciseHistoryHTML(exId)}`);
   $$('#sheet-inner [data-alt]').forEach(b => {
     b.onclick = () => openSwapConfirm(ctx.ei, b.dataset.alt, b.dataset.altname);
   });
@@ -1092,7 +1096,31 @@ function wire() {
     try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* unsupported */ }
   }
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => { /* e.g. file:// — app still works */ });
+    // updateViaCache:'none' stops the browser serving sw.js from its own HTTP
+    // cache -- GitHub Pages sets a max-age, so without this the worker itself
+    // could not be re-checked for minutes and the app sat on a stale build.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      // A brand-new install claims the page too; only reload when an existing
+      // worker was *replaced*, otherwise the first visit would loop.
+      if (!hadController || reloading) return;
+      reloading = true;
+      saveActive(true);          // flush the in-progress workout before reloading
+      location.reload();
+    });
+
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then(reg => {
+        reg.update();
+        // Re-check whenever the app is brought back to the foreground, which is
+        // how an installed PWA is normally resumed rather than reloaded.
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) reg.update();
+        });
+      })
+      .catch(() => { /* e.g. file:// — app still works */ });
   }
 })();
 

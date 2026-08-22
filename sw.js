@@ -1,7 +1,7 @@
 /* LiftLog service worker — precaches the app shell + data.json, cache-first, versioned. */
 'use strict';
 
-const VERSION = 'liftlog-v202608221424';
+const VERSION = 'liftlog-v202608221436';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './app.js',
   './data.json',
   './quotes.json',
+  './marcus.png',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png'
@@ -36,10 +37,20 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // never touch cross-origin (e.g. YouTube links)
 
-  // Navigations: serve the shell so the PWA always opens offline.
+  // Navigations: network-first so a deployed fix actually arrives, falling back
+  // to the cached shell when offline. Cache-first here meant the app could sit
+  // on a stale build indefinitely.
   if (req.mode === 'navigate') {
     event.respondWith(
-      caches.match('./index.html').then(cached => cached || fetch(req))
+      fetch(req)
+        .then(res => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(VERSION).then(c => c.put('./index.html', copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match('./index.html').then(c => c || Response.error()))
     );
     return;
   }
