@@ -195,8 +195,8 @@ h2{font-size:1.05rem}
    included) so columns stay aligned and nothing shifts on completion. */
 .set-row{
   display:grid;
-  grid-template-columns:36px 58px minmax(0,1fr) minmax(0,1fr) 48px 28px;
-  gap:4px;align-items:center;
+  grid-template-columns:30px 52px minmax(0,1fr) minmax(0,1fr) 48px 24px;
+  gap:3px;align-items:center;
   min-height:54px;padding:4px 0 4px 9px;
   border-top:1px solid var(--border);
 }
@@ -209,18 +209,16 @@ h2{font-size:1.05rem}
   font-weight:700;font-size:.95rem;line-height:1.1;
 }
 .c-prev{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
-.c-inp{display:flex;align-items:center;gap:2px;min-width:0}
-.step{
-  width:26px;height:40px;flex:none;border-radius:8px;
-  background:var(--surface2);border:1px solid var(--border);
-  display:inline-flex;align-items:center;justify-content:center;
-  font-weight:700;color:var(--muted);
-}
-.step:active{background:var(--border)}
+.c-inp{min-width:0}
+/* No +/- steppers: they were two 26px flex:none buttons per column, which
+   squeezed the field (width:100%;min-width:0) down to almost nothing and
+   clipped the digits. The field now owns the whole column, and its
+   inputmode raises the device number pad on tap. */
 .inp{
-  width:100%;min-width:0;height:42px;text-align:center;
-  background:var(--surface);border:1px solid var(--border);border-radius:8px;
-  font-variant-numeric:tabular-nums;font-size:.95rem;
+  width:100%;min-width:0;height:46px;text-align:center;
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  font-variant-numeric:tabular-nums;font-size:1.05rem;font-weight:600;
+  padding:0 2px;
 }
 .inp:focus{outline:2px solid var(--accent);outline-offset:-1px}
 /* pre-filled but unconfirmed: dimmed + regular weight (never colour alone) */
@@ -237,7 +235,7 @@ h2{font-size:1.05rem}
 }
 .check .ic{width:22px;height:22px}
 .check.on{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
-.rowmenu{width:28px;height:44px;color:var(--muted);display:inline-flex;align-items:center;justify-content:center}
+.rowmenu{width:24px;height:44px;color:var(--muted);display:inline-flex;align-items:center;justify-content:center}
 .rowmenu .ic{width:16px;height:16px}
 .gloss{
   width:22px;height:22px;border-radius:50%;flex:none;

@@ -302,14 +302,10 @@ function rowHTML(ex, s, ei, si) {
     <span class="c-set">${s.n}${effortMark(ex, s)}${badges}</span>
     <span class="c-prev">${esc(prev)}</span>
     <span class="c-inp">
-      <button class="step" data-act="step" data-field="w" data-dir="-1" aria-label="Weight down">−</button>
       <input class="inp w-inp${pref}" type="text" inputmode="decimal" value="${esc(wv)}" placeholder="0" ${dis} aria-label="Weight (${esc(unit)})">
-      <button class="step" data-act="step" data-field="w" data-dir="1" aria-label="Weight up">+</button>
     </span>
     <span class="c-inp">
-      <button class="step" data-act="step" data-field="r" data-dir="-1" aria-label="Reps down">−</button>
       <input class="inp r-inp${pref}" type="text" inputmode="numeric" value="${esc(rv)}" placeholder="0" ${dis} aria-label="Reps">
-      <button class="step" data-act="step" data-field="r" data-dir="1" aria-label="Reps up">+</button>
     </span>
     <button class="check${s.done ? ' on' : ''}" data-act="check" aria-pressed="${s.done}" aria-label="${s.done ? 'Uncomplete set' : 'Complete set'}"><svg class="ic"><use href="#i-check"/></svg></button>
     <button class="rowmenu" data-act="rowmenu" aria-label="Set options"><svg class="ic"><use href="#i-dots"/></svg></button>
@@ -359,22 +355,6 @@ function toggleSet(ei, si) {
   renderActive();
 }
 
-function stepVal(ei, si, field, dir) {
-  const ex = state.active.exercises[ei], s = ex.sets[si];
-  if (s.done) return;
-  const row = rowEl(ei, si);
-  const inp = row.querySelector(field === 'w' ? '.w-inp' : '.r-inp');
-  let v = parseDisp(inp.value);
-  if (v == null) v = field === 'w'
-    ? (s.weightKg != null ? dispKg(s.weightKg) : (s.prev ? dispKg(s.prev.weightKg) : 0))
-    : (s.reps ?? (s.prev ? s.prev.reps : 0));
-  const st = field === 'w' ? stepFor() : 1;
-  v = Math.max(0, Math.round((v + dir * st) * 100) / 100);
-  inp.value = field === 'w' ? fmtNum(v) : String(Math.round(v));
-  inp.classList.remove('pref');
-  if (field === 'w') s.weightKg = toKg(v); else s.reps = Math.round(v);
-  saveActive();
-}
 
 function addSet(ei) {
   const ex = state.active.exercises[ei];
@@ -538,6 +518,17 @@ async function discardActive() {
   await DB.del('kv', 'active');
   skipRest();
 }
+
+/* Tapping anywhere off a number field blurs it, which closes the device
+   keypad and commits the value through the existing `change` handler.
+   Capture phase so the value is committed before any button click lands. */
+document.addEventListener('pointerdown', e => {
+  const a = document.activeElement;
+  if (!a || !a.classList || !a.classList.contains('inp')) return;
+  if (e.target === a) return;                                   // same field
+  if (e.target.classList && e.target.classList.contains('inp')) return; // moving to another field
+  a.blur();
+}, true);
 
 document.addEventListener('visibilitychange', () => { if (document.hidden) saveActive(true); });
 window.addEventListener('pagehide', () => saveActive(true));
@@ -785,7 +776,15 @@ function deleteCurrentWod() {
 }
 
 /* ================= modal & toast ================= */
+/* Bumped on every showModal. An action whose handler opens a *further* modal
+   (confirm-a-confirm) must not then be closed by the parent's handler --
+   otherwise the second dialog is created and hidden in the same tick and the
+   user never sees it, which silently broke Delete set, Discard workout and
+   Clear all data. */
+let modalSeq = 0;
+
 function showModal({ title, body = '', actions = [] }) {
+  const gen = ++modalSeq;
   const w = $('#modal-wrap');
   w.hidden = false;
   $('#modal').innerHTML = `<h2>${esc(title)}</h2><div class="modal-body">${body}</div><div class="modal-actions"></div>`;
@@ -797,6 +796,8 @@ function showModal({ title, body = '', actions = [] }) {
     b.onclick = () => {
       // returning false from onClick keeps the modal open (used for inline validation)
       if (a.onClick && a.onClick() === false) return;
+      // If the handler opened another modal, leave that one on screen.
+      if (modalSeq !== gen) return;
       closeModal();
     };
     act.appendChild(b);
@@ -991,7 +992,6 @@ function wire() {
     else if (act === 'check') toggleSet(ei, si);
     else if (act === 'rowmenu') rowMenu(ei, si);
     else if (act === 'addset') addSet(ei);
-    else if (act === 'step') stepVal(ei, si, b.dataset.field, +b.dataset.dir);
   });
   // weight/reps edits commit on change (blur / keyboard done) — no re-render, so focus is safe
   $('#aw-body').addEventListener('change', e => {
