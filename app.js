@@ -169,6 +169,7 @@ function showView(v) {
   $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v || (v === 'wod' && b.dataset.v === 'history')));
   if (v === 'home') renderHome();
   if (v === 'history') renderHistory();
+  if (v === 'quotes') renderQuotes();
   if (v === 'active') startElapsed(); else stopElapsed();
   window.scrollTo(0, 0);
 }
@@ -525,6 +526,19 @@ function saveActive(now) {
   clearTimeout(saveT);
   saveT = setTimeout(() => DB.put('kv', state.active, 'active'), 200);
 }
+/* Drop the in-progress workout.
+   saveActive() debounces its write by 200ms, and `await` yields to the event
+   loop -- so a pending timer would fire *during* the delete, while
+   state.active was still set, and write the workout straight back. Cancel the
+   timer and null the state before awaiting anything. */
+async function discardActive() {
+  clearTimeout(saveT);
+  saveT = null;
+  state.active = null;
+  await DB.del('kv', 'active');
+  skipRest();
+}
+
 document.addEventListener('visibilitychange', () => { if (document.hidden) saveActive(true); });
 window.addEventListener('pagehide', () => saveActive(true));
 
@@ -563,9 +577,7 @@ function saveWorkout(donePairs) {
     setCount: sets.length
   };
   DB.put('workouts', rec).then(async () => {
-    await DB.del('kv', 'active');
-    state.active = null;
-    skipRest();
+    await discardActive();
     state.workouts = (await DB.getAll('workouts')).sort((x, y) => y.startTime - x.startTime);
     showView('home');
     toast('Workout saved');
@@ -597,8 +609,8 @@ function promptResume(a) {
             { label: 'Keep it' },
             {
               label: 'Discard', danger: true, onClick: async () => {
-                await DB.del('kv', 'active');
-                state.active = null; skipRest();
+                await discardActive();
+                renderHome(); showView('home');
                 toast('Workout discarded');
               }
             }
@@ -926,9 +938,9 @@ function clearAllFlow() {
                 if ($('#del-in').value.trim() !== 'DELETE') { toast('Type DELETE exactly to confirm'); return false; }
                 (async () => {
                   await DB.clear('workouts');
-                  await DB.del('kv', 'active');
-                  state.workouts = []; state.active = null;
-                  skipRest(); toast('All data cleared'); showView('home');
+                  await discardActive();
+                  state.workouts = [];
+                  toast('All data cleared'); showView('home');
                 })();
               }
             }
@@ -1012,8 +1024,7 @@ function wire() {
             { label: 'Keep lifting' },
             {
               label: 'Discard', danger: true, onClick: async () => {
-                await DB.del('kv', 'active');
-                state.active = null; skipRest();
+                await discardActive();
                 showView('home'); toast('Workout discarded');
               }
             }
@@ -1084,3 +1095,140 @@ function wire() {
     navigator.serviceWorker.register('./sw.js').catch(() => { /* e.g. file:// — app still works */ });
   }
 })();
+
+
+/* ================= Stoic quotes ================= */
+const quotesState = { list: null, idx: 0, swipeInit: false };
+
+const prefersReducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+async function loadQuotes() {
+  if (quotesState.list) return quotesState.list;   // fetched once, then in memory
+  try {
+    const res = await fetch('./quotes.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    quotesState.list = Array.isArray(data.quotes) ? data.quotes : [];
+  } catch (err) {
+    quotesState.list = [];
+    toast('Could not load quotes');
+  }
+  return quotesState.list;
+}
+
+function goToQuote(i) {
+  const list = quotesState.list;
+  if (!list || !list.length) return;
+  quotesState.idx = ((i % list.length) + list.length) % list.length;   // wraps both ends
+  try { localStorage.setItem('ll.quoteIdx', String(quotesState.idx)); } catch (e) {}
+  const q = list[quotesState.idx];
+  $('#q-text').textContent = q.text || '';
+  $('#q-author').textContent = q.author ? '\u2014 ' + q.author : '';
+  $('#q-source').textContent = q.source || '';
+  $('#q-pos').textContent = (quotesState.idx + 1) + ' / ' + list.length;
+  $('#q-stage').setAttribute('aria-label',
+    'Quote ' + (quotesState.idx + 1) + ' of ' + list.length);
+}
+
+const stepQuote = dir => goToQuote(quotesState.idx + dir);
+
+function randomQuote() {
+  const n = quotesState.list ? quotesState.list.length : 0;
+  if (n < 2) return;
+  let r;
+  do { r = Math.floor(Math.random() * n); } while (r === quotesState.idx);
+  goToQuote(r);
+}
+
+async function renderQuotes() {
+  initQuoteSwipe();
+  if (!quotesState.list) {
+    const list = await loadQuotes();
+    if (!list.length) {
+      $('#q-text').textContent = 'No quotes available.';
+      $('#q-author').textContent = '';
+      $('#q-source').textContent = '';
+      $('#q-pos').textContent = '\u2013 / \u2013';
+      return;
+    }
+    let saved = NaN;
+    try { saved = parseInt(localStorage.getItem('ll.quoteIdx'), 10); } catch (e) {}
+    quotesState.idx = (Number.isInteger(saved) && saved >= 0 && saved < list.length)
+      ? saved                                      // resume where the user left off
+      : Math.floor(Math.random() * list.length);   // first ever open: random
+  }
+  goToQuote(quotesState.idx);
+}
+
+function initQuoteSwipe() {
+  if (quotesState.swipeInit) return;
+  quotesState.swipeInit = true;
+
+  const stage = $('#q-stage');
+  const track = $('#q-track');
+  let pid = null, x0 = 0, y0 = 0, dx = 0, axis = null, tLast = 0, xLast = 0, v = 0;
+
+  stage.addEventListener('pointerdown', e => {
+    if (!quotesState.list || !quotesState.list.length) return;
+    pid = e.pointerId;
+    x0 = xLast = e.clientX; y0 = e.clientY;
+    dx = 0; axis = null; v = 0; tLast = performance.now();
+    track.classList.remove('q-anim');
+    try { stage.setPointerCapture(pid); } catch (err) {}
+  });
+
+  stage.addEventListener('pointermove', e => {
+    if (pid === null || e.pointerId !== pid) return;
+    dx = e.clientX - x0;
+    const dy = e.clientY - y0;
+    if (axis === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';   // lock the axis once
+      if (axis === 'y') { pid = null; track.style.transform = ''; return; }
+    }
+    if (axis !== 'x') return;
+    const now = performance.now(), dt = now - tLast;
+    if (dt > 0) v = (e.clientX - xLast) / dt;            // px/ms, for flick detection
+    tLast = now; xLast = e.clientX;
+    track.style.transform = 'translateX(' + dx + 'px)';  // card follows the finger
+  });
+
+  function finish(e) {
+    if (pid === null || (e && e.pointerId !== pid)) return;
+    pid = null;
+    const w = stage.clientWidth || 1;
+    const flick = Math.abs(v) > 0.5 && Math.abs(dx) > 30;
+    if (axis === 'x' && (Math.abs(dx) > w * 0.25 || flick)) {
+      const dir = dx < 0 ? 1 : -1;
+      if (prefersReducedMotion()) {
+        stepQuote(dir); track.style.transform = '';
+      } else {
+        track.classList.add('q-anim');
+        track.style.transform = 'translateX(' + (-dir * w) + 'px)';
+        setTimeout(() => {
+          stepQuote(dir);
+          track.classList.remove('q-anim');
+          track.style.transform = '';
+        }, 210);
+      }
+    } else {
+      track.classList.add('q-anim');                     // spring back
+      track.style.transform = '';
+      setTimeout(() => track.classList.remove('q-anim'), 210);
+    }
+    axis = null; dx = 0; v = 0;
+  }
+
+  stage.addEventListener('pointerup', finish);
+  stage.addEventListener('pointercancel', finish);
+
+  $('#q-prev').addEventListener('click', () => stepQuote(-1));
+  $('#q-next').addEventListener('click', () => stepQuote(1));
+  $('#q-shuffle').addEventListener('click', randomQuote);
+
+  document.addEventListener('keydown', e => {
+    if (state.view !== 'quotes') return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stepQuote(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); stepQuote(1); }
+  });
+}
