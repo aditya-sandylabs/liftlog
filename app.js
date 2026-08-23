@@ -608,7 +608,24 @@ async function backgroundSync() {
   renderDrive();
 }
 
+/* Show which build is actually running. The service-worker cache name carries
+   the deploy stamp, so this reports the build being *served*, not the one that
+   was deployed -- which is exactly what you need when a stale worker is
+   suspected. */
+async function renderBuildStamp() {
+  const el = $('#build-stamp');
+  if (!el) return;
+  let v = 'unknown';
+  try {
+    const keys = await caches.keys();
+    const hit = keys.find(k => k.startsWith('liftlog-v'));
+    if (hit) v = hit.replace('liftlog-v', '');
+  } catch (e) { /* caches unavailable */ }
+  el.textContent = 'LiftLog · build ' + v;
+}
+
 function renderDrive() {
+  renderBuildStamp();
   const on = sync.isConnected();
   const last = sync.lastSync();
   $('#drive-connect').hidden = on;
