@@ -1090,11 +1090,19 @@ function wire() {
   renderSettings();
   showView('home');
   if (act) promptResume(act);
-  // ask for persistent storage once, on first run
-  if (!localStorage.getItem('ll.persist')) {
-    localStorage.setItem('ll.persist', '1');
-    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* unsupported */ }
-  }
+  /* Ask for persistent storage -- and keep asking until it is actually
+     granted. Chrome refuses this until the app is installed or the site has
+     earned enough engagement, so a single fire-and-forget attempt on first run
+     usually FAILS and, because the old code recorded a flag regardless of the
+     outcome, it never asked again. Without persistence the browser may evict
+     training history under storage pressure. */
+  (async () => {
+    try {
+      if (!navigator.storage || !navigator.storage.persist) return;
+      if (await navigator.storage.persisted()) return;   // already durable
+      await navigator.storage.persist();                 // retried on every load until granted
+    } catch (e) { /* unsupported */ }
+  })();
   if ('serviceWorker' in navigator) {
     // updateViaCache:'none' stops the browser serving sw.js from its own HTTP
     // cache -- GitHub Pages sets a max-age, so without this the worker itself
