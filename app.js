@@ -161,6 +161,22 @@ function resolveExercise(id, te) {
   if (d[id]) return d[id];
   const bySlug = Object.values(d).find(e => slug(e.name) === id);
   if (bySlug) return bySlug;
+
+  /* Alternatives are NOT top-level entries in data.json -- they live inside each
+     exercise's `alternatives` array as {name, video}. Without this lookup the
+     search fell through to the `te` fallback below and returned the ORIGINAL
+     exercise, so swapping set a new exerciseId but kept the old name and video
+     and the card appeared unchanged. Inherit the parent's muscle group; the
+     alternative carries its own name and tutorial video. */
+  for (const parent of Object.values(d)) {
+    const alt = (parent.alternatives || []).find(a => slug(a.name) === id);
+    if (alt) return {
+      id, name: alt.name, muscle: parent.muscle || '',
+      bodyweight: !!parent.bodyweight, video: alt.video || null,
+      tutorial: null, steps: [], alternatives: parent.alternatives || []
+    };
+  }
+
   if (te && d[te.id]) return d[te.id];
   return { id, name: te ? te.name : id, muscle: '', bodyweight: false, video: null, tutorial: null, steps: [], alternatives: [] };
 }
@@ -249,6 +265,7 @@ function startWorkout(tplId) {
   state.active = {
     key: 'current', id: uid(), templateId: t.id, templateName: t.name,
     startTime: Date.now(), restEnd: 0,
+    elapsedMs: 0, runningSince: null, everStarted: false,   // timer starts paused
     exercises: t.exercises.map(te => makeEx(te, swaps[te.id] || null))
   };
   saveActive(true);
@@ -260,6 +277,7 @@ function startWorkout(tplId) {
 function buildActiveHeader() {
   if (!state.active) return;
   $('#aw-name').textContent = state.active.templateName;
+  renderTimerBtn();
   elTick();
 }
 
@@ -347,6 +365,9 @@ function toggleSet(ei, si) {
   const r = parseInt(row.querySelector('.r-inp').value, 10);
   const weight = w == null ? (ex.bodyweight ? 0 : (s.weightKg ?? (s.prev ? s.prev.weightKg : 0))) : toKg(w);
   const reps = isNaN(r) ? (s.reps ?? (s.prev ? s.prev.reps : 0)) : r;
+  // First completed set starts the clock, so a whole session can't be logged at
+  // 0:00. An explicit pause is never overridden -- only the never-started case.
+  if (!state.active.everStarted) timerStart();
   const prior = bestPriorE1RM(ex.exerciseId); // computed before stamping so this set can beat it
   s.weightKg = weight;
   s.reps = reps;
@@ -494,11 +515,69 @@ function skipRest() {
   if (state.active) { state.active.restEnd = 0; saveActive(true); }
 }
 
-/* ================= elapsed timer ================= */
+/* ================= elapsed timer =================
+   Accumulator, not wall clock: elapsed = elapsedMs + (runningSince ? now - runningSince : 0).
+   runningSince === null means paused. A new workout starts paused. */
 let eliv = null;
-function startElapsed() { if (!state.active) return; stopElapsed(); eliv = setInterval(elTick, 1000); elTick(); }
+
+/* Older in-progress workouts were saved before the timer had these fields.
+   Treat them as having been running since startTime so no time is lost. */
+function ensureTimerFields(a) {
+  if (!a) return;
+  if (a.elapsedMs == null) {
+    a.elapsedMs = Math.max(0, Date.now() - (a.startTime || Date.now()));
+    a.runningSince = Date.now();
+    a.everStarted = true;
+  }
+}
+function elapsedMs() {
+  const a = state.active;
+  if (!a) return 0;
+  ensureTimerFields(a);
+  return a.elapsedMs + (a.runningSince ? Date.now() - a.runningSince : 0);
+}
+function timerRunning() { return !!(state.active && state.active.runningSince); }
+
+function timerStart() {
+  const a = state.active;
+  if (!a || a.runningSince) return;
+  a.runningSince = Date.now();
+  a.everStarted = true;
+  saveActive(true);
+  startElapsed();
+  renderTimerBtn();
+}
+function timerPause() {
+  const a = state.active;
+  if (!a || !a.runningSince) return;
+  a.elapsedMs = (a.elapsedMs || 0) + (Date.now() - a.runningSince);
+  a.runningSince = null;
+  saveActive(true);
+  stopElapsed();
+  elTick();                 // paint the frozen value
+  renderTimerBtn();
+}
+function timerToggle() { timerRunning() ? timerPause() : timerStart(); }
+
+function renderTimerBtn() {
+  const b = $('#aw-timer');
+  if (!b) return;
+  const on = timerRunning();
+  b.querySelector('use').setAttribute('href', on ? '#i-pause' : '#i-play');
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.setAttribute('aria-label', on ? 'Pause workout timer' : 'Start workout timer');
+  const wrap = b.closest('.elapsed');
+  if (wrap) wrap.classList.toggle('paused', !on);
+}
+
+function startElapsed() {
+  stopElapsed();
+  if (!state.active || !timerRunning()) { elTick(); return; }
+  eliv = setInterval(elTick, 1000);
+  elTick();
+}
 function stopElapsed() { clearInterval(eliv); eliv = null; }
-function elTick() { if (state.active) $('#aw-elapsed').textContent = fmtDur((Date.now() - state.active.startTime) / 1000); }
+function elTick() { if (state.active) $('#aw-elapsed').textContent = fmtDur(elapsedMs() / 1000); }
 
 /* ================= persistence of in-progress workout ================= */
 let saveT = null;
@@ -565,7 +644,8 @@ function saveWorkout(donePairs) {
   }));
   const rec = {
     id: a.id, templateId: a.templateId, templateName: a.templateName,
-    startTime: a.startTime, endTime: end, durationSec: Math.round((end - a.startTime) / 1000),
+    startTime: a.startTime, endTime: end,
+    durationSec: Math.round(elapsedMs() / 1000),   // excludes paused time
     sets,
     volumeKg: sets.filter(s => !s.isWarmup).reduce((t, s) => t + s.weightKg * s.reps, 0),
     setCount: sets.length
@@ -1079,6 +1159,7 @@ function wire() {
 
   // active header
   $('#btn-finish').onclick = finishFlow;
+  $('#aw-timer').onclick = timerToggle;
   $('#aw-menu').onclick = () => showModal({
     title: 'Workout options',
     actions: [

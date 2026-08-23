@@ -362,51 +362,54 @@ function isoDate(ms) {
   try { return new Date(n).toISOString().slice(0, 10); } catch (_) { return ''; }
 }
 
-/** Flatten workouts -> one row per set, header row first. */
-function toCsv(workouts) {
+/**
+ * Flatten workouts -> one row per set, header row first.
+ *
+ * A saved workout record is FLAT -- its `sets` array sits directly on the
+ * workout and each set carries its own `exerciseName`. There is no
+ * `workout.exercises` level. Walking a nested shape here silently produced a
+ * header-only file, which looked like a broken upload but was actually a
+ * correct upload of nothing.
+ *
+ *   { id, templateName, startTime, endTime, durationSec, volumeKg, setCount,
+ *     sets: [ { exerciseId, exerciseName, setNumber, weightKg, reps,
+ *               isWarmup, note, pr } ] }
+ */
+export function toCsv(workouts) {
   const header = 'date,workout,exercise,set_number,is_warmup,weight_kg,reps,estimated_1rm,notes';
   const lines = [header];
 
-  const list = Array.isArray(workouts) ? workouts : [];
+  const list = Array.isArray(workouts) ? workouts.slice() : [];
+  // Oldest first: a spreadsheet reads better chronologically.
+  list.sort((a, b) => (Number(a && a.startTime) || 0) - (Number(b && b.startTime) || 0));
+
   for (const workout of list) {
     if (!workout || typeof workout !== 'object') continue;
+    const date = isoDate(workout.startTime);
+    const workoutName = String(workout.templateName || '');
+    const sets = Array.isArray(workout.sets) ? workout.sets : [];
 
-    const date = isoDate(workout.startTime) || String(workout.date || '');
-    const workoutName = String(workout.name || workout.title || '');
-    const exercises = Array.isArray(workout.exercises) ? workout.exercises : [];
+    for (const set of sets) {
+      if (!set || typeof set !== 'object') continue;
+      const weight = Number(set.weightKg) || 0;
+      const reps = Number(set.reps) || 0;
+      // Epley estimated 1RM: w * (1 + reps / 30), blank when weight is 0.
+      const estimated1rm = weight > 0 ? (weight * (1 + reps / 30)).toFixed(2) : '';
 
-    for (const exercise of exercises) {
-      if (!exercise || typeof exercise !== 'object') continue;
-      const exerciseName = String(
-        exercise.name || exercise.exerciseName || exercise.title || '');
-      const sets = Array.isArray(exercise.sets) ? exercise.sets : [];
-
-      sets.forEach((set, index) => {
-        if (!set || typeof set !== 'object') return;
-        const weight = Number(set.weight != null ? set.weight :
-                              (set.weightKg != null ? set.weightKg : 0)) || 0;
-        const reps = Number(set.reps != null ? set.reps : 0) || 0;
-        const warmup = !!(set.isWarmup != null ? set.isWarmup :
-                          (set.is_warmup != null ? set.is_warmup : set.warmup));
-        // Epley estimated 1RM: w * (1 + reps / 30), blank when weight is 0.
-        const estimated1rm = weight > 0 ? (weight * (1 + reps / 30)).toFixed(2) : '';
-
-        lines.push([
-          date,
-          workoutName,
-          exerciseName,
-          String(index + 1),
-          warmup ? 'true' : 'false',
-          String(weight),
-          String(reps),
-          estimated1rm,
-          String(set.notes || ''),
-        ].map(csvEscape).join(','));
-      });
+      lines.push([
+        date,
+        workoutName,
+        String(set.exerciseName || ''),
+        String(set.setNumber != null ? set.setNumber : ''),
+        set.isWarmup ? 'true' : 'false',
+        String(weight),
+        String(reps),
+        estimated1rm,
+        String(set.note || ''),
+      ].map(csvEscape).join(','));
     }
   }
 
-  // Explicit escape sequence — never a literal newline inside a string literal.
   return lines.join('\n');
 }
 

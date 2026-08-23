@@ -1,7 +1,7 @@
 /* LiftLog service worker — precaches the app shell + data.json, cache-first, versioned. */
 'use strict';
 
-const VERSION = 'liftlog-v202608231415';
+const VERSION = 'liftlog-v202608231458';
 const ASSETS = [
   './',
   './index.html',
@@ -32,7 +32,14 @@ self.addEventListener('activate', event => {
   );
 });
 
+/* On localhost the VERSION constant never changes (only the deploy step stamps
+   it), so a cached asset would shadow every local edit and make code changes
+   look like they had no effect. Bypass the cache entirely during development;
+   production keeps full offline caching. */
+const DEV = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
 self.addEventListener('fetch', event => {
+  if (DEV) return;                            // straight to network while developing
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
