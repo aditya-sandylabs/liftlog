@@ -117,6 +117,19 @@
           <input type="checkbox" id="opt-rest">
         </label>
 
+        <h2 class="sec">Backup to Google Drive</h2>
+        <div id="drive-box">
+          <p class="muted pad-s" id="drive-state">Not connected.</p>
+          <div class="btn-col">
+            <button class="btn" id="drive-connect"><svg class="ic"><use href="#i-up"/></svg>Connect Google Drive</button>
+            <button class="btn" id="drive-sync" hidden><svg class="ic"><use href="#i-up"/></svg>Sync now</button>
+            <button class="btn" id="drive-disconnect" hidden>Disconnect</button>
+          </div>
+          <p class="muted pad-s">Backs up automatically after each workout, to your own Drive.
+            A hidden app folder holds the restore file; a readable CSV is saved to your Drive for analysis.
+            Your workouts are never deleted by a sync.</p>
+        </div>
+
         <h2 class="sec">Export</h2>
         <div class="btn-col">
           <button class="btn" id="exp-csv"><svg class="ic"><use href="#i-down"/></svg>Export CSV</button>

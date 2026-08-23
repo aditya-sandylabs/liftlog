@@ -80,6 +80,28 @@ YouTube" button hands off to the YouTube app.
 Training history lives in the phone's IndexedDB. That survives normal use, but
 it does **not** survive "clear browsing data" or uninstalling the browser.
 
+### Google Drive backup (recommended)
+
+**Settings → Connect Google Drive.** After that it backs itself up automatically
+after every workout, to *your own* Drive:
+
+- `liftlog-backup.json` in Drive's hidden **appDataFolder** — the restore file.
+  It does not appear in your Drive listing, so it cannot be deleted by accident.
+- `LiftLog Workout History.csv` in your normal Drive — one row per set, openable
+  in Sheets for analysis.
+
+The app requests only `drive.appdata` and `drive.file`, so it can touch **only
+files it created** — it cannot read anything else in your Drive.
+
+Sync is a mirror, never the source of truth. IndexedDB stays authoritative, the
+merge is a **union by workout id**, and a sync can never delete a workout. If
+Drive is unreachable or was never connected, the app behaves exactly as before.
+
+On a new phone: install, connect the same Google account, and the history pulls
+back down.
+
+### Manual backup
+
 **Settings → Backup (JSON)** writes a full snapshot to the phone's Downloads.
 Do that occasionally — monthly is plenty — and keep a copy somewhere off the
 phone. **Import backup** merges by workout id, so restoring never wipes what is

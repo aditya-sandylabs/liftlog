@@ -1,6 +1,9 @@
-/* LiftLog — single-file ES module. Storage: IndexedDB. No network calls at runtime
-   except the one-time data.json fetch (cached by the service worker and mirrored to IDB). */
+/* LiftLog — ES module. Storage: IndexedDB (system of record).
+   The only network calls are the one-time data.json fetch and, if the user has
+   explicitly connected it, the best-effort Google Drive mirror in sync.js. */
 'use strict';
+
+import { sync } from './sync.js';
 
 /* ================= tiny helpers ================= */
 const $  = (s, r = document) => r.querySelector(s);
@@ -572,7 +575,48 @@ function saveWorkout(donePairs) {
     state.workouts = (await DB.getAll('workouts')).sort((x, y) => y.startTime - x.startTime);
     showView('home');
     toast('Workout saved');
+    backgroundSync();          // fire-and-forget; never blocks or blocks on failure
   });
+}
+
+/* ================= Google Drive mirror =================
+   IndexedDB stays authoritative. Everything here is best-effort: if Drive is
+   unreachable, not connected, or errors, the app carries on unchanged. */
+function syncPayload() {
+  return {
+    app: 'LiftLog', schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    workouts: state.workouts
+  };
+}
+
+async function backgroundSync() {
+  if (!sync.isConnected()) return;
+  const res = await sync.syncNow(syncPayload());   // resolves even on failure
+  if (!res || !Array.isArray(res.merged)) { renderDrive(); return; }
+
+  // The merge is a union, so it can only ever be a superset of what we hold.
+  // Persist anything Drive knew about that this device did not.
+  if (res.merged.length > state.workouts.length) {
+    const have = new Set(state.workouts.map(w => w.id));
+    for (const w of res.merged) if (!have.has(w.id)) await DB.put('workouts', w);
+    state.workouts = res.merged.slice().sort((x, y) => y.startTime - x.startTime);
+    if (state.view === 'home') renderHome();
+    else if (state.view === 'history') renderHistory();
+    toast('Restored ' + (res.merged.length - have.size) + ' workout(s) from Drive');
+  }
+  renderDrive();
+}
+
+function renderDrive() {
+  const on = sync.isConnected();
+  const last = sync.lastSync();
+  $('#drive-connect').hidden = on;
+  $('#drive-sync').hidden = !on;
+  $('#drive-disconnect').hidden = !on;
+  $('#drive-state').textContent = on
+    ? (last ? 'Connected · last backed up ' + relTime(last).toLowerCase() : 'Connected · not backed up yet')
+    : 'Not connected.';
 }
 
 function promptResume(a) {
@@ -961,6 +1005,7 @@ function renderSettings() {
   $$('#seg-unit button').forEach(b => b.classList.toggle('on', b.dataset.v === unit));
   $$('#seg-theme button').forEach(b => b.classList.toggle('on', b.dataset.v === prefs.theme));
   $('#opt-rest').checked = prefs.defaultRest;
+  renderDrive();
 }
 
 /* ================= event wiring ================= */
@@ -1066,6 +1111,31 @@ function wire() {
   });
   $$('#seg-theme button').forEach(b => b.onclick = () => { prefs.theme = b.dataset.v; renderSettings(); });
   $('#opt-rest').onchange = e => { prefs.defaultRest = e.target.checked; };
+  // Google Drive backup
+  $('#drive-connect').onclick = async () => {
+    $('#drive-state').textContent = 'Opening Google sign-in…';
+    const ok = await sync.connect();
+    if (!ok) { toast('Could not connect to Drive'); renderDrive(); return; }
+    toast('Drive connected');
+    await backgroundSync();
+  };
+  $('#drive-sync').onclick = async () => {
+    $('#drive-state').textContent = 'Backing up…';
+    await backgroundSync();
+  };
+  $('#drive-disconnect').onclick = async () => {
+    await sync.disconnect();          // clears local flags only; deletes nothing
+    toast('Drive disconnected');
+    renderDrive();
+  };
+  sync.onStatus(s => {
+    if (state.view !== 'settings') return;
+    if (s.state === 'syncing') $('#drive-state').textContent = 'Backing up…';
+    else if (s.state === 'offline') $('#drive-state').textContent = 'Offline — will back up later.';
+    else if (s.state === 'error') $('#drive-state').textContent = s.message || 'Backup problem — local data is safe.';
+    else renderDrive();
+  });
+
   $('#exp-csv').onclick = exportCSV;
   $('#exp-md').onclick = exportMD;
   $('#exp-txt').onclick = exportTXT;
@@ -1090,6 +1160,9 @@ function wire() {
   renderSettings();
   showView('home');
   if (act) promptResume(act);
+  // Pull anything this device is missing (e.g. a replaced phone). Deferred so
+  // it can never delay first paint, and it fails silently when offline.
+  setTimeout(backgroundSync, 1200);
   /* Ask for persistent storage -- and keep asking until it is actually
      granted. Chrome refuses this until the app is installed or the site has
      earned enough engagement, so a single fire-and-forget attempt on first run
