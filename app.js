@@ -3,7 +3,12 @@
    explicitly connected it, the best-effort Google Drive mirror in sync.js. */
 'use strict';
 
-import { sync } from './sync.js';
+import { sync, mergeWorkouts } from './sync.js';
+import {
+  buildExerciseIndex, searchExercises, makeCustomExercise,
+  mergeCustomExercises, mergeBodyWeights,
+  bodyWeightSeries, bodyWeightSVG, heatmapSVG, parseStrongCsv
+} from './features.js';
 
 /* ================= tiny helpers ================= */
 const $  = (s, r = document) => r.querySelector(s);
@@ -105,9 +110,20 @@ const state = {
   data: null,       // parsed data.json (read-only, authoritative)
   workouts: [],     // completed workouts, newest first
   active: null,     // in-progress workout (persisted continuously)
+  custom: [],       // user-created exercises (synced)
+  weights: [],      // body-weight entries {ts, kg} (synced)
   view: 'home',
   wodId: null
 };
+
+/* The searchable exercise index is derived from data.json + custom + history,
+   so it must be rebuilt whenever any of those change. */
+let exIndex = [];
+function rebuildExerciseIndex() {
+  exIndex = buildExerciseIndex({
+    data: state.data, custom: state.custom, workouts: state.workouts
+  });
+}
 
 async function loadData() {
   try {
@@ -159,6 +175,14 @@ function bestPriorE1RM(exId) {
 function resolveExercise(id, te) {
   const d = (state.data && state.data.exercises) || {};
   if (d[id]) return d[id];
+
+  // User-created exercises live outside data.json but must resolve like any other.
+  const own = (state.custom || []).find(c => c.id === id);
+  if (own) return {
+    id: own.id, name: own.name, muscle: own.muscle || '',
+    bodyweight: !!own.bodyweight, video: null, tutorial: null,
+    steps: [], alternatives: [], custom: true
+  };
   const bySlug = Object.values(d).find(e => slug(e.name) === id);
   if (bySlug) return bySlug;
 
@@ -188,6 +212,7 @@ function showView(v) {
   $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v || (v === 'wod' && b.dataset.v === 'history')));
   if (v === 'home') renderHome();
   if (v === 'history') renderHistory();
+  if (v === 'stats') renderStats();
   if (v === 'quotes') renderQuotes();
   if (v === 'active') startElapsed(); else stopElapsed();
   window.scrollTo(0, 0);
@@ -235,8 +260,10 @@ function renderHome() {
     </div>
     <h2 class="sec">Start workout</h2>
     <div class="list">${cards}</div>
+    <button class="addex" id="start-empty"><svg class="ic"><use href="#i-plus"/></svg>Start an empty workout</button>
     <h2 class="sec">Recent workouts</h2>
     <div class="list">${recent}</div>`;
+  $('#start-empty').onclick = startEmptyWorkout;
 }
 
 /* ================= active workout ================= */
@@ -350,7 +377,12 @@ function renderActive() {
       i = j;
     } else { html += cardHTML(ex, i); i++; }
   }
+  if (!a.exercises.length) {
+    html += '<p class="muted pad-s">Nothing here yet \u2014 add an exercise to begin.</p>';
+  }
+  html += '<button class="addex" id="add-ex"><svg class="ic"><use href="#i-plus"/></svg>Add an exercise</button>';
   $('#aw-body').innerHTML = html;
+  $('#add-ex').onclick = () => openExercisePicker('Add an exercise', addExerciseToActive);
 }
 
 function rowEl(ei, si) {
@@ -481,6 +513,7 @@ function doSwap(ei, altId, remember) {
 const rest = { iv: null, end: 0, fired: false };
 function startRest(sec) {
   rest.end = Date.now() + sec * 1000;
+  scheduleRestNotif(sec * 1000);
   rest.fired = false;
   if (state.active) { state.active.restEnd = rest.end; saveActive(true); }
   $('#restbar').hidden = false;
@@ -510,6 +543,7 @@ function adjustRest(sec) {
   restTick();
 }
 function skipRest() {
+  clearRestNotif();
   clearInterval(rest.iv); rest.iv = null; rest.fired = false;
   $('#restbar').hidden = true;
   if (state.active) { state.active.restEnd = 0; saveActive(true); }
@@ -653,10 +687,21 @@ function saveWorkout(donePairs) {
   DB.put('workouts', rec).then(async () => {
     await discardActive();
     state.workouts = (await DB.getAll('workouts')).sort((x, y) => y.startTime - x.startTime);
+    rebuildExerciseIndex();
     showView('home');
     toast('Workout saved');
     backgroundSync();          // fire-and-forget; never blocks or blocks on failure
   });
+}
+
+/* ================= custom exercises & body weight ================= */
+async function saveCustom() {
+  await DB.put('kv', state.custom, 'custom');
+  rebuildExerciseIndex();
+}
+async function saveWeights() {
+  state.weights.sort((a, b) => a.ts - b.ts);
+  await DB.put('kv', state.weights, 'weights');
 }
 
 /* ================= Google Drive mirror =================
@@ -664,26 +709,42 @@ function saveWorkout(donePairs) {
    unreachable, not connected, or errors, the app carries on unchanged. */
 function syncPayload() {
   return {
-    app: 'LiftLog', schemaVersion: 1,
+    app: 'LiftLog', schemaVersion: 2,
     exportedAt: new Date().toISOString(),
-    workouts: state.workouts
+    workouts: state.workouts,
+    customExercises: state.custom,
+    bodyWeights: state.weights
   };
 }
 
+/* pull -> merge all three -> push. Done here rather than inside sync.js so the
+   transport stays ignorant of record types and every merge stays union-only. */
 async function backgroundSync() {
   if (!sync.isConnected()) return;
-  const res = await sync.syncNow(syncPayload());   // resolves even on failure
-  if (!res || !Array.isArray(res.merged)) { renderDrive(); return; }
 
-  // The merge is a union, so it can only ever be a superset of what we hold.
-  // Persist anything Drive knew about that this device did not.
-  if (res.merged.length > state.workouts.length) {
-    const have = new Set(state.workouts.map(w => w.id));
-    for (const w of res.merged) if (!have.has(w.id)) await DB.put('workouts', w);
-    state.workouts = res.merged.slice().sort((x, y) => y.startTime - x.startTime);
+  const remote = await sync.pull();                 // null on failure/offline
+  const beforeW = state.workouts.length;
+
+  const workouts = mergeWorkouts(state.workouts, remote && remote.workouts);
+  const custom   = mergeCustomExercises(state.custom, remote && remote.customExercises);
+  const weights  = mergeBodyWeights(state.weights, remote && remote.bodyWeights);
+
+  // Persist only what this device was missing; a union can never shrink.
+  const haveW = new Set(state.workouts.map(w => w.id));
+  for (const w of workouts) if (!haveW.has(w.id)) await DB.put('workouts', w);
+  state.workouts = workouts.slice().sort((x, y) => y.startTime - x.startTime);
+
+  if (custom.length !== state.custom.length) { state.custom = custom; await saveCustom(); }
+  if (weights.length !== state.weights.length) { state.weights = weights; await saveWeights(); }
+  rebuildExerciseIndex();
+
+  await sync.push(syncPayload());                   // resolves even on failure
+
+  const gained = state.workouts.length - beforeW;
+  if (gained > 0) {
     if (state.view === 'home') renderHome();
     else if (state.view === 'history') renderHistory();
-    toast('Restored ' + (res.merged.length - have.size) + ' workout(s) from Drive');
+    toast('Restored ' + gained + ' workout(s) from Drive');
   }
   renderDrive();
 }
@@ -1102,6 +1163,8 @@ function renderSettings() {
   $$('#seg-unit button').forEach(b => b.classList.toggle('on', b.dataset.v === unit));
   $$('#seg-theme button').forEach(b => b.classList.toggle('on', b.dataset.v === prefs.theme));
   $('#opt-rest').checked = prefs.defaultRest;
+  $('#opt-notif').checked = ('Notification' in window) &&
+    localStorage.getItem('ll.notif') === '1' && Notification.permission === 'granted';
   renderDrive();
 }
 
@@ -1209,6 +1272,11 @@ function wire() {
   });
   $$('#seg-theme button').forEach(b => b.onclick = () => { prefs.theme = b.dataset.v; renderSettings(); });
   $('#opt-rest').onchange = e => { prefs.defaultRest = e.target.checked; };
+  $('#opt-notif').onchange = async e => {
+    if (!e.target.checked) { localStorage.setItem('ll.notif', '0'); clearRestNotif(); return; }
+    const ok = await requestNotif();
+    e.target.checked = ok;
+  };
   // Google Drive backup
   $('#drive-connect').onclick = async () => {
     $('#drive-state').textContent = 'Opening Google sign-in…';
@@ -1252,6 +1320,9 @@ function wire() {
   try { await DB.open(); } catch (e) { /* storage blocked; app will still render read-only */ }
   await loadData();
   state.workouts = (await DB.getAll('workouts')).sort((a, b) => b.startTime - a.startTime);
+  state.custom = (await DB.get('kv', 'custom')) || [];
+  state.weights = (await DB.get('kv', 'weights')) || [];
+  rebuildExerciseIndex();
   const act = await DB.get('kv', 'active');
   if (act) state.active = act;
   wire();
@@ -1439,3 +1510,221 @@ function initQuoteSwipe() {
     else if (e.key === 'ArrowRight') { e.preventDefault(); stepQuote(1); }
   });
 }
+
+
+/* ================= exercise picker ================= */
+/* One picker serves three jobs: adding an exercise to a live workout, starting
+   an empty workout, and creating a custom exercise. Rows show how often the
+   exercise has actually been logged, so the ones you use surface first. */
+function pickerRowsHTML(q) {
+  const rows = searchExercises(exIndex, q, { limit: 120 });
+  if (!rows.length) return '<p class="muted pad-s">No match. Create it below.</p>';
+  return rows.map(x => {
+    const tag = [x.muscle || '', x.custom ? 'custom' : (x.isAlternative ? 'alternative' : '')]
+      .filter(Boolean).join(' · ');
+    const count = x.timesLogged
+      ? '<span class="pick-n">' + x.timesLogged + '\u00d7</span><span class="muted small">' +
+        esc(relTime(x.lastLoggedTs).toLowerCase()) + '</span>'
+      : '<span class="muted small">never</span>';
+    return '<button class="pick-row" data-pick="' + esc(x.id) + '">' +
+      '<span class="pick-main"><strong>' + esc(x.name) + '</strong>' +
+      '<span class="muted small">' + esc(tag) + '</span></span>' +
+      '<span class="pick-meta">' + count + '</span></button>';
+  }).join('');
+}
+
+function openExercisePicker(title, onPick) {
+  openSheet(
+    '<h2>' + esc(title) + '</h2>' +
+    '<input id="pick-q" class="inp wide" type="search" placeholder="Search exercises\u2026" ' +
+    'autocomplete="off" autocapitalize="none" aria-label="Search exercises">' +
+    '<div id="pick-list" class="pick-list">' + pickerRowsHTML('') + '</div>' +
+    '<button class="btn" id="pick-new"><svg class="ic"><use href="#i-plus"/></svg>Create a new exercise</button>');
+
+  const list = $('#pick-list');
+  const wireRows = () => $$('#pick-list [data-pick]').forEach(b => {
+    b.onclick = () => { closeSheet(); onPick(b.dataset.pick); };
+  });
+  wireRows();
+  $('#pick-q').addEventListener('input', e => {
+    list.innerHTML = pickerRowsHTML(e.target.value);
+    wireRows();
+  });
+  $('#pick-new').onclick = () => openCreateExercise(onPick);
+}
+
+function openCreateExercise(onPick) {
+  const muscles = ['Chest','Back','Shoulders','Biceps','Triceps','Quads','Hamstrings',
+                   'Glutes','Calves','Lower Back','Core','Cardio','Other'];
+  showModal({
+    title: 'New exercise',
+    body: '<label class="fld"><span>Name</span>' +
+      '<input id="nx-name" class="inp wide" type="text" autocomplete="off" placeholder="e.g. Cable Crossover"></label>' +
+      '<label class="fld"><span>Muscle group</span><select id="nx-muscle" class="inp wide">' +
+      muscles.map(m => '<option>' + esc(m) + '</option>').join('') + '</select></label>' +
+      '<label class="checkline"><input type="checkbox" id="nx-bw"> Bodyweight (no weight column)</label>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Create', primary: true, onClick: () => {
+          const name = $('#nx-name').value.trim();
+          if (!name) { toast('Give it a name'); return false; }
+          let ex;
+          try {
+            ex = makeCustomExercise(name, $('#nx-muscle').value, { bodyweight: $('#nx-bw').checked });
+          } catch (e) { toast('Give it a name'); return false; }
+          if (exIndex.some(x => x.id === ex.id)) { toast('That exercise already exists'); return false; }
+          state.custom = state.custom.concat([ex]);
+          // Rebuild synchronously: onPick runs on this tick and looks the new
+          // exercise up in the index, so an async rebuild would miss it and the
+          // card would show the raw slug instead of the name.
+          rebuildExerciseIndex();
+          saveCustom().then(() => { backgroundSync(); });
+          closeSheet();
+          if (onPick) onPick(ex.id);
+          toast('Created ' + ex.name);
+        } }
+    ]
+  });
+}
+
+/* Build a workout-exercise entry for something that has no template row. */
+function adHocEx(exId) {
+  const meta = exIndex.find(x => x.id === exId) || {};
+  return makeEx({
+    id: exId, name: meta.name || exId, sets: 3, reps: '8-12', rest: '2 min',
+    superset: null, efforts: []
+  }, null);
+}
+
+function addExerciseToActive(exId) {
+  if (!state.active) return;
+  state.active.exercises.push(adHocEx(exId));
+  saveActive(true);
+  renderActive();
+  toast('Added');
+}
+
+function startEmptyWorkout() {
+  if (state.active) { promptResume(state.active); return; }
+  state.active = {
+    key: 'current', id: uid(), templateId: null, templateName: 'Custom workout',
+    startTime: Date.now(), restEnd: 0,
+    elapsedMs: 0, runningSince: null, everStarted: false,
+    exercises: []
+  };
+  saveActive(true);
+  buildActiveHeader();
+  renderActive();
+  showView('active');
+  openExercisePicker('Add your first exercise', addExerciseToActive);
+}
+
+/* ================= stats: heatmap + body weight ================= */
+function renderStats() {
+  const el = $('#stats-body');
+  if (!el) return;
+  const series = bodyWeightSeries(state.weights);
+  const goal = parseFloat(localStorage.getItem('ll.wgoal') || '');
+  const latest = series.points.length ? series.points[series.points.length - 1] : null;
+
+  el.innerHTML =
+    '<h2 class="sec">Activity</h2>' +
+    '<div class="hm-wrap">' + heatmapSVG(state.workouts, { endTs: Date.now() }) + '</div>' +
+    '<h2 class="sec">Body weight</h2>' +
+    '<div class="bw-head">' +
+      '<strong>' + (latest ? esc(fmtW(latest.kg)) : '\u2014') + '</strong>' +
+      (series.change != null
+        ? '<span class="muted small">' + (series.change > 0 ? '+' : '') +
+          esc(fmtNum(dispKg(Math.abs(series.change)) * (series.change < 0 ? -1 : 1))) +
+          ' ' + esc(unit) + ' since ' + esc(fmtDate(series.first.ts)) + '</span>'
+        : '<span class="muted small">Log it to start a trend</span>') +
+    '</div>' +
+    '<div class="bw-wrap">' +
+      bodyWeightSVG(state.weights, {
+        goalKg: isFinite(goal) ? goal : undefined,
+        unit, convert: dispKg
+      }) +
+    '</div>' +
+    '<div class="btn-col">' +
+      '<button class="btn primary" id="bw-log"><svg class="ic"><use href="#i-plus"/></svg>Log body weight</button>' +
+      '<button class="btn" id="bw-goal">' + (isFinite(goal) ? 'Goal: ' + esc(fmtW(goal)) : 'Set a goal weight') + '</button>' +
+    '</div>';
+
+  $('#bw-log').onclick = openLogWeight;
+  $('#bw-goal').onclick = openGoalWeight;
+}
+
+function openLogWeight() {
+  const series = bodyWeightSeries(state.weights);
+  const last = series.points.length ? dispKg(series.points[series.points.length - 1].kg) : '';
+  showModal({
+    title: 'Log body weight',
+    body: '<label class="fld"><span>Weight (' + esc(unit) + ')</span>' +
+      '<input id="bw-in" class="inp wide" type="text" inputmode="decimal" value="' + esc(last) + '"></label>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Save', primary: true, onClick: () => {
+          const v = parseDisp($('#bw-in').value);
+          if (v == null || v <= 0) { toast('Enter a number'); return false; }
+          state.weights = state.weights.concat([{ ts: Date.now(), kg: toKg(v) }]);
+          saveWeights().then(() => { renderStats(); backgroundSync(); });
+          toast('Logged');
+        } }
+    ]
+  });
+}
+
+function openGoalWeight() {
+  const cur = parseFloat(localStorage.getItem('ll.wgoal') || '');
+  showModal({
+    title: 'Goal weight',
+    body: '<label class="fld"><span>Target (' + esc(unit) + ')</span>' +
+      '<input id="wg-in" class="inp wide" type="text" inputmode="decimal" value="' +
+      (isFinite(cur) ? esc(dispKg(cur)) : '') + '"></label>' +
+      '<p class="muted pad-s">Drawn as a dashed line on the chart. Leave blank to remove it.</p>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Save', primary: true, onClick: () => {
+          const raw = $('#wg-in').value.trim();
+          if (!raw) { localStorage.removeItem('ll.wgoal'); renderStats(); return; }
+          const v = parseDisp(raw);
+          if (v == null || v <= 0) { toast('Enter a number'); return false; }
+          localStorage.setItem('ll.wgoal', String(toKg(v)));
+          renderStats();
+        } }
+    ]
+  });
+}
+
+/* ================= rest-timer notifications =================
+   Honest limit: without a push server this is a page timer. Chrome throttles
+   and can freeze background timers, so a long rest with the phone locked may
+   fire late or not at all. The Settings copy says so. */
+const notif = { timer: null };
+function notifEnabled() { return localStorage.getItem('ll.notif') === '1' && Notification.permission === 'granted'; }
+
+async function requestNotif() {
+  if (!('Notification' in window)) { toast('This browser has no notifications'); return false; }
+  let p = Notification.permission;
+  if (p === 'default') { try { p = await Notification.requestPermission(); } catch (e) { p = 'denied'; } }
+  if (p !== 'granted') { toast('Notifications not allowed'); localStorage.setItem('ll.notif', '0'); return false; }
+  localStorage.setItem('ll.notif', '1');
+  return true;
+}
+
+function scheduleRestNotif(ms) {
+  clearRestNotif();
+  if (!notifEnabled() || ms <= 0) return;
+  notif.timer = setTimeout(async () => {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration();
+      const body = 'Next set.';
+      if (reg && reg.showNotification) {
+        reg.showNotification('Rest over', { body, tag: 'liftlog-rest', renotify: true, icon: './icon-192.png', vibrate: [200, 80, 200] });
+      } else {
+        new Notification('Rest over', { body, tag: 'liftlog-rest' });
+      }
+    } catch (e) { /* best effort */ }
+  }, ms);
+}
+function clearRestNotif() { clearTimeout(notif.timer); notif.timer = null; }

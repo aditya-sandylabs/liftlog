@@ -17,6 +17,7 @@
 
 <svg hidden aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
   <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><polyline points="4 15 9 10 13 13 20 6"/><line x1="3.5" y1="20" x2="20.5" y2="20"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
   <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></g></symbol>
@@ -76,6 +77,11 @@
       <div class="pad" id="wod-body"></div>
     </section>
 
+    <section id="view-stats" class="view" aria-label="Stats">
+      <header class="topbar"><h1>Stats</h1></header>
+      <div class="pad" id="stats-body"></div>
+    </section>
+
     <section id="view-quotes" class="view" aria-label="Stoic quotes">
       <h1 class="sr-only">Stoic quotes</h1>
       <div class="q-stage" id="q-stage" role="group" aria-roledescription="carousel" aria-label="Stoic quotes">
@@ -117,6 +123,13 @@
           <span>Auto-start after a completed set</span>
           <input type="checkbox" id="opt-rest">
         </label>
+        <label class="switch-row">
+          <span>Notify me when rest is over</span>
+          <input type="checkbox" id="opt-notif">
+        </label>
+        <p class="muted pad-s">Best effort. Without a push server the alert comes from a
+          timer in the app, and Android may delay or drop it once the app has been in the
+          background a while. The in-app timer and vibration are unaffected.</p>
 
         <h2 class="sec">Backup to Google Drive</h2>
         <div id="drive-box">
@@ -155,6 +168,7 @@
   <nav id="tabbar" aria-label="Main navigation">
     <button data-v="home"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></button>
     <button data-v="history"><svg class="ic"><use href="#i-history"/></svg><span>History</span></button>
+    <button data-v="stats"><svg class="ic"><use href="#i-chart"/></svg><span>Stats</span></button>
     <button data-v="quotes"><img class="ic-img" src="./marcus.png" alt="" width="22" height="22"><span>Stoic</span></button>
     <button data-v="settings"><svg class="ic"><use href="#i-gear"/></svg><span>Settings</span></button>
   </nav>

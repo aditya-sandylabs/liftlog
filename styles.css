@@ -441,3 +441,50 @@ h2{font-size:1.05rem}
 .q-shuffle{align-self:center;padding:0 20px;font-size:.95rem;font-weight:600}
 .q-anim{transition:transform .2s ease}
 @media (prefers-reduced-motion: reduce){ .q-anim{transition:none} }
+
+/* ---------- 5 tabs ---------- */
+#tabbar{grid-template-columns:repeat(5,1fr)}
+#tabbar button span{font-size:.66rem}
+
+/* ---------- exercise picker ---------- */
+.inp.wide{width:100%;text-align:left;padding:0 12px;height:48px}
+.pick-list{max-height:52vh;overflow-y:auto;margin:10px 0;display:flex;flex-direction:column;gap:4px}
+.pick-row{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  min-height:56px;padding:8px 10px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+}
+.pick-row:active{background:var(--surface2)}
+.pick-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.pick-main strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pick-meta{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:none}
+/* Times-logged is a count, so it reads without colour. */
+.pick-n{font-weight:800;font-variant-numeric:tabular-nums}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;font-size:.85rem}
+.fld > span{color:var(--muted);font-weight:600}
+select.inp{appearance:none;background:var(--surface2)}
+
+/* ---------- stats ---------- */
+.hm-wrap,.bw-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.hm-wrap svg,.bw-wrap svg{display:block;min-width:0}
+/* Single-hue luminance ramp: levels differ by lightness, never by hue, so the
+   grid is readable with any colour-vision deficiency. */
+.hm-l0{fill:var(--surface2)}
+.hm-l1{fill:var(--accent);fill-opacity:.28}
+.hm-l2{fill:var(--accent);fill-opacity:.52}
+.hm-l3{fill:var(--accent);fill-opacity:.76}
+.hm-l4{fill:var(--accent);fill-opacity:1}
+.hm-lbl,.bw-ax{fill:var(--muted);font-size:9px}
+.bw-line{fill:none;stroke:var(--accent);stroke-width:2}
+.bw-dot{fill:var(--accent)}
+.bw-goal{fill:none;stroke:var(--text);stroke-width:1.5;stroke-dasharray:5 4}
+.bw-head{display:flex;align-items:baseline;gap:8px;margin:2px 0 8px}
+.bw-head strong{font-size:1.5rem;font-variant-numeric:tabular-nums}
+
+/* ---------- empty-workout entry ---------- */
+.addex{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  min-height:52px;border:1px dashed var(--border);border-radius:var(--radius);
+  color:var(--muted);font-weight:600;margin-bottom:14px;background:var(--surface);
+}
+.addex:active{background:var(--surface2)}

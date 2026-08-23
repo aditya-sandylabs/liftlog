@@ -1,22 +1,29 @@
 # LiftLog
 
 A phone-first workout tracker for the **Built With Science Upper/Lower** routine,
-modelled on the Strong app. Static site, no backend, no accounts. All training
-data stays on the device it was entered on.
+modelled on the Strong app. Static site, no backend. Training data lives on the
+device it was entered on; backing it up to your own Google Drive is **optional
+and off by default** — connect it from Settings if you want it.
 
-Built for two people: Aditya and his dad, each on their own Android phone.
+Built for two people: Aditya and his dad, each on their own Android phone, with
+completely separate data.
 
 ## What's here
 
 | File | What it is |
 |---|---|
 | `index.html` | App shell |
-| `app.js` | The whole application (single ES module) |
+| `app.js` | The whole application (ES module) |
+| `sync.js` | Optional Google Drive backup (lazy-loaded; inert until connected) |
 | `styles.css` | All styling; light + dark, manual override |
 | `data.json` | **Generated, read-only.** The routine, exercise guides and video links |
+| `quotes.json` | 20 Stoic passages with their sources |
 | `sw.js` | Service worker — offline caching |
 | `manifest.webmanifest` | PWA manifest |
-| `icon-*.png` | Home-screen icons |
+| `icon-*.png`, `marcus.png` | Home-screen and tab icons |
+| `deploy.sh` | Publishes to the GitHub Pages repo |
+| `build/` | Data-generation and test scripts (not shipped to the site) |
+| `HANDOFF.md` | Project context for a future session — decisions, constraints, gotchas |
 
 ## `data.json` is generated — don't hand-edit it
 
@@ -31,11 +38,13 @@ and contains:
 Every video id came from a link annotation in the PDF, mapped to its table row by
 vertical position — never typed from memory. 11 of the 21 main lifts were
 independently cross-checked against the alternatives tables, which list the same
-exercises with the same ids on different pages. The build scripts live in the
-session scratchpad (`parse_guides.py`, `build_data.py`, `build_alts.py`,
-`assemble.py`).
+exercises with the same ids on different pages. The build scripts live in
+[`build/`](build/) — run `parse_guides.py` → `build_data.py` → `build_alts.py` →
+`assemble.py`.
 
 If the routine ever changes, regenerate the file rather than editing it by hand.
+Never hand-edit it, and never have a model rewrite it: a fabricated video id is
+indistinguishable from a correct one until someone taps it in a gym.
 
 ## Deploying to GitHub Pages
 
@@ -44,27 +53,26 @@ workspace's git checkpointing. GitHub Pages needs its own small public repo with
 the app at the root, so `deploy.sh` copies the shipping files there and pushes —
 rather than nesting a second git repo inside this one.
 
-One time: create an empty **public** repo on github.com named `liftlog`, then:
+It is already set up. The site is live at
+**https://aditya-sandylabs.github.io/liftlog/** and publishing is one command:
 
 ```bash
-cd "D:/Sandy Labs/_Personal/liftlog" && bash deploy.sh <your-github-username>
+cd "/d/Sandy Labs/_Personal/liftlog" && ./deploy.sh
 ```
 
-Then on github.com: **Settings → Pages → Source: Deploy from a branch →
-`main` / `(root)` → Save.** After a minute the app is live at
-`https://<your-username>.github.io/liftlog/`.
+Run it from Git Bash. It stamps a new service-worker cache version each time, so
+phones pick up the new build instead of serving the old one from cache.
 
-Every time after that, just:
+Setting it up from scratch elsewhere would be
+`./deploy.sh https://github.com/<owner>/<repo>.git` once, then **Settings → Pages
+→ Deploy from a branch → `main` / `(root)` → Save** on github.com.
 
-```bash
-cd "D:/Sandy Labs/_Personal/liftlog" && bash deploy.sh
-```
-
-The script bumps the service-worker cache name on each publish, so phones pick up
-the new build instead of serving the old one from cache forever.
-
-> The repo must be **public** for Pages on a free account. Nothing sensitive is in
-> it — no training data is ever committed, only the app itself.
+> **Two traps, both hit once already.** The repo must stay **public** — making it
+> private disables Pages, and making it public again does *not* switch Pages back
+> on. And re-enabling Pages does *not* rebuild the site: it 404s until you push a
+> commit, so run `./deploy.sh` after re-enabling.
+>
+> No training data is ever committed — only the app itself.
 
 ## Setting it up on a phone (the one-time bit)
 
