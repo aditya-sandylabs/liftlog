@@ -705,7 +705,17 @@ async function saveCustom() {
   rebuildExerciseIndex();
 }
 async function saveWeights() {
-  state.weights.sort((a, b) => a.ts - b.ts);
+  // Collapse to one entry per calendar day (latest ts wins) before storing, so
+  // storage matches what the chart and export show and self-heals any same-day
+  // duplicates -- including ones a cross-device sync merged in by timestamp.
+  const byDay = new Map();
+  for (const w of state.weights) {
+    if (!w || !isFinite(w.kg) || w.ts == null) continue;
+    const d = startOfDay(w.ts);
+    const cur = byDay.get(d);
+    if (!cur || w.ts >= cur.ts) byDay.set(d, w);
+  }
+  state.weights = [...byDay.values()].sort((a, b) => a.ts - b.ts);
   await DB.put('kv', state.weights, 'weights');
 }
 
@@ -1648,7 +1658,10 @@ function renderStats() {
         ? '<span class="muted small">' + (series.change > 0 ? '+' : '') +
           esc(fmtNum(dispKg(Math.abs(series.change)) * (series.change < 0 ? -1 : 1))) +
           ' ' + esc(unit) + ' since ' + esc(fmtDate(series.first.ts)) + '</span>'
-        : '<span class="muted small">Log it to start a trend</span>') +
+        : series.points.length
+          ? '<span class="muted small">Logged ' + esc(relTime(latest.ts).toLowerCase()) +
+            ' · log another day to see a trend</span>'
+          : '<span class="muted small">No entries yet</span>') +
     '</div>' +
     '<div class="bw-wrap">' +
       bodyWeightSVG(state.weights, {
@@ -1677,9 +1690,15 @@ function openLogWeight() {
       { label: 'Save', primary: true, onClick: () => {
           const v = parseDisp($('#bw-in').value);
           if (v == null || v <= 0) { toast('Enter a number'); return false; }
-          state.weights = state.weights.concat([{ ts: Date.now(), kg: toKg(v) }]);
+          // One weigh-in per day: replace any entry already logged today rather
+          // than appending, so storage matches the one-per-day the chart shows.
+          const now = Date.now();
+          const today = startOfDay(now);
+          const kept = state.weights.filter(w => startOfDay(w.ts) !== today);
+          const already = state.weights.length !== kept.length;
+          state.weights = kept.concat([{ ts: now, kg: toKg(v) }]);
           saveWeights().then(() => { renderStats(); backgroundSync(); });
-          toast('Logged');
+          toast(already ? 'Updated today' : 'Logged');
         } }
     ]
   });
