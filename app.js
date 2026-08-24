@@ -214,7 +214,7 @@ function showView(v) {
   if (v === 'history') renderHistory();
   if (v === 'stats') renderStats();
   if (v === 'quotes') renderQuotes();
-  if (v === 'active') startElapsed(); else stopElapsed();
+  if (v === 'active') { startElapsed(); acquireWake(); } else { stopElapsed(); releaseWake(); }
   window.scrollTo(0, 0);
 }
 
@@ -259,8 +259,10 @@ function renderHome() {
       <div><strong>Suggested next:</strong> ${esc(nu ? nu.name : '—')}<br><span class="muted small">A suggestion only — any day can be started.</span></div>
     </div>
     <h2 class="sec">Start workout</h2>
-    <div class="list">${cards}</div>
-    <button class="addex" id="start-empty"><svg class="ic"><use href="#i-plus"/></svg>Start an empty workout</button>
+    <div class="list">
+      <button class="addex" id="start-empty"><svg class="ic"><use href="#i-plus"/></svg>Start an empty workout</button>
+      ${cards}
+    </div>
     <h2 class="sec">Recent workouts</h2>
     <div class="list">${recent}</div>`;
   $('#start-empty').onclick = startEmptyWorkout;
@@ -299,6 +301,7 @@ function startWorkout(tplId) {
   buildActiveHeader();
   renderActive();
   showView('active');
+  showCheer('start', esc(state.active.templateName));
 }
 
 function buildActiveHeader() {
@@ -688,8 +691,10 @@ function saveWorkout(donePairs) {
     await discardActive();
     state.workouts = (await DB.getAll('workouts')).sort((x, y) => y.startTime - x.startTime);
     rebuildExerciseIndex();
+    releaseWake();
     showView('home');
-    toast('Workout saved');
+    showCheer('finish', rec.setCount + ' sets · ' + fmtW(rec.volumeKg) +
+      (rec.durationSec ? ' · ' + fmtDur(rec.durationSec) : ''));
     backgroundSync();          // fire-and-forget; never blocks or blocks on failure
   });
 }
@@ -1163,6 +1168,7 @@ function renderSettings() {
   $$('#seg-unit button').forEach(b => b.classList.toggle('on', b.dataset.v === unit));
   $$('#seg-theme button').forEach(b => b.classList.toggle('on', b.dataset.v === prefs.theme));
   $('#opt-rest').checked = prefs.defaultRest;
+  $('#opt-wake').checked = wakeWanted();
   $('#opt-notif').checked = ('Notification' in window) &&
     localStorage.getItem('ll.notif') === '1' && Notification.permission === 'granted';
   renderDrive();
@@ -1272,6 +1278,11 @@ function wire() {
   });
   $$('#seg-theme button').forEach(b => b.onclick = () => { prefs.theme = b.dataset.v; renderSettings(); });
   $('#opt-rest').onchange = e => { prefs.defaultRest = e.target.checked; };
+  $('#opt-wake').onchange = e => {
+    localStorage.setItem('ll.wake', e.target.checked ? '1' : '0');
+    if (e.target.checked && state.view === 'active') acquireWake(); else releaseWake();
+    if (e.target.checked && !('wakeLock' in navigator)) toast('This browser has no screen lock control');
+  };
   $('#opt-notif').onchange = async e => {
     if (!e.target.checked) { localStorage.setItem('ll.notif', '0'); clearRestNotif(); return; }
     const ok = await requestNotif();
@@ -1616,7 +1627,7 @@ function startEmptyWorkout() {
   buildActiveHeader();
   renderActive();
   showView('active');
-  openExercisePicker('Add your first exercise', addExerciseToActive);
+  showCheer('start', 'Custom workout', () => openExercisePicker('Add your first exercise', addExerciseToActive));
 }
 
 /* ================= stats: heatmap + body weight ================= */
@@ -1728,3 +1739,95 @@ function scheduleRestNotif(ms) {
   }, ms);
 }
 function clearRestNotif() { clearTimeout(notif.timer); notif.timer = null; }
+
+
+/* ================= wake lock ================= */
+/* Off by default. Held only while a workout is on screen, and re-acquired when
+   the app returns to the foreground -- the browser drops the lock on hide. */
+let wakeLock = null;
+function wakeWanted() { return localStorage.getItem('ll.wake') === '1'; }
+
+async function acquireWake() {
+  if (!wakeWanted() || wakeLock) return;
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch (e) { /* denied, low battery, or unsupported */ }
+}
+function releaseWake() {
+  try { if (wakeLock) wakeLock.release(); } catch (e) { /* already gone */ }
+  wakeLock = null;
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  if (state.view === 'active' && state.active) acquireWake();
+});
+
+/* ================= start / finish motivation ================= */
+/* Inline rather than fetched: these are UI copy, and a failed fetch must never
+   be the reason a workout can't start. */
+const CHEER_START = [
+  'You already did the hard part. You showed up. The rest is just moving weight.',
+  'Nobody is coming to do this for you. That is not bad news. That is the entire point.',
+  'Somewhere in the next hour there is a set you will not want to finish. Decide about it now, not then.',
+  'You do not have to feel like it. Feeling like it was never a requirement. The bar does not check.',
+  'Motivation is a guest. Discipline lives here. Today you are working with whoever stayed.',
+  'The weight has no idea you are tired. Borrow its confidence.',
+  'Strong is not something you are. It is something you are about to spend an hour becoming.',
+  'Every rep you nearly skipped is the one doing most of the work.',
+  'You have never once regretted the session you actually did. Strange how that keeps holding.',
+  'Start badly if you have to. Just start. Form follows momentum.',
+  'Your excuses are extremely well rehearsed by now. Give them the day off.',
+  'This hour passes either way. You may as well be heavier at the end of it.',
+  'The version of you that quits today gets a vote on who you are tomorrow. Do not hand him a ballot.',
+  'Be the reason your future self runs out of excuses.',
+];
+const CHEER_FINISH = [
+  'That is done. It cannot be taken back, it cannot be done for you, and it is on the board forever.',
+  'You were never going to feel ready. You went anyway. That is the whole skill.',
+  'Small deposit. Compounding interest. See you next time.',
+  'The work is quiet. It does not announce itself. It just turns up later, in you.',
+  'You proved something to the only person whose opinion actually runs your life.',
+  'Nothing dramatic happened in there. That is precisely how this works.',
+  'Another one your excuses lost. They are building quite a losing record.',
+  'You did not get stronger in there. You earned the right to get stronger while you sleep.',
+  'That is a promise kept. Those are rarer than people admit.',
+  'You showed up when not showing up was available. Remember that the next time it is hard.',
+  'Job done. Go eat something and be insufferably pleased with yourself.',
+  'Consistency is not dramatic. It is just this, again, on a day you did not feel like it.',
+  'One more session between you and the person you are turning into.',
+  'The first step of a long walk counts exactly as much as the last one. You took one today.',
+];
+
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+function cheerArt(kind) {
+  if (kind === 'finish') {
+    const rays = Array.from({ length: 10 }, (_, i) =>
+      '<span class="cheer-ray" style="--a:' + (i * 36) + 'deg;animation-delay:' +
+      (i * 22) + 'ms"></span>').join('');
+    return rays + '<span class="cheer-emoji">\ud83c\udfc6</span>';
+  }
+  return '<span class="cheer-emoji">\ud83d\udd25</span>';
+}
+
+function showCheer(kind, sub, onGo) {
+  const wrap = $('#cheer');
+  if (!wrap) { if (onGo) onGo(); return; }
+  $('#cheer-kicker').textContent = kind === 'finish' ? 'Workout complete' : 'Session start';
+  $('#cheer-line').textContent = pick(kind === 'finish' ? CHEER_FINISH : CHEER_START);
+  $('#cheer-sub').textContent = sub || '';
+  $('.cheer-art').innerHTML = cheerArt(kind);
+  $('#cheer-go').textContent = kind === 'finish' ? 'Done' : 'Let\u2019s go';
+  wrap.hidden = false;
+
+  const close = () => {
+    wrap.hidden = true;
+    $('#cheer-go').onclick = null;
+    $('.cheer-backdrop').onclick = null;
+    if (onGo) onGo();
+  };
+  $('#cheer-go').onclick = close;
+  $('.cheer-backdrop').onclick = close;
+}

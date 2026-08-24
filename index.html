@@ -127,6 +127,13 @@
           <span>Notify me when rest is over</span>
           <input type="checkbox" id="opt-notif">
         </label>
+        <label class="switch-row">
+          <span>Keep the screen awake while training</span>
+          <input type="checkbox" id="opt-wake">
+        </label>
+        <p class="muted pad-s">Off by default. While a workout is open the screen won’t
+          dim or lock, so you don’t have to unlock and find your place between sets. It is
+          released the moment you finish or leave the workout.</p>
         <p class="muted pad-s">Best effort. Without a push server the alert comes from a
           timer in the app, and Android may delay or drop it once the app has been in the
           background a while. The in-app timer and vibration are unaffected.</p>
@@ -193,6 +200,17 @@
   <div id="modal-wrap" hidden>
     <div class="backdrop" id="modal-backdrop"></div>
     <div id="modal" role="alertdialog" aria-modal="true"></div>
+  </div>
+
+  <div id="cheer" hidden>
+    <div class="cheer-backdrop"></div>
+    <div class="cheer-card" role="dialog" aria-modal="true" aria-labelledby="cheer-line">
+      <div class="cheer-art" aria-hidden="true"></div>
+      <p class="cheer-kicker" id="cheer-kicker"></p>
+      <p class="cheer-line" id="cheer-line"></p>
+      <p class="cheer-sub muted small" id="cheer-sub"></p>
+      <button class="btn primary" id="cheer-go">Let’s go</button>
+    </div>
   </div>
 
   <div id="toast" hidden></div>
