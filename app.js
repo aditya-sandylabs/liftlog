@@ -4,10 +4,11 @@
 'use strict';
 
 import { sync, mergeWorkouts } from './sync.js';
+import { parseStrongCsv } from './strong.js';
 import {
   buildExerciseIndex, searchExercises, makeCustomExercise,
   mergeCustomExercises, mergeBodyWeights,
-  bodyWeightSeries, bodyWeightSVG, heatmapSVG, parseStrongCsv
+  bodyWeightSeries, bodyWeightSVG, heatmapSVG
 } from './features.js';
 
 /* ================= tiny helpers ================= */
@@ -1327,6 +1328,11 @@ function wire() {
   $('#exp-md').onclick = exportMD;
   $('#exp-txt').onclick = exportTXT;
   $('#exp-json').onclick = exportJSON;
+  $('#imp-strong').addEventListener('change', e => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    if (f) importStrong(f);
+  });
   $('#imp-file').addEventListener('change', e => {
     const f = e.target.files[0];
     e.target.value = '';
@@ -1849,4 +1855,67 @@ function showCheer(kind, sub, onGo) {
   };
   $('#cheer-go').onclick = close;
   $('.cheer-backdrop').onclick = close;
+}
+
+
+/* ================= Strong CSV import ================= */
+/* Union-only, like every other write path here: workouts merge by id, custom
+   exercises merge by id, and re-importing the same export is a no-op because
+   the parser derives stable ids from Strong's own workout numbers. */
+function importStrong(file) {
+  file.text().then(txt => {
+    const res = parseStrongCsv(txt, { now: Date.now() });
+    if (res.error) { toast(res.error); return; }
+    if (!res.workouts.length) { toast('No workouts found in that file'); return; }
+
+    const haveW = new Set(state.workouts.map(w => w.id));
+    const freshW = res.workouts.filter(w => !haveW.has(w.id));
+    const haveX = new Set(state.custom.map(c => c.id));
+    const knownIds = new Set(exIndex.map(x => x.id));
+    const freshX = res.customExercises.filter(c => !haveX.has(c.id) && !knownIds.has(c.id));
+
+    const st = res.stats;
+    const range = st.firstDate
+      ? esc(fmtDate(st.firstDate)) + ' \u2192 ' + esc(fmtDate(st.lastDate)) : '';
+
+    if (!freshW.length) {
+      showModal({
+        title: 'Nothing new to import',
+        body: '<p>All ' + st.workouts + ' workouts in that file are already here. ' +
+              'Nothing was changed.</p>',
+        actions: [{ label: 'OK' }]
+      });
+      return;
+    }
+
+    showModal({
+      title: 'Import from Strong',
+      body:
+        '<p><strong>' + freshW.length + '</strong> workout' + (freshW.length === 1 ? '' : 's') +
+          ' \u00b7 <strong>' + st.sets + '</strong> sets \u00b7 ' + range + '</p>' +
+        '<p class="muted small">' +
+          freshX.length + ' new exercise' + (freshX.length === 1 ? '' : 's') + ' will be added to your list. ' +
+          st.restRowsSkipped + ' rest-timer rows were skipped \u2014 they are not sets.' +
+          (st.workouts - freshW.length > 0
+            ? ' ' + (st.workouts - freshW.length) + ' already imported and will be left alone.' : '') +
+        '</p>' +
+        '<p class="muted small">Nothing existing is replaced or deleted.</p>',
+      actions: [
+        { label: 'Cancel' },
+        { label: 'Import', primary: true, onClick: async () => {
+            for (const w of freshW) await DB.put('workouts', w);
+            state.workouts = (await DB.getAll('workouts'))
+              .sort((a, b) => b.startTime - a.startTime);
+            if (freshX.length) {
+              state.custom = state.custom.concat(freshX);
+              await saveCustom();
+            }
+            rebuildExerciseIndex();
+            renderHome();
+            toast('Imported ' + freshW.length + ' workout' + (freshW.length === 1 ? '' : 's'));
+            backgroundSync();
+          } }
+      ]
+    });
+  }).catch(() => toast('Could not read that file'));
 }
