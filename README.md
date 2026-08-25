@@ -15,6 +15,8 @@ completely separate data.
 | `index.html` | App shell |
 | `app.js` | The whole application (ES module) |
 | `sync.js` | Optional Google Drive backup (lazy-loaded; inert until connected) |
+| `features.js` | Pure logic: exercise search, heatmap, body-weight chart, merges |
+| `strong.js` | Strong CSV import parser |
 | `styles.css` | All styling; light + dark, manual override |
 | `data.json` | **Generated, read-only.** The routine, exercise guides and video links |
 | `quotes.json` | 20 Stoic passages with their sources |
@@ -24,6 +26,7 @@ completely separate data.
 | `deploy.sh` | Publishes to the GitHub Pages repo |
 | `build/` | Data-generation and test scripts (not shipped to the site) |
 | `HANDOFF.md` | Project context for a future session — decisions, constraints, gotchas |
+| `RESUME-PROMPT.md` | Paste-ready prompt to continue this work in a new session |
 
 ## `data.json` is generated — don't hand-edit it
 
@@ -107,6 +110,20 @@ Drive is unreachable or was never connected, the app behaves exactly as before.
 
 On a new phone: install, connect the same Google account, and the history pulls
 back down.
+
+### Coming from Strong
+
+**Settings → Import from Strong (CSV).** Export from Strong (Settings → Export
+Data) and pick the file. You get a preview of exactly what will be added before
+anything is written.
+
+Every exercise in the export becomes a real exercise in this app — they are not
+auto-matched to the Built With Science ones, because a wrong match would
+silently merge two exercises' histories with no undo.
+
+Rest-timer rows in the export are skipped (they are not sets), exercise notes
+are preserved, and re-importing the same file does nothing, so it is safe to
+run twice.
 
 ### Manual backup
 
