@@ -91,16 +91,27 @@ function parseRest(s) {
 /* ================= IndexedDB layer ================= */
 const DB = {
   db: null,
+  /* An IndexedDB open can BLOCK -- another tab holding an older version, or a
+     pending deleteDatabase -- and when it does, neither onsuccess nor onerror
+     ever fires. Without the two guards below the promise never settles, init()
+     never gets past its first await, and the app paints a completely blank
+     screen with nothing in the console. A try/catch cannot catch a hang. */
   open() {
     return new Promise((res, rej) => {
       const r = indexedDB.open('liftlog', 1);
+      let settled = false;
+      const done = (fn, arg) => { if (settled) return; settled = true; clearTimeout(timer); fn(arg); };
+      // Long enough that a slow phone under storage pressure is not cut off,
+      // short enough that nobody sits looking at an empty screen.
+      const timer = setTimeout(() => done(rej, new Error('idb-timeout')), 8000);
       r.onupgradeneeded = () => {
         const d = r.result;
         if (!d.objectStoreNames.contains('workouts')) d.createObjectStore('workouts', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
       };
-      r.onsuccess = () => { DB.db = r.result; res(); };
-      r.onerror = () => rej(r.error);
+      r.onsuccess = () => { DB.db = r.result; done(res); };
+      r.onerror = () => done(rej, r.error || new Error('idb-error'));
+      r.onblocked = () => done(rej, new Error('idb-blocked'));
     });
   },
   tx(store, mode, fn) {
@@ -2016,7 +2027,26 @@ function wire() {
 /* ================= init ================= */
 (async function init() {
   applyTheme();
-  try { await DB.open(); } catch (e) { /* storage blocked; app will still render read-only */ }
+  try {
+    await DB.open();
+  } catch (e) {
+    /* Every read below needs DB.db, so carrying on just crashes one line later
+       and still shows an empty app. Say what happened instead: this is almost
+       always the app being open in another tab or window, which the user can
+       actually fix. Nothing is lost -- the data is still on disk. */
+    document.body.innerHTML =
+      '<div style="padding:2rem;font-family:system-ui;line-height:1.5;max-width:34rem">' +
+      '<h1 style="font-size:1.1rem">LiftLog could not open its storage</h1>' +
+      '<p>This usually means the app is already open in another tab or window. ' +
+      'Close the others and reload.</p>' +
+      '<p style="opacity:.7;font-size:.9rem">Your workouts are safe on this device — ' +
+      'nothing has been deleted.</p>' +
+      '<p style="opacity:.7;font-size:.9rem">Reason: ' + esc(e && e.message ? e.message : 'unknown') + '</p>' +
+      '<button onclick="location.reload()" style="min-height:44px;padding:0 18px;' +
+      'border:1px solid currentColor;border-radius:10px;background:transparent;' +
+      'color:inherit;font:inherit;font-weight:600">Reload</button></div>';
+    throw e;   // stop init; nothing below can work without storage
+  }
   await loadData();
   state.workouts = (await DB.getAll('workouts')).sort((a, b) => b.startTime - a.startTime);
   state.custom = (await DB.get('kv', 'custom')) || [];
