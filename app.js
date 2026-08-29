@@ -754,7 +754,39 @@ function cardMenu(ei) {
     actions: [
       { label: 'Exercise details', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) },
       { label: 'Swap exercise', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) },
+      { label: 'Remove exercise', danger: true, onClick: () => removeExerciseConfirm(ei) },
       { label: 'Cancel' }
+    ]
+  });
+}
+
+/* Drop a whole exercise from the live workout.
+   Until now the only way to get rid of one was to delete its sets one at a
+   time, which still left an empty card sitting in the workout. Logged history
+   is untouched -- this only edits the in-progress session. */
+function removeExerciseConfirm(ei) {
+  const ex = state.active.exercises[ei];
+  if (!ex) return;
+  const done = ex.sets.filter(s => s.done).length;
+  showModal({
+    title: 'Remove exercise?',
+    body: `<p>Remove <strong>${esc(ex.name)}</strong> from this workout?</p>` +
+      (done
+        // Only warn when there is something to lose. Saying "0 sets will be
+        // discarded" on an untouched card is noise that trains you to tap through.
+        ? `<p class="warnline"><svg class="ic"><use href="#i-warn"/></svg><span>${done} completed set${done === 1 ? '' : 's'} will be discarded.</span></p>`
+        : '') +
+      '<p class="muted small">Workouts you have already finished are not affected.</p>',
+    actions: [
+      { label: 'Cancel' },
+      {
+        label: 'Remove', danger: true, onClick: () => {
+          state.active.exercises.splice(ei, 1);
+          saveActive(true);
+          renderActive();
+          toast('Removed ' + ex.name);
+        }
+      }
     ]
   });
 }
@@ -1063,6 +1095,12 @@ function backupUnhealthy() {
 async function backgroundSync(opts) {
   if (!sync.isConnected()) return { ok: false, reason: 'not-connected' };
   const interactive = !!(opts && opts.interactive);
+  /* An automatic sync stops here once we know only a tap can fix the sign-in.
+     sync.js enforces this too, but doing it here as well means the whole
+     pull/merge/push cycle is skipped rather than run and thrown away, and it
+     keeps every one of the eight automatic callers honest without each having
+     to remember the check. */
+  if (!interactive && sync.needsAuth()) return { ok: false, reason: 'needs-auth' };
 
   const remote = await sync.pull({ interactive });  // null on failure/offline
   const beforeW = state.workouts.length;
@@ -1993,15 +2031,24 @@ function wire() {
   if (act) promptResume(act);
   // Pull anything this device is missing (e.g. a replaced phone). Deferred so
   // it can never delay first paint, and it fails silently when offline.
+  // backgroundSync itself declines when the sign-in needs a tap, so a device
+  // with a dead grant does no Google work at all on launch.
   setTimeout(backgroundSync, 1200);
   /* Retry a failed backup when the phone comes back -- network returning, or
      the app being brought to the foreground. Without this a backup that failed
-     in the gym waited until the *next* workout to try again. Skipped when the
-     failure needs a tap, since a silent retry would fail identically. */
+     in the gym waited until the *next* workout to try again.
+
+     Rate-limited: this fires on EVERY foreground, and an installed PWA is
+     foregrounded constantly. Skipped outright when the failure needs a tap,
+     since a silent retry would fail identically. */
+  let lastRetry = 0;
+  const RETRY_COOLDOWN_MS = 15 * 60 * 1000;
   const retryIfBehind = () => {
     if (!sync.isConnected() || sync.needsAuth()) return;
     if (typeof navigator !== 'undefined' && !navigator.onLine) return;
     if (!backupUnhealthy()) return;
+    if (Date.now() - lastRetry < RETRY_COOLDOWN_MS) return;
+    lastRetry = Date.now();
     backgroundSync();
   };
   window.addEventListener('online', retryIfBehind);

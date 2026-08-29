@@ -60,6 +60,10 @@ let syncInFlight = null;     // debounce handle for syncNow
 // friendly text -- a friendly message that never names the fault is how this
 // module stayed broken without anyone being able to say what was wrong.
 let lastErrorCode = null;
+// Set when a silent token request has already failed in this session. A second
+// automatic attempt would fail identically, so it is not made. Cleared only by
+// something the user actually tapped.
+let silentAuthBlocked = false;
 
 const listeners = new Set();
 let idleResetTimer = null;
@@ -106,6 +110,7 @@ function describeError(err) {
   const m = typeof err.message === 'string' ? err.message : '';
   if (m === 'offline') return 'No network connection';
   if (m === 'gsi-load-failed') return 'Could not reach Google. Backup will retry.';
+  if (m === 'auth-suppressed') return 'Google sign-in expired — tap Sync now to reconnect.';
   if (m.indexOf('auth') === 0) {
     // The actionable one: only a tap can fix it, so say that rather than
     // "sign-in failed", which reads as something the app might sort out.
@@ -121,13 +126,27 @@ function isAuthError(err) {
   return m.indexOf('auth') === 0 || /-40[13]$/.test(m);
 }
 
+/** True once an automatic sync would be pointless without a user gesture. */
+function silentPathDead() {
+  return silentAuthBlocked || lsGet('ll.driveNeedsAuth') === 'true';
+}
+
 function noteFailure(err) {
-  lastErrorCode = (err && err.message) ? String(err.message) : 'unknown';
+  const m = err && typeof err.message === 'string' ? err.message : '';
+  // A suppressed attempt is us declining to ask, not Google refusing. Keep the
+  // original reason on screen rather than replacing it with a code that would
+  // tell the user nothing about what actually broke.
+  if (m === 'auth-suppressed') {
+    lsSet('ll.driveNeedsAuth', 'true');
+    return;
+  }
+  lastErrorCode = m || 'unknown';
   if (isAuthError(err)) lsSet('ll.driveNeedsAuth', 'true');
 }
 
 function noteSuccess() {
   lastErrorCode = null;
+  silentAuthBlocked = false;
   lsRemove('ll.driveNeedsAuth');
   lsSet('ll.driveLastSync', String(Date.now()));
 }
@@ -167,11 +186,18 @@ function loadGsi() {
  * Request an access token via the GIS token client.
  *
  * Token lifecycle rules:
- * - `interactive === false` -> `prompt: ''`, i.e. fully silent. Fails rather
- *   than showing UI (used for background syncs).
+ * - `interactive === false` -> `prompt: 'none'`. GIS shows NO UI at all and
+ *   errors instead. This is the only value that guarantees silence.
  * - `interactive === true`  -> default prompt, so the consent/account chooser
  *   may appear. Used only when the user explicitly triggered the action, or
  *   as a fallback after a silent request fails.
+ *
+ * `prompt: ''` IS NOT SILENT. It means "skip the consent screen if the grant
+ * already exists" -- it will still raise the account chooser when GIS cannot
+ * resolve a session on its own. Using it for background syncs meant the app
+ * asked the user to pick a Google account on EVERY launch, because access
+ * tokens are in-memory and every launch starts without one. Only `'none'`
+ * fails quietly, which is what a background sync must do.
  *
  * A fresh token client is created per request so each call gets its own
  * callback/error_callback pair — this keeps the promise wiring simple and
@@ -206,7 +232,9 @@ function requestToken(interactive) {
           finish(reject, new Error('auth-' + ((err && err.type) || 'error')));
         },
       });
-      client.requestAccessToken(interactive ? {} : { prompt: '' });
+      // 'none' -> never shows UI, errors instead. See the note above: '' is
+      // NOT the silent value and will show the account chooser.
+      client.requestAccessToken(interactive ? {} : { prompt: 'none' });
     } catch (err) {
       finish(reject, err);
     }
@@ -219,16 +247,33 @@ function requestToken(interactive) {
  */
 async function ensureToken(interactive) {
   if (accessToken && Date.now() < tokenExpiresAt) return accessToken;
+
+  /* Refuse to do any Google work at all on an automatic sync once we know the
+     silent path is not going to work -- either it already failed this session,
+     or a previous session recorded that only a tap can fix it. This runs
+     BEFORE loadGsi(), so a device with a dead grant does not even fetch
+     Google's script, let alone contact it, until the user asks for it. */
+  if (!interactive && (silentAuthBlocked || lsGet('ll.driveNeedsAuth') === 'true')) {
+    throw new Error('auth-suppressed');
+  }
+
   // The script is loaded lazily on connect(); after a fresh app launch it is
   // not in the page yet, and without this every automatic sync threw
   // "window.google is undefined" before it ever reached a token request.
   await loadGsi();
   try {
-    return await requestToken(false); // silent first, always
+    const tok = await requestToken(false); // silent first, always
+    silentAuthBlocked = false;
+    return tok;
   } catch (silentErr) {
+    // One silent attempt per session. Retrying costs a round-trip and, if the
+    // prompt value were ever wrong again, would cost the user a dialog.
+    silentAuthBlocked = true;
     if (!interactive) throw silentErr;
     // Interactive fallback, only for something the user actually tapped.
-    return await requestToken(true);
+    const tok = await requestToken(true);
+    silentAuthBlocked = false;
+    return tok;
   }
 }
 
@@ -535,7 +580,7 @@ export const sync = {
    * silent retry will fail identically every time until the user taps.
    */
   needsAuth() {
-    return lsGet('ll.driveNeedsAuth') === 'true';
+    return silentPathDead();
   },
 
   /** Raw failure code from the last attempt, or null. For diagnosis only. */
@@ -554,6 +599,7 @@ export const sync = {
       await requestToken(true); // interactive consent
       lsSet('ll.driveConnected', 'true');
       lastErrorCode = null;
+      silentAuthBlocked = false;
       lsRemove('ll.driveNeedsAuth');
       emitTerminal('ok', 'Google Drive connected');
       return true;
@@ -578,6 +624,7 @@ export const sync = {
     accessToken = null;
     tokenExpiresAt = 0;
     lastErrorCode = null;
+    silentAuthBlocked = false;
     lsRemove('ll.driveConnected');
     lsRemove('ll.driveLastSync');
     lsRemove('ll.driveNeedsAuth');
