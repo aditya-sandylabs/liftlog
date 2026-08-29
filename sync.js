@@ -6,8 +6,27 @@
  *   corrupt local data: every exported async function resolves (never rejects)
  *   and failures are reported through onStatus instead of thrown.
  * - Records of record are UNIONED, never replaced. A sync cannot delete a workout.
- * - Access tokens live in memory only. Only two flags touch localStorage:
- *   `ll.driveConnected` (boolean) and `ll.driveLastSync` (ms epoch).
+ * - Access tokens live in memory only. Only three flags touch localStorage:
+ *   `ll.driveConnected` (boolean), `ll.driveLastSync` (ms epoch) and
+ *   `ll.driveNeedsAuth` (boolean -- set when a SILENT token request fails, so
+ *   the UI can tell the user that only a tap can fix it).
+ *
+ * AUTHORISATION, AND WHY THIS MODULE USED TO STOP BACKING UP SILENTLY
+ *   Access tokens are in-memory, so every app launch starts with none, and
+ *   every sync therefore begins by asking Google for one. `pullImpl`/`pushImpl`
+ *   used to hardcode a SILENT request (`prompt: ''`) with no interactive
+ *   fallback anywhere except `connect()`. A silent request needs a live Google
+ *   session and an unexpired grant -- and grants issued by an OAuth app still
+ *   in Testing expire after about a week. Once that happened, every sync failed
+ *   forever, the only cure was Disconnect + Connect, and nothing said so: the
+ *   status listener in the app only rendered while Settings was on screen, so a
+ *   post-workout backup failure was completely invisible and Settings just went
+ *   on showing an ever-staler "last backed up".
+ *
+ *   Now: `pull`/`push`/`syncNow` take `{ interactive }`. Automatic syncs stay
+ *   silent (a popup with no user gesture would be blocked anyway), but they
+ *   record WHY they failed, and a user-initiated "Sync now" is allowed to
+ *   prompt and recover.
  */
 
 // Substituted at deploy time by the build/deploy step.
@@ -36,6 +55,11 @@ let accessToken = null;      // never persisted anywhere
 let tokenExpiresAt = 0;      // ms epoch, already reduced by the safety margin
 let gsiLoadPromise = null;   // memoised script injection
 let syncInFlight = null;     // debounce handle for syncNow
+// Raw reason the last attempt failed, for diagnosis. Deliberately the machine
+// code ('auth-popup_failed_to_open', 'drive-update-failed-403'), not the
+// friendly text -- a friendly message that never names the fault is how this
+// module stayed broken without anyone being able to say what was wrong.
+let lastErrorCode = null;
 
 const listeners = new Set();
 let idleResetTimer = null;
@@ -79,11 +103,33 @@ function lsRemove(key) {
 
 function describeError(err) {
   if (!err) return 'Unknown error';
-  if (err.message === 'offline') return 'No network connection';
-  if (typeof err.message === 'string' && err.message.indexOf('auth') === 0) {
-    return 'Google sign-in failed';
+  const m = typeof err.message === 'string' ? err.message : '';
+  if (m === 'offline') return 'No network connection';
+  if (m === 'gsi-load-failed') return 'Could not reach Google. Backup will retry.';
+  if (m.indexOf('auth') === 0) {
+    // The actionable one: only a tap can fix it, so say that rather than
+    // "sign-in failed", which reads as something the app might sort out.
+    return 'Google sign-in expired — tap Sync now to reconnect.';
   }
-  return 'Sync problem — your local data is safe.';
+  if (/-40[13]$/.test(m)) return 'Google refused the request — tap Sync now to reconnect.';
+  return 'Backup problem — your local data is safe.';
+}
+
+/** True for failures only a user gesture can clear. */
+function isAuthError(err) {
+  const m = err && typeof err.message === 'string' ? err.message : '';
+  return m.indexOf('auth') === 0 || /-40[13]$/.test(m);
+}
+
+function noteFailure(err) {
+  lastErrorCode = (err && err.message) ? String(err.message) : 'unknown';
+  if (isAuthError(err)) lsSet('ll.driveNeedsAuth', 'true');
+}
+
+function noteSuccess() {
+  lastErrorCode = null;
+  lsRemove('ll.driveNeedsAuth');
+  lsSet('ll.driveLastSync', String(Date.now()));
 }
 
 /* ------------------------------------------------------------------ */
@@ -173,11 +219,15 @@ function requestToken(interactive) {
  */
 async function ensureToken(interactive) {
   if (accessToken && Date.now() < tokenExpiresAt) return accessToken;
+  // The script is loaded lazily on connect(); after a fresh app launch it is
+  // not in the page yet, and without this every automatic sync threw
+  // "window.google is undefined" before it ever reached a token request.
+  await loadGsi();
   try {
     return await requestToken(false); // silent first, always
   } catch (silentErr) {
     if (!interactive) throw silentErr;
-    // Interactive fallback only for user-initiated actions.
+    // Interactive fallback, only for something the user actually tapped.
     return await requestToken(true);
   }
 }
@@ -292,8 +342,8 @@ async function upsertFile(fileId, metadata, payload, payloadMime, token) {
 /* ------------------------------------------------------------------ */
 
 /** Download and parse liftlog-backup.json from appDataFolder. Null if absent. */
-async function pullImpl() {
-  const token = await ensureToken(false);
+async function pullImpl(interactive) {
+  const token = await ensureToken(!!interactive);
   const fileId = await findFileId(
     "name='" + BACKUP_NAME + "' and trashed=false", 'appDataFolder', token);
   if (!fileId) return null; // nothing backed up yet — not an error
@@ -312,8 +362,8 @@ async function pullImpl() {
 /* ------------------------------------------------------------------ */
 
 /** Upload both artifacts: hidden JSON backup + visible CSV. */
-async function pushImpl(payload) {
-  const token = await ensureToken(false);
+async function pushImpl(payload, interactive) {
+  const token = await ensureToken(!!interactive);
   const json = JSON.stringify(payload);
 
   // 1. Machine-readable restore point in the hidden per-app folder.
@@ -480,6 +530,20 @@ export const sync = {
   },
 
   /**
+   * True when the last attempt failed in a way only a user gesture can clear
+   * (expired grant, revoked consent, 401/403). The UI must surface this: a
+   * silent retry will fail identically every time until the user taps.
+   */
+  needsAuth() {
+    return lsGet('ll.driveNeedsAuth') === 'true';
+  },
+
+  /** Raw failure code from the last attempt, or null. For diagnosis only. */
+  lastError() {
+    return lastErrorCode;
+  },
+
+  /**
    * Interactive consent flow. User-initiated only.
    * Resolves true on success, false on any failure. Never rejects.
    */
@@ -489,6 +553,8 @@ export const sync = {
       await loadGsi(); // lazy; throws when offline or blocked
       await requestToken(true); // interactive consent
       lsSet('ll.driveConnected', 'true');
+      lastErrorCode = null;
+      lsRemove('ll.driveNeedsAuth');
       emitTerminal('ok', 'Google Drive connected');
       return true;
     } catch (err) {
@@ -511,8 +577,10 @@ export const sync = {
     } catch (_) { /* best effort */ }
     accessToken = null;
     tokenExpiresAt = 0;
+    lastErrorCode = null;
     lsRemove('ll.driveConnected');
     lsRemove('ll.driveLastSync');
+    lsRemove('ll.driveNeedsAuth');
     emitStatus('idle', 'Disconnected from Google Drive');
   },
 
@@ -520,7 +588,7 @@ export const sync = {
    * Fetch the remote backup. Returns the parsed object ({ workouts: [...] })
    * or null (nothing stored / not connected / any failure). Never rejects.
    */
-  async pull() {
+  async pull(opts) {
     if (!this.isConnected()) return null;
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       emitTerminal('offline', 'No network connection');
@@ -528,10 +596,11 @@ export const sync = {
     }
     try {
       emitStatus('syncing', 'Checking Google Drive…');
-      const result = await pullImpl();
+      const result = await pullImpl(opts && opts.interactive);
       emitStatus('idle');
       return result;
     } catch (err) {
+      noteFailure(err);
       emitTerminal('error', describeError(err));
       return null;
     }
@@ -541,18 +610,20 @@ export const sync = {
    * Upload the payload (JSON backup + CSV). Resolves true/false. Never rejects.
    * payload = { workouts, exportedAt, schemaVersion }
    */
-  async push(payload) {
+  async push(payload, opts) {
+    if (!this.isConnected()) return false;
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       emitTerminal('offline', 'No network connection');
       return false;
     }
     try {
       emitStatus('syncing', 'Backing up to Google Drive…');
-      const ok = await pushImpl(payload);
-      lsSet('ll.driveLastSync', String(Date.now()));
+      const ok = await pushImpl(payload, opts && opts.interactive);
+      noteSuccess();
       emitTerminal('ok', 'Backup saved to Google Drive');
       return ok;
     } catch (err) {
+      noteFailure(err);
       emitTerminal('error', describeError(err));
       return false;
     }
@@ -564,14 +635,15 @@ export const sync = {
    * (debounce) instead of racing each other.
    * Returns { merged, added, pushed, error }. Never rejects.
    */
-  syncNow(payload) {
+  syncNow(payload, opts) {
     if (syncInFlight) return syncInFlight;
-    syncInFlight = this._runSync(payload).finally(() => { syncInFlight = null; });
+    syncInFlight = this._runSync(payload, opts).finally(() => { syncInFlight = null; });
     return syncInFlight;
   },
 
   /** Internal worker for syncNow — exposed as a method only for testability. */
-  async _runSync(payload) {
+  async _runSync(payload, opts) {
+    const interactive = !!(opts && opts.interactive);
     const result = { merged: null, added: 0, pushed: false, error: null };
 
     if (!this.isConnected()) {
@@ -587,7 +659,7 @@ export const sync = {
     try {
       emitStatus('syncing', 'Syncing…');
 
-      const remote = await pullImpl(); // may be null on first ever sync
+      const remote = await pullImpl(interactive); // may be null on first ever sync
       const localWorkouts =
         payload && Array.isArray(payload.workouts) ? payload.workouts : [];
 
@@ -599,23 +671,33 @@ export const sync = {
       result.merged = merged;
       result.added = Math.max(0, merged.length - localWorkouts.length);
 
-      const outgoing = {
+      /* Everything the caller handed us EXCEPT workouts is carried through
+         untouched, then workouts are replaced by the merged union.
+
+         This used to build `{workouts, exportedAt, schemaVersion}` from
+         scratch, which silently dropped customExercises, customTemplates and
+         bodyWeights -- so one call to syncNow would have overwritten the Drive
+         backup with a workouts-only file and destroyed the mirror of the other
+         three record types. Spreading the payload makes adding a fourth record
+         type incapable of reintroducing that. */
+      const outgoing = Object.assign({}, payload, {
         workouts: merged,
         exportedAt: new Date().toISOString(),
         schemaVersion: payload && payload.schemaVersion != null
           ? payload.schemaVersion
           : 1,
-      };
+      });
 
-      result.pushed = await pushImpl(outgoing);
+      result.pushed = await pushImpl(outgoing, interactive);
       if (result.pushed) {
-        lsSet('ll.driveLastSync', String(Date.now()));
+        noteSuccess();
         emitTerminal('ok', 'Synced to Google Drive');
       } else {
         result.error = result.error || 'push-failed';
       }
     } catch (err) {
       result.error = (err && err.message) ? err.message : 'sync-failed';
+      noteFailure(err);
       emitTerminal('error', describeError(err));
       // Local data untouched — IndexedDB remains the system of record.
     }

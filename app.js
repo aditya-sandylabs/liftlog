@@ -8,8 +8,17 @@ import { parseStrongCsv } from './strong.js';
 import {
   buildExerciseIndex, searchExercises, makeCustomExercise,
   mergeCustomExercises, mergeBodyWeights,
-  bodyWeightSeries, bodyWeightSVG, heatmapSVG
+  bodyWeightSeries, bodyWeightSVG, heatmapSVG,
+  CARDIO_EXERCISES, isCardio, cardioMode, estimateKcal, latestBodyKg,
+  fmtCardio, workoutKcal
 } from './features.js';
+import {
+  newTemplate, templateFromWorkout, validateTemplateName, renameTemplate,
+  addExercise as tplAddExercise, removeExercise as tplRemoveExercise,
+  setSets as tplSetSets, moveExercise as tplMoveExercise,
+  setReps as tplSetReps, setRest as tplSetRest, setDuration as tplSetDuration,
+  mergeCustomTemplates, allTemplates, isCustomTemplate
+} from './templates.js';
 
 /* ================= tiny helpers ================= */
 const $  = (s, r = document) => r.querySelector(s);
@@ -31,6 +40,24 @@ const stepFor = () => (unit === 'kg' ? 2.5 : 5);
 const fmtNum = d => d == null ? '—' : String(Math.round(d * 100) / 100);
 const fmtW = kg => { const d = dispKg(kg); return d == null ? '—' : fmtNum(d) + ' ' + unit; };
 const e1rm = (w, r) => (w > 0 && r > 0) ? w * (1 + r / 30) : null; // Epley
+
+/* Cardio duration is entered in minutes and stored in seconds. Accepts either
+   "32" or "32:30"; anything unparseable is null rather than 0, so a typo shows
+   as empty instead of silently logging a zero-minute session. */
+const parseMin = v => {
+  const t = String(v == null ? '' : v).trim().replace(',', '.');
+  if (!t) return null;
+  const mm = t.match(/^(\d+):([0-5]?\d)$/);
+  if (mm) return (+mm[1]) * 60 + (+mm[2]);
+  const n = parseFloat(t);
+  return isNaN(n) || n < 0 ? null : Math.round(n * 60);
+};
+/* Seconds back to what the field should show: whole minutes stay whole. */
+const dispMin = sec => {
+  if (sec == null || !isFinite(sec) || sec <= 0) return '';
+  if (sec % 60 === 0) return String(sec / 60);
+  return Math.floor(sec / 60) + ':' + String(Math.round(sec % 60)).padStart(2, '0');
+};
 
 const fmtDur = s => {
   s = Math.max(0, Math.round(s));
@@ -112,6 +139,7 @@ const state = {
   workouts: [],     // completed workouts, newest first
   active: null,     // in-progress workout (persisted continuously)
   custom: [],       // user-created exercises (synced)
+  templates: [],    // user-created workout templates (synced)
   weights: [],      // body-weight entries {ts, kg} (synced)
   view: 'home',
   wodId: null
@@ -124,6 +152,19 @@ function rebuildExerciseIndex() {
   exIndex = buildExerciseIndex({
     data: state.data, custom: state.custom, workouts: state.workouts
   });
+}
+
+/* Built-in templates come from data.json and are READ-ONLY; the user's own
+   live in state.templates. Anything that used to read state.data.templates
+   must read this instead, or custom templates are invisible to it. */
+function templateList() {
+  return allTemplates(state.data && state.data.templates, state.templates);
+}
+function findTemplate(id) {
+  return templateList().find(t => t.id === id) || null;
+}
+async function saveTemplates() {
+  await DB.put('kv', state.templates, 'templates');
 }
 
 async function loadData() {
@@ -148,7 +189,14 @@ async function loadData() {
 function prevFor(exId, n) {
   for (const w of state.workouts) {
     const s = w.sets.find(s => s.exerciseId === exId && s.setNumber === n && !s.isWarmup);
-    if (s) return { weightKg: s.weightKg, reps: s.reps };
+    // Projected rather than returned whole so the "previous" snapshot cannot
+    // drag a stale note or PR flag into a new set. Cardio fields are part of
+    // that snapshot: without them a repeat interval prefills nothing and the
+    // "last:" line on a cardio row renders empty.
+    if (s) return s.cardio
+      ? { weightKg: s.weightKg, reps: s.reps, cardio: true, durationSec: s.durationSec,
+          speedKmh: s.speedKmh ?? null, inclinePct: s.inclinePct ?? null, kcal: s.kcal ?? null }
+      : { weightKg: s.weightKg, reps: s.reps };
   }
   return null;
 }
@@ -177,13 +225,27 @@ function resolveExercise(id, te) {
   const d = (state.data && state.data.exercises) || {};
   if (d[id]) return d[id];
 
+  /* Cardio built-ins are defined in features.js, not data.json -- data.json is
+     regenerated from the PDF by build/, so anything added there is wiped. */
+  const cardio = CARDIO_EXERCISES.find(c => c.id === id);
+  if (cardio) return {
+    id: cardio.id, name: cardio.name, muscle: 'Cardio', bodyweight: true,
+    cardio: true, mode: cardio.mode, met: cardio.met,
+    video: null, tutorial: null, steps: [], alternatives: []
+  };
+
   // User-created exercises live outside data.json but must resolve like any other.
   const own = (state.custom || []).find(c => c.id === id);
-  if (own) return {
-    id: own.id, name: own.name, muscle: own.muscle || '',
-    bodyweight: !!own.bodyweight, video: null, tutorial: null,
-    steps: [], alternatives: [], custom: true
-  };
+  if (own) {
+    const c = isCardio(own);
+    return {
+      id: own.id, name: own.name, muscle: own.muscle || '',
+      bodyweight: c ? true : !!own.bodyweight, video: null, tutorial: null,
+      cardio: c, mode: c ? cardioMode(own) : null,
+      met: typeof own.met === 'number' ? own.met : null,
+      steps: [], alternatives: [], custom: true
+    };
+  }
   const bySlug = Object.values(d).find(e => slug(e.name) === id);
   if (bySlug) return bySlug;
 
@@ -215,8 +277,43 @@ function showView(v) {
   if (v === 'history') renderHistory();
   if (v === 'stats') renderStats();
   if (v === 'quotes') renderQuotes();
-  if (v === 'active') { startElapsed(); acquireWake(); } else { stopElapsed(); releaseWake(); }
+  /* Settings used to be painted once at startup and never again, so the Drive
+     box showed whatever was true when the app launched -- including "Not
+     connected" or a last-backed-up date that had since gone stale. Opening the
+     screen must re-read the real state. */
+  if (v === 'settings') renderDrive();
+  // The elapsed clock keeps running while the workout is minimised -- the mini
+  // bar shows it -- so it is tied to the workout existing, not to the view.
+  if (state.active) startElapsed(); else stopElapsed();
+  if (v === 'active') acquireWake(); else releaseWake();
+  renderMiniBar();
   window.scrollTo(0, 0);
+}
+
+/* ================= minimised workout =================
+   Leaving the active view used to strand the workout: it was still running and
+   still saved, but the only route back was to reload the app and answer the
+   resume prompt. The mini bar is that route -- always on screen while a
+   workout is open and the active view is not. */
+function reopenActive() {
+  if (!state.active) return;
+  buildActiveHeader();
+  renderActive();
+  showView('active');
+}
+
+function renderMiniBar() {
+  const bar = $('#minibar');
+  if (!bar) return;
+  const show = !!state.active && state.view !== 'active';
+  bar.hidden = !show;
+  document.body.classList.toggle('has-mini', show);
+  if (!show) return;
+  const a = state.active;
+  const done = a.exercises.reduce((t, ex) => t + ex.sets.filter(s => s.done).length, 0);
+  $('#mini-name').textContent = a.templateName;
+  $('#mini-sets').textContent = done + ' set' + (done === 1 ? '' : 's') + ' done';
+  $('#mini-elapsed').textContent = fmtDur(elapsedMs() / 1000);
 }
 
 /* ================= home ================= */
@@ -241,21 +338,42 @@ function nextUp() {
 function renderHome() {
   $('#program-name').textContent = (state.data.program && state.data.program.name) || '';
   const nu = nextUp();
-  const cards = state.data.templates.map(t => {
+  const cards = templateList().map(t => {
     const last = state.workouts.find(w => w.templateId === t.id);
-    return `<button class="tpl" data-tpl="${esc(t.id)}">
-      <span class="tpl-name">${esc(t.name)}</span>
+    const mine = isCustomTemplate(t);
+    // "Custom" is a bordered text badge, never a colour: the palette carries no
+    // state by hue anywhere in this app.
+    const badge = mine ? '<span class="tpl-badge">Custom</span>' : '';
+    const card = `<button class="tpl" data-tpl="${esc(t.id)}">
+      <span class="tpl-name">${esc(t.name)}${badge}</span>
       <span class="tpl-meta">${t.exercises.length} exercises · ${esc(relTime(last ? last.startTime : 0))}</span>
       <svg class="ic chev"><use href="#i-chev"/></svg></button>`;
+    // Siblings, not nesting: a <button> inside a <button> is invalid HTML and
+    // the inner one is unreachable to a real tap.
+    return mine
+      ? `<div class="tpl-row">${card}<button class="tpl-edit" data-tpledit="${esc(t.id)}" aria-label="Edit ${esc(t.name)}"><svg class="ic"><use href="#i-dots"/></svg></button></div>`
+      : card;
   }).join('');
   const recent = state.workouts.slice(0, 5).map(w =>
     `<button class="hist-item" data-wod="${esc(w.id)}">
       <span class="hi-date">${esc(fmtDate(w.startTime))}</span>
       <span class="hi-name">${esc(w.templateName)}</span>
-      <span class="hi-meta">${fmtDur(w.durationSec)} · ${fmtW(w.volumeKg)} · ${w.setCount} sets</span>
+      <span class="hi-meta">${esc(workoutMeta(w))}</span>
     </button>`).join('')
     || '<p class="muted pad-s">No workouts yet — pick a day above to start.</p>';
+  /* A dead backup has to be visible somewhere the user actually looks. Settings
+     is not that place -- the whole failure mode was that nobody opened it. */
+  const backupWarn = backupUnhealthy()
+    ? `<button class="nextup warn" id="backup-warn"><svg class="ic"><use href="#i-warn"/></svg>
+        <div><strong>Backup is not up to date.</strong><br><span class="small">${
+          sync.needsAuth()
+            ? 'Google sign-in expired. Tap to reconnect.'
+            : 'Last backed up ' + esc(sync.lastSync() ? relTime(sync.lastSync()).toLowerCase() : 'never') + '. Tap to retry.'
+        }</span></div></button>`
+    : '';
+
   $('#home-body').innerHTML = `
+    ${backupWarn}
     <div class="nextup"><svg class="ic"><use href="#i-info"/></svg>
       <div><strong>Suggested next:</strong> ${esc(nu ? nu.name : '—')}<br><span class="muted small">A suggestion only — any day can be started.</span></div>
     </div>
@@ -263,40 +381,96 @@ function renderHome() {
     <div class="list">
       <button class="addex" id="start-empty"><svg class="ic"><use href="#i-plus"/></svg>Start an empty workout</button>
       ${cards}
+      <button class="addex" data-tplnew="1"><svg class="ic"><use href="#i-plus"/></svg>Create a template</button>
     </div>
     <h2 class="sec">Recent workouts</h2>
     <div class="list">${recent}</div>`;
   $('#start-empty').onclick = startEmptyWorkout;
+  const bw = $('#backup-warn');
+  // The tap IS the user gesture the interactive token request needs, so this
+  // is a real fix-it button, not just a link to Settings.
+  if (bw) bw.onclick = async () => {
+    toast('Reconnecting to Google Drive…');
+    const r = await backgroundSync({ interactive: true });
+    toast(r.ok ? 'Backup up to date' : 'Still not working — see Settings');
+    renderHome();
+  };
 }
 
 /* ================= active workout ================= */
-function makeSet(exId, n) {
+function makeSet(exId, n, opts) {
   const p = prevFor(exId, n);
+  const o = opts || {};
+  if (o.cardio) {
+    /* A cardio set carries time, not load. Pre-filled from the last time this
+       exercise was logged so a repeat session is one tap; the template's
+       prescribed duration is the fallback on the very first outing. */
+    return {
+      n, done: false, isWarmup: false, note: '', prev: p, pr: false,
+      cardio: true,
+      durationSec: p && p.durationSec != null ? p.durationSec : (o.durationSec ?? null),
+      speedKmh: p && p.speedKmh != null ? p.speedKmh : null,
+      inclinePct: p && p.inclinePct != null ? p.inclinePct : null,
+      kcal: null,
+      // kcal stays derived until the user types over it, at which point their
+      // number is authoritative and must never be recomputed away.
+      kcalManual: false,
+      weightKg: 0, reps: 0
+    };
+  }
   // weightKg/reps pre-filled from history (rendered dimmed until confirmed)
   return { n, weightKg: p ? p.weightKg : null, reps: p ? p.reps : null, done: false, isWarmup: false, note: '', prev: p, pr: false };
 }
 function makeEx(te, altId) {
   const exId = altId || te.id;
   const ex = resolveExercise(exId, te);
+  const cardio = isCardio(ex) || te.cardio === true;
+  const dur = te.durationSec != null ? te.durationSec : (cardio ? 1800 : null);
   return {
     origId: te.id, exerciseId: exId, name: ex.name, muscle: ex.muscle || '',
-    bodyweight: !!ex.bodyweight, video: ex.video || null,
+    bodyweight: cardio ? true : !!ex.bodyweight, video: ex.video || null,
     targetReps: te.reps, rest: te.rest, superset: te.superset || null,
     efforts: te.efforts || [],
-    sets: Array.from({ length: te.sets }, (_, i) => makeSet(exId, i + 1))
+    cardio, mode: cardio ? cardioMode(ex) : null,
+    met: cardio && typeof ex.met === 'number' ? ex.met : null,
+    targetDurationSec: cardio ? dur : null,
+    sets: Array.from({ length: te.sets },
+      (_, i) => makeSet(exId, i + 1, { cardio, durationSec: dur }))
   };
+}
+
+/* makeSet cannot estimate calories on its own -- the mode and MET live on the
+   exercise, not the set -- so a prefilled cardio row is costed here, once the
+   exercise wrapper exists. Without this the estimate stays blank until the
+   first field is touched. */
+function withKcal(ex) {
+  if (ex.cardio) for (const s of ex.sets) refreshKcal(ex, s);
+  return ex;
+}
+
+/* Body weight drives the calorie estimate. Falls back inside estimateKcal to a
+   documented 75 kg when nothing has been logged. */
+function bodyKg() { return latestBodyKg(state.weights); }
+
+/* Recompute a cardio set's calorie estimate unless the user typed their own. */
+function refreshKcal(ex, s) {
+  if (!s.cardio || s.kcalManual) return;
+  s.kcal = estimateKcal({
+    mode: ex.mode, met: ex.met, durationSec: s.durationSec,
+    speedKmh: s.speedKmh, inclinePct: s.inclinePct, bodyKg: bodyKg()
+  });
 }
 
 function startWorkout(tplId) {
   if (state.active) { promptResume(state.active); return; }
-  const t = state.data.templates.find(t => t.id === tplId);
+  const t = findTemplate(tplId);
   if (!t) return;
   const swaps = prefs.swaps[tplId] || {};
   state.active = {
     key: 'current', id: uid(), templateId: t.id, templateName: t.name,
     startTime: Date.now(), restEnd: 0,
     elapsedMs: 0, runningSince: null, everStarted: false,   // timer starts paused
-    exercises: t.exercises.map(te => makeEx(te, swaps[te.id] || null))
+    exercises: t.exercises.map(te => withKcal(makeEx(te, swaps[te.id] || null)))
   };
   saveActive(true);
   buildActiveHeader();
@@ -314,21 +488,63 @@ function buildActiveHeader() {
 
 function cardHTML(ex, ei) {
   const rows = ex.sets.map((s, si) => rowHTML(ex, s, ei, si)).join('');
-  return `<article class="ex-card" data-ei="${ei}">
+  // Cardio has no weight/reps columns, so it gets no column header either --
+  // each field carries its own label instead.
+  const head = ex.cardio ? ''
+    : `<div class="set-row head"><span>SET</span><span>PREVIOUS</span><span>${esc(unit.toUpperCase())}</span><span>REPS</span><span></span><span></span></div>`;
+  const target = ex.cardio
+    ? `<span class="muted">${esc(ex.targetDurationSec ? dispMin(ex.targetDurationSec) + ' min target' : 'time-based')}</span>`
+    : `<span class="muted">${esc(ex.targetReps)} reps · rest ${esc(ex.rest)}</span>`;
+  return `<article class="ex-card${ex.cardio ? ' cardio-card' : ''}" data-ei="${ei}">
     <header class="ex-head">
       <button class="ex-name" data-act="detail" data-ei="${ei}"><span>${esc(ex.name)}</span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <button class="icon-btn" data-act="cardmenu" data-ei="${ei}" aria-label="Exercise options"><svg class="ic"><use href="#i-dots"/></svg></button>
     </header>
     <div class="ex-target">
       <span class="tag">${esc(ex.muscle || 'Exercise')}</span>
-      <span class="muted">${esc(ex.targetReps)} reps · rest ${esc(ex.rest)}</span>
+      ${target}
     </div>
     <div class="set-grid">
-      <div class="set-row head"><span>SET</span><span>PREVIOUS</span><span>${esc(unit.toUpperCase())}</span><span>REPS</span><span></span><span></span></div>
+      ${head}
       ${rows}
     </div>
-    <button class="addset" data-act="addset" data-ei="${ei}"><svg class="ic"><use href="#i-plus"/></svg> Add set</button>
+    <button class="addset" data-act="addset" data-ei="${ei}"><svg class="ic"><use href="#i-plus"/></svg> ${ex.cardio ? 'Add interval' : 'Add set'}</button>
   </article>`;
+}
+
+/* One labelled numeric field inside a cardio row. */
+function cardioField(cls, label, value, hint, disabled) {
+  return `<label class="cr-f"><span class="cr-lbl">${esc(label)}</span>
+    <input class="inp ${cls}" type="text" inputmode="decimal" value="${esc(value)}"
+      placeholder="${esc(hint)}" ${disabled ? 'disabled' : ''} aria-label="${esc(label)}"></label>`;
+}
+
+/* Cardio set: time (+ speed and incline for treadmill-shaped work) and an
+   editable calorie estimate. Laid out as its own block rather than squeezed
+   into the six lifting columns, which are already tight on a phone. */
+function cardioRowHTML(ex, s, ei, si) {
+  const dis = s.done;
+  const showPace = ex.mode === 'walk' || ex.mode === 'run';
+  const prev = s.prev ? fmtCardio(s.prev) : '';
+  const badges = (s.note ? `<span class="badge note" role="img" aria-label="Has note"><svg class="ic"><use href="#i-note"/></svg></span>` : '');
+  const est = (!s.kcalManual && s.kcal != null) ? '<span class="cr-est">est.</span>' : '';
+  return `<div class="set-row cardio-row${s.done ? ' done' : ''}" data-ei="${ei}" data-si="${si}">
+    <div class="cr-top">
+      <span class="c-set">${s.n}${badges}</span>
+      ${prev ? `<span class="c-prev">last: ${esc(prev)}</span>` : '<span class="c-prev">—</span>'}
+    </div>
+    <div class="cr-fields">
+      ${cardioField('d-inp', 'MIN', dispMin(s.durationSec), '30', dis)}
+      ${showPace ? cardioField('sp-inp', 'KM/H', s.speedKmh == null ? '' : s.speedKmh, '5.0', dis) : ''}
+      ${showPace ? cardioField('in-inp', 'INCLINE %', s.inclinePct == null ? '' : s.inclinePct, '12', dis) : ''}
+      ${cardioField('k-inp', 'KCAL', s.kcal == null ? '' : s.kcal, '—', dis)}
+    </div>
+    <div class="cr-actions">
+      ${est}
+      <button class="check${s.done ? ' on' : ''}" data-act="check" aria-pressed="${s.done}" aria-label="${s.done ? 'Uncomplete set' : 'Complete set'}"><svg class="ic"><use href="#i-check"/></svg></button>
+      <button class="rowmenu" data-act="rowmenu" aria-label="Set options"><svg class="ic"><use href="#i-dots"/></svg></button>
+    </div>
+  </div>`;
 }
 
 /* Glossary marker: only for effort strings that differ from the plain default and exist in the glossary. */
@@ -341,6 +557,7 @@ function effortMark(ex, s) {
 }
 
 function rowHTML(ex, s, ei, si) {
+  if (ex.cardio) return cardioRowHTML(ex, s, ei, si);
   const prev = s.prev ? `${fmtNum(dispKg(s.prev.weightKg))} × ${s.prev.reps}` : '—';
   const wv = s.weightKg == null ? '' : fmtNum(dispKg(s.weightKg));
   const rv = s.reps == null ? '' : String(s.reps);
@@ -393,9 +610,54 @@ function rowEl(ei, si) {
   return $(`#aw-body .ex-card[data-ei="${ei}"] .set-row[data-si="${si}"]`);
 }
 
+/* Pull whatever is currently in a cardio row's fields into the set, and
+   re-derive the calorie estimate. Called both on every field edit and again on
+   completion, so a value typed but not blurred is never lost. */
+function readCardioRow(ex, s, row) {
+  if (!row) return;
+  // A field the row does not render (speed/incline on a non-treadmill
+  // exercise) reads back as undefined and must leave the stored value alone,
+  // never overwrite it with null.
+  const g = c => { const el = row.querySelector('.' + c); return el ? el.value : undefined; };
+  const dRaw = g('d-inp');
+  if (dRaw !== undefined) {
+    const d = parseMin(dRaw);
+    // Junk keeps the previous value; an empty field genuinely clears it.
+    if (d != null || String(dRaw).trim() === '') s.durationSec = d;
+  }
+  if (g('sp-inp') !== undefined) s.speedKmh = parseDisp(g('sp-inp'));
+  if (g('in-inp') !== undefined) s.inclinePct = parseDisp(g('in-inp'));
+  const kRaw = g('k-inp');
+  if (kRaw === undefined) { refreshKcal(ex, s); return; }
+  const k = parseDisp(kRaw);
+  // A cleared calorie field hands control back to the estimator.
+  if (String(kRaw || '').trim() === '') { s.kcalManual = false; s.kcal = null; }
+  else if (k != null && k !== s.kcal) { s.kcalManual = true; s.kcal = Math.round(k); }
+  refreshKcal(ex, s);
+}
+
+function toggleCardioSet(ei, si) {
+  const ex = state.active.exercises[ei], s = ex.sets[si];
+  readCardioRow(ex, s, rowEl(ei, si));
+  if (s.durationSec == null || s.durationSec <= 0) {
+    // Time is the whole record for a cardio set; completing without it would
+    // save an empty row that shows as "—" forever.
+    toast('Enter how long it took');
+    return;
+  }
+  if (!state.active.everStarted) timerStart();
+  s.done = true;
+  s.weightKg = 0; s.reps = 0; s.pr = false;
+  saveActive();
+  renderActive();
+}
+
 function toggleSet(ei, si) {
   const ex = state.active.exercises[ei], s = ex.sets[si];
   if (s.done) { s.done = false; s.pr = false; saveActive(); renderActive(); return; }
+  // Cardio has no weight/reps to read, no e1RM and no PR, and does not start a
+  // rest timer -- the interval itself is the work.
+  if (ex.cardio) return toggleCardioSet(ei, si);
   const row = rowEl(ei, si);
   const w = parseDisp(row.querySelector('.w-inp').value);
   const r = parseInt(row.querySelector('.r-inp').value, 10);
@@ -420,6 +682,21 @@ function addSet(ei) {
   const ex = state.active.exercises[ei];
   const last = ex.sets[ex.sets.length - 1];
   const n = ex.sets.length + 1;
+  if (ex.cardio) {
+    const s = {
+      n, done: false, isWarmup: false, note: '', prev: prevFor(ex.exerciseId, n), pr: false,
+      cardio: true,
+      durationSec: last ? last.durationSec : ex.targetDurationSec,
+      speedKmh: last ? last.speedKmh : null,
+      inclinePct: last ? last.inclinePct : null,
+      kcal: null, kcalManual: false, weightKg: 0, reps: 0
+    };
+    refreshKcal(ex, s);
+    ex.sets.push(s);
+    saveActive();
+    renderActive();
+    return;
+  }
   ex.sets.push({
     n, weightKg: last ? last.weightKg : null, reps: last ? last.reps : null,
     done: false, isWarmup: false, note: '', prev: prevFor(ex.exerciseId, n), pr: false
@@ -435,7 +712,7 @@ function rowMenu(ei, si) {
   showModal({
     title: `Set ${s.n} — ${ex.name}`,
     actions: [
-      { label: s.isWarmup ? 'Unmark warm-up' : 'Mark as warm-up', onClick: () => { s.isWarmup = !s.isWarmup; saveActive(); renderActive(); } },
+      ...(ex.cardio ? [] : [{ label: s.isWarmup ? 'Unmark warm-up' : 'Mark as warm-up', onClick: () => { s.isWarmup = !s.isWarmup; saveActive(); renderActive(); } }]),
       { label: s.note ? 'Edit note' : 'Add note', onClick: () => noteModal(ei, si) },
       {
         label: 'Delete set', danger: true, onClick: () => showModal({
@@ -497,10 +774,10 @@ function openSwapConfirm(ei, altId, altName) {
 }
 function doSwap(ei, altId, remember) {
   const a = state.active, old = a.exercises[ei];
-  const tpl = state.data.templates.find(t => t.id === a.templateId);
+  const tpl = findTemplate(a.templateId);
   const te = (tpl && tpl.exercises.find(x => x.id === old.origId)) ||
     { id: old.origId, name: old.name, sets: old.sets.length, reps: old.targetReps, rest: old.rest, superset: old.superset, efforts: old.efforts };
-  a.exercises[ei] = makeEx(te, altId);
+  a.exercises[ei] = withKcal(makeEx(te, altId));
   if (remember) {
     const sw = prefs.swaps;
     sw[a.templateId] = sw[a.templateId] || {};
@@ -608,14 +885,23 @@ function renderTimerBtn() {
   if (wrap) wrap.classList.toggle('paused', !on);
 }
 
+/* Idempotent: showView calls this on every navigation while a workout is open,
+   and a second interval would double the tick rate for no benefit. */
 function startElapsed() {
+  if (eliv) { elTick(); return; }
   stopElapsed();
   if (!state.active || !timerRunning()) { elTick(); return; }
   eliv = setInterval(elTick, 1000);
   elTick();
 }
 function stopElapsed() { clearInterval(eliv); eliv = null; }
-function elTick() { if (state.active) $('#aw-elapsed').textContent = fmtDur(elapsedMs() / 1000); }
+function elTick() {
+  if (!state.active) return;
+  const t = fmtDur(elapsedMs() / 1000);
+  $('#aw-elapsed').textContent = t;
+  const m = $('#mini-elapsed');
+  if (m) m.textContent = t;
+}
 
 /* ================= persistence of in-progress workout ================= */
 let saveT = null;
@@ -637,6 +923,8 @@ async function discardActive() {
   state.active = null;
   await DB.del('kv', 'active');
   skipRest();
+  stopElapsed();
+  renderMiniBar();
 }
 
 /* Tapping anywhere off a number field blurs it, which closes the device
@@ -675,18 +963,33 @@ function finishFlow() {
 
 function saveWorkout(donePairs) {
   const a = state.active, end = Date.now();
-  const sets = donePairs.map(({ ex, s }) => ({
-    exerciseId: ex.exerciseId, exerciseName: ex.name, setNumber: s.n,
-    weightKg: s.weightKg == null ? 0 : s.weightKg, reps: s.reps == null ? 0 : s.reps,
-    isWarmup: !!s.isWarmup, note: s.note || '', pr: !!s.pr
-  }));
+  const sets = donePairs.map(({ ex, s }) => {
+    const row = {
+      exerciseId: ex.exerciseId, exerciseName: ex.name, setNumber: s.n,
+      weightKg: s.weightKg == null ? 0 : s.weightKg, reps: s.reps == null ? 0 : s.reps,
+      isWarmup: !!s.isWarmup, note: s.note || '', pr: !!s.pr
+    };
+    // Cardio fields are added only on cardio rows, so every existing lifting
+    // record keeps exactly the shape the exports and merges already expect.
+    if (s.cardio) {
+      row.cardio = true;
+      row.durationSec = s.durationSec == null ? 0 : s.durationSec;
+      if (s.speedKmh != null) row.speedKmh = s.speedKmh;
+      if (s.inclinePct != null) row.inclinePct = s.inclinePct;
+      if (s.kcal != null) row.kcal = s.kcal;
+      row.kcalEstimated = !s.kcalManual;
+    }
+    return row;
+  });
   const rec = {
     id: a.id, templateId: a.templateId, templateName: a.templateName,
     startTime: a.startTime, endTime: end,
     durationSec: Math.round(elapsedMs() / 1000),   // excludes paused time
     sets,
     volumeKg: sets.filter(s => !s.isWarmup).reduce((t, s) => t + s.weightKg * s.reps, 0),
-    setCount: sets.length
+    setCount: sets.length,
+    kcal: workoutKcal(sets),
+    cardioSec: sets.reduce((t, s) => t + (s.durationSec || 0), 0)
   };
   DB.put('workouts', rec).then(async () => {
     await discardActive();
@@ -696,7 +999,7 @@ function saveWorkout(donePairs) {
     showView('home');
     showCheer('finish', rec.setCount + ' sets · ' + fmtW(rec.volumeKg) +
       (rec.durationSec ? ' · ' + fmtDur(rec.durationSec) : ''));
-    backgroundSync();          // fire-and-forget; never blocks or blocks on failure
+    backupAfterWorkout();      // fire-and-forget; never blocks, but does report
   });
 }
 
@@ -729,21 +1032,45 @@ function syncPayload() {
     exportedAt: new Date().toISOString(),
     workouts: state.workouts,
     customExercises: state.custom,
-    bodyWeights: state.weights
+    bodyWeights: state.weights,
+    customTemplates: state.templates
   };
 }
 
-/* pull -> merge all three -> push. Done here rather than inside sync.js so the
-   transport stays ignorant of record types and every merge stays union-only. */
-async function backgroundSync() {
-  if (!sync.isConnected()) return;
+/* How long a backup may go stale before the app says so on the Home screen.
+   Two days: long enough that a rest day or a flat battery is not an alarm,
+   short enough that a silently dead backup is caught within one training week
+   rather than discovered when a phone is lost. */
+const BACKUP_STALE_MS = 2 * DAY;
 
-  const remote = await sync.pull();                 // null on failure/offline
+/* True when Drive is connected but the backup is not actually working: either
+   the last attempt failed in a way only a tap can fix, or nothing has succeeded
+   in BACKUP_STALE_MS. This is what turns a silent failure into a visible one. */
+function backupUnhealthy() {
+  if (!sync.isConnected()) return false;
+  if (sync.needsAuth()) return true;
+  const last = sync.lastSync();
+  return last == null || (Date.now() - last) > BACKUP_STALE_MS;
+}
+
+/* pull -> merge all three -> push. Done here rather than inside sync.js so the
+   transport stays ignorant of record types and every merge stays union-only.
+
+   `opts.interactive` is passed only by things the user tapped. An automatic
+   sync must stay silent -- a Google popup with no user gesture is blocked by
+   the browser anyway -- but when the silent path fails the failure is now
+   recorded and surfaced instead of being swallowed. */
+async function backgroundSync(opts) {
+  if (!sync.isConnected()) return { ok: false, reason: 'not-connected' };
+  const interactive = !!(opts && opts.interactive);
+
+  const remote = await sync.pull({ interactive });  // null on failure/offline
   const beforeW = state.workouts.length;
 
   const workouts = mergeWorkouts(state.workouts, remote && remote.workouts);
   const custom   = mergeCustomExercises(state.custom, remote && remote.customExercises);
   const weights  = mergeBodyWeights(state.weights, remote && remote.bodyWeights);
+  const tpls     = mergeCustomTemplates(state.templates, remote && remote.customTemplates);
 
   // Persist only what this device was missing; a union can never shrink.
   const haveW = new Set(state.workouts.map(w => w.id));
@@ -752,9 +1079,14 @@ async function backgroundSync() {
 
   if (custom.length !== state.custom.length) { state.custom = custom; await saveCustom(); }
   if (weights.length !== state.weights.length) { state.weights = weights; await saveWeights(); }
+  // Templates compare by JSON, not length: a rename arriving from another
+  // device changes content without changing the count.
+  if (JSON.stringify(tpls) !== JSON.stringify(state.templates)) {
+    state.templates = tpls; await saveTemplates();
+  }
   rebuildExerciseIndex();
 
-  await sync.push(syncPayload());                   // resolves even on failure
+  const pushed = await sync.push(syncPayload(), { interactive }); // resolves even on failure
 
   const gained = state.workouts.length - beforeW;
   if (gained > 0) {
@@ -763,6 +1095,25 @@ async function backgroundSync() {
     toast('Restored ' + gained + ' workout(s) from Drive');
   }
   renderDrive();
+  // Home carries the backup warning, so it has to repaint when health changes.
+  if (state.view === 'home' && gained <= 0) renderHome();
+  return { ok: !!pushed, reason: pushed ? null : (sync.lastError() || 'push-failed') };
+}
+
+/* Automatic sync that is allowed to complain. Used after a workout is saved --
+   the one moment where a failed backup matters most and where, until now, the
+   failure was completely invisible because the status listener only rendered
+   while Settings was on screen.
+
+   Offline is not an error worth a toast: it is expected in a basement gym and
+   the next sync will pick it up. Anything else gets one line. */
+async function backupAfterWorkout() {
+  const r = await backgroundSync();
+  if (r.ok || !sync.isConnected()) return;
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+  toast(sync.needsAuth()
+    ? 'Backup needs reconnecting — Settings › Sync now'
+    : 'Backup failed — your workout is saved on this phone');
 }
 
 /* Show which build is actually running. The service-worker cache name carries
@@ -788,9 +1139,28 @@ function renderDrive() {
   $('#drive-connect').hidden = on;
   $('#drive-sync').hidden = !on;
   $('#drive-disconnect').hidden = !on;
-  $('#drive-state').textContent = on
-    ? (last ? 'Connected · last backed up ' + relTime(last).toLowerCase() : 'Connected · not backed up yet')
-    : 'Not connected.';
+
+  /* "Connected · last backed up 6 days ago" was indistinguishable from a
+     working backup, because nothing else ever contradicted it. State the
+     verdict first, and name the raw failure code -- a friendly message that
+     never says what broke is how this went unnoticed for a week. */
+  const box = $('#drive-state');
+  if (!on) { box.textContent = 'Not connected.'; box.classList.remove('warnline'); return; }
+  const when = last ? 'Last backed up ' + relTime(last).toLowerCase() + '.' : 'Never backed up yet.';
+  const bad = backupUnhealthy();
+  box.classList.toggle('warnline', bad);
+  const code = sync.lastError();
+  if (sync.needsAuth()) {
+    box.innerHTML = '<strong>Backup is not working.</strong> Google sign-in has expired — ' +
+      'tap <strong>Sync now</strong> to reconnect. ' + esc(when) +
+      (code ? '<br><span class="muted small">Reason: ' + esc(code) + '</span>' : '');
+  } else if (bad) {
+    box.innerHTML = '<strong>Backup is behind.</strong> ' + esc(when) +
+      ' Tap <strong>Sync now</strong>.' +
+      (code ? '<br><span class="muted small">Reason: ' + esc(code) + '</span>' : '');
+  } else {
+    box.textContent = 'Connected · ' + when.charAt(0).toLowerCase() + when.slice(1);
+  }
 }
 
 function promptResume(a) {
@@ -807,7 +1177,7 @@ function promptResume(a) {
             $('#restbar').hidden = false;
             clearInterval(rest.iv); rest.iv = setInterval(restTick, 250);
           }
-          buildActiveHeader(); renderActive(); showView('active');
+          reopenActive();
         }
       },
       {
@@ -929,11 +1299,22 @@ function openGlossary(term) {
 }
 
 /* ================= history & read-only workout view ================= */
+/* One-line summary for a saved workout. Volume is dropped when the session was
+   pure cardio -- "0 kg volume" reads as a bug, not as information. */
+function workoutMeta(w) {
+  const k = w.kcal || 0;
+  const bits = [fmtDur(w.durationSec)];
+  if (w.volumeKg > 0) bits.push(fmtW(w.volumeKg));
+  bits.push(w.setCount + ' set' + (w.setCount === 1 ? '' : 's'));
+  if (k > 0) bits.push(k + ' kcal');
+  return bits.join(' · ');
+}
+
 function renderHistory() {
   const groups = {};
   for (const w of state.workouts) {
     const d = new Date(w.startTime);
-    const k = d.getFullYear() + '-' + d.getMonth();
+    const k = d.getFullYear() + '-' + String(d.getMonth()).padStart(2, '0');
     (groups[k] = groups[k] || []).push(w);
   }
   const keys = Object.keys(groups).sort().reverse();
@@ -944,7 +1325,7 @@ function renderHistory() {
         `<button class="hist-item" data-wod="${esc(w.id)}">
           <span class="hi-date">${esc(fmtDate(w.startTime))}</span>
           <span class="hi-name">${esc(w.templateName)}</span>
-          <span class="hi-meta">${fmtDur(w.durationSec)} · ${fmtW(w.volumeKg)} · ${w.setCount} sets</span>
+          <span class="hi-meta">${esc(workoutMeta(w))}</span>
         </button>`).join('') + '</div>';
   }).join('') || '<p class="muted pad-s">No workouts logged yet.</p>';
 }
@@ -960,21 +1341,210 @@ function openWod(id) {
     map[s.exerciseId].push(s);
   }
   $('#wod-body').innerHTML =
-    `<div class="wod-sum">${esc(w.templateName)} · ${fmtDur(w.durationSec)} · ${fmtW(w.volumeKg)} volume · ${w.setCount} sets</div>` +
+    `<div class="wod-sum">${esc(w.templateName)} · ${esc(workoutMeta(w))}</div>` +
+    `<button class="addex" id="wod-save-tpl"><svg class="ic"><use href="#i-plus"/></svg>Save as template</button>` +
     order.map(exId => {
       const sets = map[exId];
-      return `<article class="ex-card">
+      const cardio = sets.some(s => s.cardio);
+      const body = cardio
+        // Cardio prints as one line per interval: the weight/reps columns would
+        // be two dashes and a zero.
+        ? sets.map(s => `<div class="ro-cardio">
+            <span class="ro-n">${s.setNumber}</span>
+            <span>${esc(fmtCardio(s))}${s.kcalEstimated && s.kcal ? ' <span class="cr-est">est.</span>' : ''}</span>
+            ${s.note ? `<span class="ro-note">Note: ${esc(s.note)}</span>` : ''}
+          </div>`).join('')
+        : `<div class="ro-grid" style="margin-top:6px"><span class="ro-h">SET</span><span class="ro-h">WEIGHT</span><span class="ro-h">REPS</span></div>` +
+          sets.map(s => `<div class="ro-grid ro-row${s.isWarmup ? ' warmup' : ''}">
+            <span>${s.setNumber}${s.isWarmup ? ' <span class="badge warm">Warm-up</span>' : ''}${s.pr ? ' <span class="badge pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span>' : ''}</span>
+            <span>${s.weightKg > 0 ? esc(fmtW(s.weightKg)) : '—'}</span>
+            <span>${s.reps}</span>
+            ${s.note ? `<span class="ro-note">Note: ${esc(s.note)}</span>` : ''}
+          </div>`).join('');
+      return `<article class="ex-card${cardio ? ' cardio-card' : ''}">
         <header class="ex-head"><span class="ex-name" style="cursor:default"><span>${esc(sets[0].exerciseName)}</span></span></header>
-        <div class="ro-grid" style="margin-top:6px"><span class="ro-h">SET</span><span class="ro-h">WEIGHT</span><span class="ro-h">REPS</span></div>
-        ${sets.map(s => `<div class="ro-grid ro-row${s.isWarmup ? ' warmup' : ''}">
-          <span>${s.setNumber}${s.isWarmup ? ' <span class="badge warm">Warm-up</span>' : ''}${s.pr ? ' <span class="badge pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span>' : ''}</span>
-          <span>${s.weightKg > 0 ? esc(fmtW(s.weightKg)) : '—'}</span>
-          <span>${s.reps}</span>
-          ${s.note ? `<span class="ro-note">Note: ${esc(s.note)}</span>` : ''}
-        </div>`).join('')}
+        ${body}
       </article>`;
     }).join('');
+  $('#wod-save-tpl').onclick = () => saveWorkoutAsTemplate(w);
   showView('wod');
+}
+
+/* Turn a logged workout into a reusable template. The name is asked for up
+   front because the workout's own name ("Upper Body 1", "Custom workout") is
+   rarely what the user wants the template called. */
+function saveWorkoutAsTemplate(w) {
+  showModal({
+    title: 'Save as template',
+    body: '<label class="fld"><span>Template name</span>' +
+      '<input id="tpl-nm" class="inp wide" type="text" autocomplete="off" value="' +
+      esc(w.templateName || '') + '"></label>' +
+      '<p class="muted small">Exercises and set counts are copied from this workout. ' +
+      'Warm-up sets are not counted.</p>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Save template', primary: true, onClick: () => {
+          const v = validateTemplateName($('#tpl-nm').value);
+          if (!v.ok) { toast(v.error || 'Give it a name'); return false; }
+          const tpl = templateFromWorkout(w, v.name, { now: Date.now() });
+          state.templates = state.templates.concat([tpl]);
+          saveTemplates().then(() => backgroundSync());
+          toast('Saved "' + tpl.name + '"');
+        } }
+    ]
+  });
+}
+
+/* ================= template editor ================= */
+/* Edits a draft copy and commits on Save, so backing out of a half-finished
+   edit cannot leave a mangled template behind. */
+let tplDraft = null;
+
+function openTemplateEditor(tplId) {
+  const existing = tplId ? state.templates.find(t => t.id === tplId) : null;
+  tplDraft = existing ? JSON.parse(JSON.stringify(existing))
+                      : newTemplate('', { now: Date.now() });
+  renderTemplateEditor(!!existing);
+}
+
+function tplField(cls, label, value, hint, i) {
+  return `<label class="tpl-f"><span>${esc(label)}</span>
+    <input class="inp ${cls}" type="text" value="${esc(value)}" placeholder="${esc(hint)}"
+      data-i="${i}" autocomplete="off" aria-label="${esc(label)}"></label>`;
+}
+
+function templateEditorRowsHTML() {
+  if (!tplDraft.exercises.length)
+    return '<p class="muted pad-s">No exercises yet — add one below.</p>';
+  return tplDraft.exercises.map((e, i) => {
+    // A cardio row prescribes minutes; reps and rest mean nothing for it.
+    const fields = e.cardio
+      ? tplField('tf-dur', 'MINUTES', dispMin(e.durationSec), '30', i)
+      : tplField('tf-reps', 'REPS', e.reps, '8-12', i) +
+        tplField('tf-rest', 'REST', e.rest, '2-3 min', i);
+    return `
+    <div class="tpl-ex" data-i="${i}">
+      <div class="tpl-ex-main">
+        <strong>${esc(e.name)}</strong>
+        ${e.cardio ? '<span class="muted small">Cardio — logged by time</span>' : ''}
+      </div>
+      <div class="tpl-ex-fields">${fields}</div>
+      <div class="tpl-ex-sets">
+        <button class="btn tiny" data-te="dec" aria-label="Fewer sets"><svg class="ic"><use href="#i-minus"/></svg></button>
+        <span class="tpl-ex-n">${e.sets}<span class="muted small"> ${e.cardio ? (e.sets === 1 ? 'interval' : 'intervals') : 'sets'}</span></span>
+        <button class="btn tiny" data-te="inc" aria-label="More sets"><svg class="ic"><use href="#i-plus"/></svg></button>
+      </div>
+      <div class="tpl-ex-ord">
+        <button class="btn tiny" data-te="up" aria-label="Move up"${i === 0 ? ' disabled' : ''}><svg class="ic"><use href="#i-up"/></svg></button>
+        <button class="btn tiny" data-te="down" aria-label="Move down"${i === tplDraft.exercises.length - 1 ? ' disabled' : ''}><svg class="ic"><use href="#i-down"/></svg></button>
+        <button class="btn tiny danger" data-te="del" aria-label="Remove ${esc(e.name)}">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* Read every reps / rest / minutes field in the editor back into the draft.
+   Called before anything that re-renders the list or saves, so a value typed
+   and not blurred is never silently dropped. */
+function commitTplFields() {
+  if (!tplDraft) return;
+  const now = Date.now();
+  for (const el of $$('#tpl-ex-list .tf-reps'))
+    tplDraft = tplSetReps(tplDraft, +el.dataset.i, el.value, { now });
+  for (const el of $$('#tpl-ex-list .tf-rest'))
+    tplDraft = tplSetRest(tplDraft, +el.dataset.i, el.value, { now });
+  for (const el of $$('#tpl-ex-list .tf-dur')) {
+    const sec = parseMin(el.value);
+    if (sec != null) tplDraft = tplSetDuration(tplDraft, +el.dataset.i, sec, { now });
+  }
+}
+
+function renderTemplateEditor(isExisting) {
+  openSheet(
+    '<h2>' + (isExisting ? 'Edit template' : 'New template') + '</h2>' +
+    '<label class="fld"><span>Name</span><input id="tpl-name" class="inp wide" type="text" ' +
+    'autocomplete="off" placeholder="e.g. Push Day" value="' + esc(tplDraft.name) + '"></label>' +
+    '<div id="tpl-ex-list" class="tpl-ex-list">' + templateEditorRowsHTML() + '</div>' +
+    '<button class="btn" id="tpl-add"><svg class="ic"><use href="#i-plus"/></svg>Add exercise</button>' +
+    '<div class="tpl-actions">' +
+      '<button class="btn primary" id="tpl-save">Save template</button>' +
+      (isExisting ? '<button class="btn danger" id="tpl-del">Delete template</button>' : '') +
+    '</div>');
+
+  // Keep whatever has been typed when the list re-renders.
+  const nameEl = $('#tpl-name');
+  nameEl.addEventListener('input', () => { tplDraft.name = nameEl.value; });
+
+  $('#tpl-ex-list').onclick = e => {
+    const b = e.target.closest('[data-te]');
+    if (!b) return;
+    // Whatever is half-typed in the reps/rest/minutes fields is committed
+    // first, so reordering or adding a set never discards it.
+    commitTplFields();
+    const i = +b.closest('.tpl-ex').dataset.i;
+    const now = Date.now();
+    const act = b.dataset.te;
+    if (act === 'inc')  tplDraft = tplSetSets(tplDraft, i, tplDraft.exercises[i].sets + 1, { now });
+    if (act === 'dec')  tplDraft = tplSetSets(tplDraft, i, tplDraft.exercises[i].sets - 1, { now });
+    if (act === 'del')  tplDraft = tplRemoveExercise(tplDraft, i, { now });
+    if (act === 'up')   tplDraft = tplMoveExercise(tplDraft, i, i - 1, { now });
+    if (act === 'down') tplDraft = tplMoveExercise(tplDraft, i, i + 1, { now });
+    $('#tpl-ex-list').innerHTML = templateEditorRowsHTML();
+  };
+
+  // Committed on change (blur / keyboard done) rather than on every keystroke:
+  // each setter returns a fresh template, and re-reading the list mid-type
+  // would fight the field the user is still in.
+  $('#tpl-ex-list').addEventListener('change', ev => {
+    if (!ev.target.classList.contains('inp')) return;
+    commitTplFields();
+  });
+
+  $('#tpl-add').onclick = () => {
+    commitTplFields();
+    openExercisePicker('Add to template', exId => {
+      const ex = resolveExercise(exId, null);
+      tplDraft = tplAddExercise(tplDraft, {
+        id: exId, name: (ex && ex.name) || exId, cardio: isCardio(ex)
+      }, { now: Date.now() });
+      renderTemplateEditor(isExisting);
+    });
+  };
+
+  $('#tpl-save').onclick = () => {
+    commitTplFields();
+    const v = validateTemplateName(tplDraft.name);
+    if (!v.ok) { toast(v.error || 'Give it a name'); return; }
+    if (!tplDraft.exercises.length) { toast('Add at least one exercise'); return; }
+    const now = Date.now();
+    const saved = renameTemplate(tplDraft, v.name, { now });
+    const i = state.templates.findIndex(t => t.id === saved.id);
+    state.templates = i >= 0
+      ? state.templates.map(t => (t.id === saved.id ? saved : t))
+      : state.templates.concat([saved]);
+    saveTemplates().then(() => backgroundSync());
+    closeSheet();
+    renderHome();
+    toast('Saved "' + saved.name + '"');
+  };
+
+  if (isExisting) $('#tpl-del').onclick = () => {
+    const id = tplDraft.id, nm = tplDraft.name;
+    showModal({
+      title: 'Delete template?',
+      body: '<p>Delete <strong>' + esc(nm) + '</strong>? Workouts you already logged from it are kept.</p>',
+      actions: [
+        { label: 'Cancel' },
+        { label: 'Delete template', danger: true, onClick: () => {
+            state.templates = state.templates.filter(t => t.id !== id);
+            saveTemplates().then(() => backgroundSync());
+            closeSheet();
+            renderHome();
+            toast('Deleted "' + nm + '"');
+          } }
+      ]
+    });
+  };
 }
 
 function deleteCurrentWod() {
@@ -1049,7 +1619,10 @@ const stamp = () => new Date().toISOString().slice(0, 10);
 const sortedAsc = () => [...state.workouts].sort((a, b) => a.startTime - b.startTime);
 
 function exportCSV() {
-  const rows = [['date','workout','exercise','set_number','is_warmup','weight_kg','weight_display','unit','reps','estimated_1rm','notes']];
+  // Cardio columns are appended, never inserted: anything already parsing this
+  // export by column position keeps working.
+  const rows = [['date','workout','exercise','set_number','is_warmup','weight_kg','weight_display','unit','reps','estimated_1rm','notes',
+                 'is_cardio','duration_sec','speed_kmh','incline_pct','kcal','kcal_estimated']];
   for (const w of sortedAsc())
     for (const s of w.sets) {
       const e = e1rm(s.weightKg, s.reps);
@@ -1057,7 +1630,10 @@ function exportCSV() {
         new Date(w.startTime).toISOString().slice(0, 10), w.templateName, s.exerciseName,
         s.setNumber, s.isWarmup ? 'true' : 'false',
         s.weightKg ?? 0, dispKg(s.weightKg ?? 0) ?? 0, unit, s.reps ?? 0,
-        e == null ? '' : e.toFixed(2), s.note || ''
+        e == null ? '' : e.toFixed(2), s.note || '',
+        s.cardio ? 'true' : 'false',
+        s.durationSec ?? '', s.speedKmh ?? '', s.inclinePct ?? '', s.kcal ?? '',
+        s.cardio ? (s.kcalEstimated ? 'true' : 'false') : ''
       ]);
     }
   const csv = rows.map(r => r.map(v => {
@@ -1074,12 +1650,15 @@ function exportMD() {
     out += `## ${fmtDate(w.startTime)} — ${w.templateName}
 
 `;
-    out += `${fmtDur(w.durationSec)} · volume ${fmtW(w.volumeKg)} · ${w.setCount} sets
+    out += `${workoutMeta(w)}
 
 `;
     out += '| Set | Exercise | Weight | Reps | Notes |\n|---|---|---|---|---|\n';
     for (const s of w.sets)
-      out += `| ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' ★PR' : ''} | ${s.exerciseName} | ${s.weightKg > 0 ? fmtW(s.weightKg) : '—'} | ${s.reps} | ${s.note || ''} |
+      out += s.cardio
+        ? `| ${s.setNumber} | ${s.exerciseName} | ${fmtCardio(s)} | — | ${s.note || ''} |
+`
+        : `| ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' ★PR' : ''} | ${s.exerciseName} | ${s.weightKg > 0 ? fmtW(s.weightKg) : '—'} | ${s.reps} | ${s.note || ''} |
 `;
     out += '\n';
   }
@@ -1092,10 +1671,13 @@ function exportTXT() {
   for (const w of sortedAsc()) {
     out += `${fmtDate(w.startTime)} — ${w.templateName}
 `;
-    out += `Duration ${fmtDur(w.durationSec)} · Volume ${fmtW(w.volumeKg)} · ${w.setCount} sets
+    out += `${workoutMeta(w)}
 `;
     for (const s of w.sets)
-      out += `  Set ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' [PR]' : ''}: ${s.exerciseName} — ${s.weightKg > 0 ? fmtW(s.weightKg) + ' x ' : ''}${s.reps} reps${s.note ? ' — ' + s.note : ''}
+      out += s.cardio
+        ? `  Set ${s.setNumber}: ${s.exerciseName} — ${fmtCardio(s)}${s.note ? ' — ' + s.note : ''}
+`
+        : `  Set ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' [PR]' : ''}: ${s.exerciseName} — ${s.weightKg > 0 ? fmtW(s.weightKg) + ' x ' : ''}${s.reps} reps${s.note ? ' — ' + s.note : ''}
 `;
     out += '\n';
   }
@@ -1104,9 +1686,16 @@ function exportTXT() {
 }
 
 function exportJSON() {
+  /* schemaVersion 2 -- the same four record types the Drive mirror carries.
+     Version 1 backups held workouts only, which meant a restore silently lost
+     every custom exercise, custom template and body-weight entry. Importing a
+     v1 file still works: the extra keys are simply absent. */
   const payload = {
-    app: 'LiftLog', schemaVersion: 1, exportedAt: new Date().toISOString(),
+    app: 'LiftLog', schemaVersion: 2, exportedAt: new Date().toISOString(),
     workouts: state.workouts,
+    customExercises: state.custom,
+    customTemplates: state.templates,
+    bodyWeights: state.weights,
     settings: { unit, theme: prefs.theme, defaultRest: prefs.defaultRest, swaps: prefs.swaps }
   };
   download(`liftlog-backup-${stamp()}.json`, 'application/json', JSON.stringify(payload, null, 2));
@@ -1122,11 +1711,21 @@ function importJSON(file) {
     const valid = arr.filter(w => w && w.id && Array.isArray(w.sets) && w.startTime);
     const have = new Set(state.workouts.map(w => w.id));
     const fresh = valid.filter(w => !have.has(w.id)); // merge by id — never replace
-    if (!fresh.length) { toast('Nothing new — all workouts already exist'); return; }
+    /* Exercises, templates and body weights ride along in schemaVersion 2
+       files. Merged with the same union-only functions the Drive sync uses, so
+       an import can no more delete something than a sync can. */
+    const exs  = mergeCustomExercises(state.custom, j.customExercises);
+    const tpls = mergeCustomTemplates(state.templates, j.customTemplates);
+    const wts  = mergeBodyWeights(state.weights, j.bodyWeights);
+    const extra = (exs.length - state.custom.length) + (tpls.length - state.templates.length) +
+                  (wts.length - state.weights.length);
+    if (!fresh.length && extra <= 0) { toast('Nothing new — everything is already here'); return; }
     const dates = fresh.map(w => fmtDate(w.startTime)).sort();
+    const range = fresh.length ? ` (${esc(dates[0])} → ${esc(dates[dates.length - 1])})` : '';
     showModal({
       title: 'Import backup',
-      body: `<p>Add <strong>${fresh.length}</strong> workout${fresh.length > 1 ? 's' : ''} (${esc(dates[0])} → ${esc(dates[dates.length - 1])})?</p>
+      body: `<p>Add <strong>${fresh.length}</strong> workout${fresh.length === 1 ? '' : 's'}${range}` +
+        (extra > 0 ? ` and <strong>${extra}</strong> exercise/template/weight record${extra === 1 ? '' : 's'}` : '') + `?</p>
         <p class="muted">${valid.length - fresh.length} duplicate${valid.length - fresh.length === 1 ? '' : 's'} will be skipped. Existing data is never replaced.</p>`,
       actions: [
         { label: 'Cancel' },
@@ -1134,7 +1733,11 @@ function importJSON(file) {
           label: 'Import', primary: true, onClick: async () => {
             for (const w of fresh) await DB.put('workouts', w);
             state.workouts = (await DB.getAll('workouts')).sort((a, b) => b.startTime - a.startTime);
-            toast(`Imported ${fresh.length} workout${fresh.length > 1 ? 's' : ''}`);
+            if (exs.length !== state.custom.length) { state.custom = exs; await saveCustom(); }
+            if (tpls.length !== state.templates.length) { state.templates = tpls; await saveTemplates(); }
+            if (wts.length !== state.weights.length) { state.weights = wts; await saveWeights(); }
+            rebuildExerciseIndex();
+            toast(`Imported ${fresh.length} workout${fresh.length === 1 ? '' : 's'}`);
             if (state.view === 'home') renderHome();
             if (state.view === 'history') renderHistory();
           }
@@ -1191,9 +1794,13 @@ function wire() {
 
   // home
   $('#home-body').addEventListener('click', e => {
-    const b = e.target.closest('[data-tpl],[data-wod]');
+    const b = e.target.closest('[data-tpl],[data-wod],[data-tpledit],[data-tplnew]');
     if (!b) return;
-    if (b.dataset.tpl) startWorkout(b.dataset.tpl);
+    // Edit and create are checked first: the edit control sits beside the card,
+    // so a tap that lands on it must not fall through to starting a workout.
+    if (b.dataset.tplnew) openTemplateEditor(null);
+    else if (b.dataset.tpledit) openTemplateEditor(b.dataset.tpledit);
+    else if (b.dataset.tpl) startWorkout(b.dataset.tpl);
     else openWod(b.dataset.wod);
   });
 
@@ -1222,10 +1829,28 @@ function wire() {
   // weight/reps edits commit on change (blur / keyboard done) — no re-render, so focus is safe
   $('#aw-body').addEventListener('change', e => {
     const i = e.target;
-    if (!i.classList.contains('w-inp') && !i.classList.contains('r-inp')) return;
+    const isCardioField = i.classList.contains('d-inp') || i.classList.contains('sp-inp') ||
+                          i.classList.contains('in-inp') || i.classList.contains('k-inp');
+    if (!isCardioField && !i.classList.contains('w-inp') && !i.classList.contains('r-inp')) return;
     const row = i.closest('.set-row');
-    const s = state.active.exercises[+row.dataset.ei].sets[+row.dataset.si];
+    const ex = state.active.exercises[+row.dataset.ei];
+    const s = ex.sets[+row.dataset.si];
     if (s.done) return;
+    if (isCardioField) {
+      readCardioRow(ex, s, row);
+      saveActive();
+      // Only the calorie field and its "est." marker can change as a result, so
+      // repaint that one row rather than the whole view -- a full re-render
+      // would steal focus while the number pad is still open.
+      const k = row.querySelector('.k-inp');
+      if (k && document.activeElement !== k) k.value = s.kcal == null ? '' : s.kcal;
+      const est = row.querySelector('.cr-est');
+      const wantEst = !s.kcalManual && s.kcal != null;
+      if (est && !wantEst) est.remove();
+      if (!est && wantEst) row.querySelector('.cr-actions')
+        .insertAdjacentHTML('afterbegin', '<span class="cr-est">est.</span>');
+      return;
+    }
     if (i.classList.contains('w-inp')) {
       const v = parseDisp(i.value);
       s.weightKg = v == null ? null : toKg(v);
@@ -1237,8 +1862,13 @@ function wire() {
     saveActive();
   });
 
+  // minimised workout bar
+  $('#mini-open').onclick = reopenActive;
+  $('#mini-finish').onclick = () => { reopenActive(); finishFlow(); };
+
   // active header
   $('#btn-finish').onclick = finishFlow;
+  $('#aw-minimise').onclick = () => showView('home');
   $('#aw-timer').onclick = timerToggle;
   $('#aw-menu').onclick = () => showModal({
     title: 'Workout options',
@@ -1309,7 +1939,11 @@ function wire() {
   };
   $('#drive-sync').onclick = async () => {
     $('#drive-state').textContent = 'Backing up…';
-    await backgroundSync();
+    // The user tapped, so this one is allowed to raise Google's consent
+    // prompt. Without an interactive path here there was no way at all to
+    // recover an expired grant short of Disconnect + Connect.
+    const r = await backgroundSync({ interactive: true });
+    toast(r.ok ? 'Backed up to Drive' : 'Backup failed — see the note above');
   };
   $('#drive-disconnect').onclick = async () => {
     await sync.disconnect();          // clears local flags only; deletes nothing
@@ -1349,6 +1983,7 @@ function wire() {
   state.workouts = (await DB.getAll('workouts')).sort((a, b) => b.startTime - a.startTime);
   state.custom = (await DB.get('kv', 'custom')) || [];
   state.weights = (await DB.get('kv', 'weights')) || [];
+  state.templates = (await DB.get('kv', 'templates')) || [];
   rebuildExerciseIndex();
   const act = await DB.get('kv', 'active');
   if (act) state.active = act;
@@ -1359,6 +1994,18 @@ function wire() {
   // Pull anything this device is missing (e.g. a replaced phone). Deferred so
   // it can never delay first paint, and it fails silently when offline.
   setTimeout(backgroundSync, 1200);
+  /* Retry a failed backup when the phone comes back -- network returning, or
+     the app being brought to the foreground. Without this a backup that failed
+     in the gym waited until the *next* workout to try again. Skipped when the
+     failure needs a tap, since a silent retry would fail identically. */
+  const retryIfBehind = () => {
+    if (!sync.isConnected() || sync.needsAuth()) return;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+    if (!backupUnhealthy()) return;
+    backgroundSync();
+  };
+  window.addEventListener('online', retryIfBehind);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) retryIfBehind(); });
   /* Ask for persistent storage -- and keep asking until it is actually
      granted. Chrome refuses this until the app is installed or the site has
      earned enough engagement, so a single fire-and-forget attempt on first run
@@ -1547,7 +2194,8 @@ function pickerRowsHTML(q) {
   const rows = searchExercises(exIndex, q, { limit: 120 });
   if (!rows.length) return '<p class="muted pad-s">No match. Create it below.</p>';
   return rows.map(x => {
-    const tag = [x.muscle || '', x.custom ? 'custom' : (x.isAlternative ? 'alternative' : '')]
+    const tag = [x.muscle || '', x.cardio ? 'time-based' : '',
+                 x.custom ? 'custom' : (x.isAlternative ? 'alternative' : '')]
       .filter(Boolean).join(' · ');
     const count = x.timesLogged
       ? '<span class="pick-n">' + x.timesLogged + '\u00d7</span><span class="muted small">' +
@@ -1583,21 +2231,38 @@ function openExercisePicker(title, onPick) {
 function openCreateExercise(onPick) {
   const muscles = ['Chest','Back','Shoulders','Biceps','Triceps','Quads','Hamstrings',
                    'Glutes','Calves','Lower Back','Core','Cardio','Other'];
+  // Cardio style decides which fields the set row offers and how calories are
+  // estimated: treadmill-shaped work gets speed + incline and the ACSM
+  // equations, everything else a flat MET.
+  const modes = [
+    { v: 'walk',  label: 'Walking / incline walking (speed + incline)', met: 4.3 },
+    { v: 'run',   label: 'Running (speed + incline)',                   met: 9.8 },
+    { v: 'other', label: 'Machine or activity (time only)',             met: 6.0 }
+  ];
   showModal({
     title: 'New exercise',
     body: '<label class="fld"><span>Name</span>' +
       '<input id="nx-name" class="inp wide" type="text" autocomplete="off" placeholder="e.g. Cable Crossover"></label>' +
       '<label class="fld"><span>Muscle group</span><select id="nx-muscle" class="inp wide">' +
       muscles.map(m => '<option>' + esc(m) + '</option>').join('') + '</select></label>' +
-      '<label class="checkline"><input type="checkbox" id="nx-bw"> Bodyweight (no weight column)</label>',
+      '<label class="fld" id="nx-mode-fld" hidden><span>Cardio style</span><select id="nx-mode" class="inp wide">' +
+      modes.map(m => '<option value="' + esc(m.v) + '">' + esc(m.label) + '</option>').join('') + '</select></label>' +
+      '<label class="checkline" id="nx-bw-fld"><input type="checkbox" id="nx-bw"> Bodyweight (no weight column)</label>',
     actions: [
       { label: 'Cancel' },
       { label: 'Create', primary: true, onClick: () => {
           const name = $('#nx-name').value.trim();
           if (!name) { toast('Give it a name'); return false; }
+          const muscle = $('#nx-muscle').value;
+          const cardio = muscle === 'Cardio';
+          const mode = cardio ? $('#nx-mode').value : null;
           let ex;
           try {
-            ex = makeCustomExercise(name, $('#nx-muscle').value, { bodyweight: $('#nx-bw').checked });
+            ex = makeCustomExercise(name, muscle, {
+              bodyweight: $('#nx-bw').checked,
+              cardio, mode,
+              met: cardio ? (modes.find(m => m.v === mode) || {}).met : undefined
+            });
           } catch (e) { toast('Give it a name'); return false; }
           if (exIndex.some(x => x.id === ex.id)) { toast('That exercise already exists'); return false; }
           state.custom = state.custom.concat([ex]);
@@ -1612,15 +2277,29 @@ function openCreateExercise(onPick) {
         } }
     ]
   });
+  // Wired after showModal has put the body in the DOM.
+  const mus = $('#nx-muscle');
+  const syncMode = () => {
+    const c = mus.value === 'Cardio';
+    $('#nx-mode-fld').hidden = !c;
+    $('#nx-bw-fld').hidden = c;   // cardio never has a weight column anyway
+  };
+  mus.addEventListener('change', syncMode);
+  syncMode();
 }
 
 /* Build a workout-exercise entry for something that has no template row. */
 function adHocEx(exId) {
   const meta = exIndex.find(x => x.id === exId) || {};
-  return makeEx({
-    id: exId, name: meta.name || exId, sets: 3, reps: '8-12', rest: '2 min',
-    superset: null, efforts: []
-  }, null);
+  const cardio = !!meta.cardio;
+  return withKcal(makeEx({
+    id: exId, name: meta.name || exId,
+    // One interval by default: a cardio "3 sets" is almost never what is meant.
+    sets: cardio ? 1 : 3,
+    reps: '8-12', rest: '2 min',
+    superset: null, efforts: [],
+    cardio, durationSec: cardio ? 1800 : null
+  }, null));
 }
 
 function addExerciseToActive(exId) {

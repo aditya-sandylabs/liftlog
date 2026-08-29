@@ -37,6 +37,7 @@
   <symbol id="i-up" viewBox="0 0 24 24"><line x1="12" y1="21" x2="12" y2="9"/><polyline points="6 13 12 7 18 13"/><line x1="5" y1="3" x2="19" y2="3"/></symbol>
   <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 4h14v11l-5 5H5z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="12" y1="11" x2="12" y2="16.5"/></symbol>
+  <symbol id="i-min" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
   <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20.5h19z"/><line x1="12" y1="10" x2="12" y2="14.5"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></symbol>
 </svg>
 
@@ -53,6 +54,7 @@
 
     <section id="view-active" class="view" aria-label="Active workout">
       <header class="topbar active-bar">
+        <button class="icon-btn" id="aw-minimise" aria-label="Minimise workout — it keeps running"><svg class="ic"><use href="#i-min"/></svg></button>
         <button class="icon-btn" id="aw-menu" aria-label="Workout options"><svg class="ic"><use href="#i-dots"/></svg></button>
         <div class="aw-title">
           <h1 id="aw-name">Workout</h1>
@@ -181,6 +183,18 @@
     <button data-v="quotes"><img class="ic-img" src="./marcus.png" alt="" width="22" height="22"><span>Stoic</span></button>
     <button data-v="settings"><svg class="ic"><use href="#i-gear"/></svg><span>Settings</span></button>
   </nav>
+
+  <div id="minibar" hidden>
+    <button class="mini-open" id="mini-open" aria-label="Back to your workout">
+      <span class="mini-main">
+        <strong id="mini-name">Workout</strong>
+        <span class="muted small" id="mini-sets">0 sets done</span>
+      </span>
+      <span class="mini-time"><svg class="ic small"><use href="#i-clock"/></svg><span id="mini-elapsed">0:00</span></span>
+      <svg class="ic chev"><use href="#i-chev"/></svg>
+    </button>
+    <button class="rbtn skip" id="mini-finish">Finish</button>
+  </div>
 
   <div id="restbar" hidden>
     <svg class="ic"><use href="#i-clock"/></svg>

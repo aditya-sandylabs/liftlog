@@ -129,15 +129,39 @@ export function buildExerciseIndex({ data, custom, workouts } = {}) {
     }
   }
 
+  // Cardio built-ins. They live here rather than in data.json because
+  // data.json is generated from the Built With Science PDF and is rebuilt by
+  // the scripts in build/ -- anything hand-added there would be wiped.
+  for (const c of CARDIO_EXERCISES) {
+    push({
+      id: c.id,
+      name: c.name,
+      muscle: 'Cardio',
+      video: null,
+      bodyweight: true,
+      cardio: true,
+      mode: c.mode,
+      met: c.met,
+      custom: false,
+      isAlternative: false,
+      timesLogged: 0, setsLogged: 0, lastLoggedTs: null,
+    });
+  }
+
   if (Array.isArray(custom)) {
     for (const c of custom) {
       if (!c || typeof c !== 'object' || !c.id) continue;
+      const cardio = isCardio(c);
       push({
         id: c.id,
         name: c.name,
         muscle: c.muscle != null ? c.muscle : null,
         video: null,
-        bodyweight: !!c.bodyweight,
+        // A cardio exercise has no weight column by definition.
+        bodyweight: cardio ? true : !!c.bodyweight,
+        cardio: cardio,
+        mode: cardio ? cardioMode(c) : null,
+        met: typeof c.met === 'number' && isFinite(c.met) ? c.met : null,
         custom: true,
         isAlternative: false,
         timesLogged: 0, setsLogged: 0, lastLoggedTs: null,
@@ -206,14 +230,24 @@ export function searchExercises(index, query, opts = {}) {
 export function makeCustomExercise(name, muscle, opts = {}) {
   const trimmed = String(name == null ? '' : name).trim();
   if (!trimmed) throw new Error('Exercise name is required.');
-  return {
+  const m = String(muscle == null ? '' : muscle).trim();
+  // Cardio is implied by the muscle group as well as by the explicit flag, so
+  // an exercise filed under "Cardio" logs as time even if the box was missed.
+  const cardio = opts.cardio === true || normText(m) === 'cardio';
+  const rec = {
     id: slugify(trimmed),
     name: trimmed,
-    muscle: String(muscle == null ? '' : muscle).trim(),
+    muscle: m,
     custom: true,
-    bodyweight: !!opts.bodyweight,
+    bodyweight: cardio ? true : !!opts.bodyweight,
     createdAt: Number.isFinite(opts.now) ? opts.now : Date.now(),
   };
+  if (cardio) {
+    rec.cardio = true;
+    rec.mode = (opts.mode === 'walk' || opts.mode === 'run') ? opts.mode : 'other';
+    rec.met = Number.isFinite(opts.met) && opts.met > 0 ? opts.met : 6;
+  }
+  return rec;
 }
 
 /* ------------------------------------------------------------------ */
@@ -515,3 +549,147 @@ export function bodyWeightSVG(entries, opts = {}) {
   return parts.join('\n');
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Cardio                                                              */
+/* ------------------------------------------------------------------ */
+/*
+ * Cardio is modelled as an exercise like any other, so it flows through the
+ * picker, templates, history, sync and export untouched. What differs is the
+ * SET: a cardio set carries durationSec / speedKmh / inclinePct / kcal instead
+ * of weightKg / reps, and contributes zero to training volume.
+ *
+ * `mode` decides which fields are worth asking for:
+ *   'walk' / 'run' — treadmill-shaped: speed and incline both meaningful, and
+ *                    calories can be derived from the ACSM equations.
+ *   'other'        — machine or activity with a flat MET estimate only.
+ */
+
+export const CARDIO_EXERCISES = [
+  { id: 'cardio-incline-walk',   name: 'Incline Walking',   mode: 'walk',  met: 4.3 },
+  { id: 'cardio-walk',           name: 'Walking',           mode: 'walk',  met: 3.5 },
+  { id: 'cardio-treadmill-run',  name: 'Treadmill Running', mode: 'run',   met: 9.8 },
+  { id: 'cardio-outdoor-run',    name: 'Outdoor Run',       mode: 'run',   met: 9.8 },
+  { id: 'cardio-stair-climber',  name: 'Stair Climber',     mode: 'other', met: 9.0 },
+  { id: 'cardio-cycling',        name: 'Cycling',           mode: 'other', met: 7.5 },
+  { id: 'cardio-stationary-bike',name: 'Stationary Bike',   mode: 'other', met: 6.8 },
+  { id: 'cardio-elliptical',     name: 'Elliptical',        mode: 'other', met: 5.0 },
+  { id: 'cardio-rowing',         name: 'Rowing Machine',    mode: 'other', met: 7.0 },
+  { id: 'cardio-jump-rope',      name: 'Jump Rope',         mode: 'other', met: 11.0 },
+  { id: 'cardio-swimming',       name: 'Swimming',          mode: 'other', met: 7.0 },
+  { id: 'cardio-hiit',           name: 'HIIT / Conditioning',mode: 'other', met: 8.0 }
+].map(function (c) {
+  return {
+    id: c.id, name: c.name, muscle: 'Cardio', cardio: true,
+    mode: c.mode, met: c.met, bodyweight: true, video: null
+  };
+});
+
+/** True for anything that should be logged as time rather than weight x reps. */
+export function isCardio(ex) {
+  if (!ex || typeof ex !== 'object') return false;
+  if (ex.cardio === true) return true;
+  return normText(ex.muscle) === 'cardio';
+}
+
+/** 'walk' | 'run' | 'other'. Unknown/absent modes fall back to 'other'. */
+export function cardioMode(ex) {
+  if (!ex || typeof ex !== 'object') return 'other';
+  const m = normText(ex.mode);
+  return (m === 'walk' || m === 'run') ? m : 'other';
+}
+
+function fin(v) {
+  const n = typeof v === 'string' ? parseFloat(v.replace(',', '.')) : v;
+  return typeof n === 'number' && isFinite(n) ? n : null;
+}
+
+/**
+ * Approximate energy cost of one cardio set, in kcal.
+ *
+ * Treadmill-shaped work uses the ACSM metabolic equations, which take grade
+ * into account — that is the whole point for incline walking, where the
+ * incline does most of the work and a flat MET number would badly understate
+ * it. Everything else falls back to a MET estimate.
+ *
+ *   walking VO2 (ml/kg/min) = 0.1*S + 1.8*S*G + 3.5      (S in m/min, G as a fraction)
+ *   running VO2             = 0.2*S + 0.9*S*G + 3.5
+ *   kcal/min                = VO2 * bodyKg / 1000 * 5
+ *
+ * The ACSM walking equation is validated for roughly 3–6 km/h and the running
+ * one from about 8 km/h, so a speed outside its band is routed to the other
+ * equation rather than extrapolated. Returns null when there is not enough
+ * input to say anything honest — never a made-up number.
+ */
+export function estimateKcal(opts) {
+  const o = (opts && typeof opts === 'object') ? opts : {};
+  const durationSec = fin(o.durationSec);
+  if (durationSec == null || durationSec <= 0) return null;
+  const minutes = durationSec / 60;
+
+  const bodyKg = fin(o.bodyKg);
+  const kg = (bodyKg != null && bodyKg > 20 && bodyKg < 400) ? bodyKg : 75; // documented fallback
+
+  const speed = fin(o.speedKmh);
+  const mode = (o.mode === 'walk' || o.mode === 'run') ? o.mode : 'other';
+
+  if (mode !== 'other' && speed != null && speed > 0) {
+    const S = speed * (1000 / 60);                 // km/h -> m/min
+    const grade = Math.max(0, Math.min(0.4, (fin(o.inclinePct) || 0) / 100));
+    // Below ~7 km/h the walking equation is the right one whatever the exercise
+    // is called, and above it the running one is. Picking by speed rather than
+    // by label keeps a "run" logged as a 5 km/h uphill trudge honest.
+    const walking = speed < 7;
+    const vo2 = walking ? (0.1 * S + 1.8 * S * grade + 3.5)
+                        : (0.2 * S + 0.9 * S * grade + 3.5);
+    const kcal = vo2 * kg / 1000 * 5 * minutes;
+    return Math.round(kcal);
+  }
+
+  const met = fin(o.met);
+  if (met == null || met <= 0) return null;
+  // MET definition: 1 MET = 3.5 ml/kg/min of O2 = ~1 kcal/kg/hour.
+  return Math.round(met * kg * (minutes / 60));
+}
+
+/** Latest body weight in kg from the weights log, or null if there is none. */
+export function latestBodyKg(entries) {
+  if (!Array.isArray(entries)) return null;
+  let best = null;
+  for (const e of entries) {
+    if (!e || typeof e !== 'object') continue;
+    const ts = fin(e.ts), kg = fin(e.kg);
+    if (ts == null || kg == null || kg <= 0) continue;
+    if (best == null || ts > best.ts) best = { ts, kg };
+  }
+  return best ? best.kg : null;
+}
+
+/** "32:00 · 5.5 km/h · 12% · 245 kcal" — omits whatever is missing. */
+export function fmtCardio(s) {
+  if (!s || typeof s !== 'object') return '';
+  const bits = [];
+  const d = fin(s.durationSec);
+  if (d != null && d > 0) {
+    const m = Math.floor(d / 60), sec = Math.round(d % 60);
+    bits.push(m + ':' + String(sec).padStart(2, '0'));
+  }
+  const sp = fin(s.speedKmh);
+  if (sp != null && sp > 0) bits.push(sp + ' km/h');
+  const inc = fin(s.inclinePct);
+  if (inc != null && inc > 0) bits.push(inc + '%');
+  const k = fin(s.kcal);
+  if (k != null && k > 0) bits.push(k + ' kcal');
+  return bits.join(' \u00b7 ');
+}
+
+/** Total kcal across a workout's sets (0 when it has no cardio). */
+export function workoutKcal(sets) {
+  if (!Array.isArray(sets)) return 0;
+  let t = 0;
+  for (const s of sets) {
+    const k = s && typeof s === 'object' ? fin(s.kcal) : null;
+    if (k != null && k > 0) t += k;
+  }
+  return Math.round(t);
+}

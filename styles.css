@@ -275,6 +275,11 @@ h2{font-size:1.05rem}
 #restbar{
   position:fixed;left:0;right:0;z-index:40;
   bottom:calc(60px + env(safe-area-inset-bottom));
+}
+body.has-mini #restbar{
+  bottom:calc(124px + env(safe-area-inset-bottom));
+}
+#restbar{
   max-width:560px;margin:0 auto;
   display:flex;align-items:center;gap:8px;
   padding:8px 12px;background:var(--surface);
@@ -523,3 +528,116 @@ select.inp{appearance:none;background:var(--surface2)}
 @media (prefers-reduced-motion: reduce){
   .cheer-card,.cheer-emoji,.cheer-ray,.cheer-art::before{animation:none}
 }
+
+/* ---------- custom workout templates ---------- */
+/* The card starts the workout; the edit control is a SIBLING button, not a
+   nested one -- a button inside a button is invalid and untappable. */
+.tpl-row { display: flex; gap: 8px; align-items: stretch; }
+.tpl-row .tpl { flex: 1 1 auto; }
+.tpl-edit { flex: 0 0 auto; width: 52px; min-height: 48px; display: inline-flex;
+  align-items: center; justify-content: center; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); }
+/* Text badge with a border: readable without relying on hue. */
+.tpl-badge { display: inline-block; margin-left: 8px; padding: 1px 7px;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
+.tpl-ex-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.tpl-ex { display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  padding: 10px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); }
+.tpl-ex-main { flex: 1 1 100%; display: flex; flex-direction: column; gap: 2px; }
+.tpl-ex-sets { display: flex; align-items: center; gap: 8px; }
+.tpl-ex-n { min-width: 62px; text-align: center; font-variant-numeric: tabular-nums; }
+.tpl-ex-ord { display: flex; gap: 6px; margin-left: auto; }
+/* 44px min target: these are thumb controls on a phone. */
+.btn.tiny { min-height: 44px; min-width: 44px; padding: 0 10px; font-size: 14px; }
+.tpl-actions { display: flex; gap: 8px; margin-top: 12px; }
+.tpl-actions .btn { flex: 1 1 0; }
+
+
+/* ---------- minimised workout bar ----------
+   A workout that is open but not on screen has to stay visible and reachable,
+   otherwise leaving the active view strands it (the old behaviour: reload the
+   app and answer the resume prompt). Sits in the rest bar's slot above the tab
+   bar; the rest bar stacks above it when both are showing. */
+#minibar{
+  position:fixed;left:0;right:0;z-index:35;
+  bottom:calc(60px + env(safe-area-inset-bottom));
+  max-width:560px;margin:0 auto;width:calc(100% - 20px);
+  display:flex;align-items:center;gap:8px;
+  padding:6px 8px 6px 12px;background:var(--surface);
+  /* Two-sided emphasis, not a colour: an inset bar plus a heavier border, so
+     the "you have a workout running" state reads without hue. */
+  border:2px solid var(--accent);border-radius:14px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);
+}
+.mini-open{
+  flex:1;min-width:0;display:flex;align-items:center;gap:10px;
+  text-align:left;color:inherit;padding:4px 0;min-height:44px;
+}
+.mini-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.mini-main strong{
+  font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mini-time{
+  display:inline-flex;align-items:center;gap:4px;flex:none;
+  font-weight:700;font-variant-numeric:tabular-nums;font-size:.95rem;
+}
+.mini-time .ic{width:15px;height:15px;color:var(--muted)}
+.mini-open .chev{flex:none;color:var(--muted)}
+#minibar .rbtn{flex:none}
+/* Keep the last card clear of the mini bar when it is up. */
+body.has-mini .pad{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
+
+/* ---------- cardio sets ----------
+   Time-based work does not fit the six lifting columns, so a cardio set is its
+   own stacked block: identity line, labelled fields, then the actions. */
+.cardio-row{
+  display:flex;flex-direction:column;gap:6px;
+  padding:10px 0 10px 9px;
+}
+.cr-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cr-top .c-prev{flex:1;min-width:0}
+.cr-fields{display:flex;gap:6px;align-items:flex-end;flex-wrap:wrap}
+.cr-f{flex:1 1 64px;min-width:0;display:flex;flex-direction:column;gap:3px}
+.cr-lbl{
+  font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--muted);
+  text-align:center;
+}
+.cr-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+/* "est." marks a derived calorie number so a typed-in one is never mistaken
+   for the app's guess. Text, not colour. */
+.cr-est{
+  font-size:.62rem;font-weight:800;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--border);border-radius:6px;padding:1px 5px;
+}
+.cardio-row.done{padding-left:9px}
+/* Read-only cardio lines in the workout-detail view. */
+.ro-cardio{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding:8px 0;border-top:1px solid var(--border);font-size:.9rem;
+}
+.ro-cardio .ro-n{font-weight:700;min-width:18px}
+.ro-cardio .ro-note{flex:1 1 100%;color:var(--muted);font-size:.82rem}
+
+/* ---------- template editor: reps / rest / duration ---------- */
+.tpl-ex-fields{display:flex;gap:8px;flex-wrap:wrap;flex:1 1 100%}
+.tpl-f{flex:1 1 78px;min-width:0;display:flex;flex-direction:column;gap:3px}
+.tpl-f span{
+  font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--muted);
+}
+.tpl-f .inp{height:42px;font-size:.95rem}
+
+/* ---------- backup health warning ----------
+   The whole failure mode was that a dead backup looked exactly like a working
+   one, so this has to be loud AND legible without colour: a warning triangle,
+   bold text and a heavier border, not a red tint doing the work. */
+.nextup.warn{
+  width:100%;text-align:left;color:inherit;
+  border:2px solid var(--pr-border);background:var(--pr-bg);
+  margin-bottom:10px;
+}
+.nextup.warn .ic{color:var(--pr)}
+.nextup.warn strong{font-weight:800}
+#drive-state.warnline{display:block;color:inherit}
+#drive-state.warnline strong{color:var(--pr);font-weight:800}
