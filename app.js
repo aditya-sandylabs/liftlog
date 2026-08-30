@@ -804,6 +804,28 @@ function removeDrop(ei, si, di) {
   renderActive();
 }
 
+/* Same confirmation as Delete set. A drop rung is logged work like any other,
+   and the x sits right beside the tick -- an unconfirmed delete there is one
+   fat-fingered tap away from silently losing a completed segment. */
+function removeDropConfirm(ei, si, di) {
+  const ex = state.active.exercises[ei], s = ex.sets[si];
+  const d = dropsOf(s)[di];
+  if (!d) return;
+  const logged = d.weightKg != null && d.reps != null
+    ? `${fmtW(d.weightKg)} × ${d.reps}`
+    : null;
+  showModal({
+    title: `Remove drop ${di + 1}?`,
+    body: `<p>Remove drop ${di + 1} of set ${s.n} — <strong>${esc(ex.name)}</strong>` +
+      (logged ? ` (${esc(logged)})` : '') + '?</p>' +
+      '<p class="muted small">The set itself and its other drops are kept.</p>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Remove drop', danger: true, onClick: () => removeDrop(ei, si, di) }
+    ]
+  });
+}
+
 function addSet(ei) {
   const ex = state.active.exercises[ei];
   const last = ex.sets[ex.sets.length - 1];
@@ -1091,16 +1113,37 @@ async function discardActive() {
   renderMiniBar();
 }
 
-/* Tapping anywhere off a number field blurs it, which closes the device
-   keypad and commits the value through the existing `change` handler.
-   Capture phase so the value is committed before any button click lands. */
-document.addEventListener('pointerdown', e => {
-  const a = document.activeElement;
-  if (!a || !a.classList || !a.classList.contains('inp')) return;
-  if (e.target === a) return;                                   // same field
-  if (e.target.classList && e.target.classList.contains('inp')) return; // moving to another field
-  a.blur();
-}, true);
+/* MIS-TAPPED BUTTONS WHILE THE KEYPAD IS OPEN -- do not reintroduce a blur here.
+
+   There used to be a capture-phase `pointerdown` listener that blurred the
+   focused number field on any tap elsewhere, to force a `change` event before
+   the tap landed. It was the direct cause of a real bug: pointerdown fires the
+   instant the finger touches down, so the keypad hid, the visual viewport grew,
+   the page reflowed under the still-moving finger, and by the time the click
+   resolved a DIFFERENT element sat at those coordinates -- reliably the "Add
+   set" button of the card above the one being edited.
+
+   Two changes remove the need for it:
+     1. Values commit on `input`, live, so nothing depends on a blur happening
+        at the right moment (see the aw-body listener).
+     2. Action buttons keep focus off themselves on mousedown, below.
+
+   Android's own focus change happens at `mousedown`, which is dispatched AFTER
+   `touchend` -- so with nothing blurring early, the click target is settled
+   before the keypad can move anything. */
+
+/* CONSIDERED AND DELIBERATELY NOT DONE: preventDefault() on mousedown for the
+   action buttons, to stop them taking focus and keep the keypad up. It is the
+   standard toolbar idiom, and on desktop it is safe -- but on Android the
+   mousedown is a COMPATIBILITY event synthesised after touchend, and cancelling
+   one of those has a real chance of suppressing the click with it. That would
+   break every button in the app whenever a field is focused: far worse than the
+   bug being fixed, on the one device that cannot be tested from here.
+   It is also unnecessary. Android fires focus changes at `mousedown`, which
+   comes AFTER `touchend` -- mousedown, mouseup and click are then dispatched
+   back to back, before the IME's hide animation can resize the viewport. The
+   old handler broke this only because `pointerdown` lands before the finger
+   lifts, leaving 100-300ms of reflow time mid-gesture. */
 
 document.addEventListener('visibilitychange', () => { if (document.hidden) saveActive(true); });
 window.addEventListener('pagehide', () => saveActive(true));
@@ -2012,12 +2055,16 @@ function wire() {
     else if (act === 'gloss') openGlossary(b.dataset.term);
     else if (act === 'check') toggleSet(ei, si);
     else if (act === 'dropcheck') toggleDrop(ei, si, +row.dataset.di);
-    else if (act === 'dropdel') removeDrop(ei, si, +row.dataset.di);
+    else if (act === 'dropdel') removeDropConfirm(ei, si, +row.dataset.di);
     else if (act === 'rowmenu') rowMenu(ei, si);
     else if (act === 'addset') addSet(ei);
   });
-  // weight/reps edits commit on change (blur / keyboard done) — no re-render, so focus is safe
-  $('#aw-body').addEventListener('change', e => {
+  /* Commit on `input` as well as `change`: `change` only fires on blur or the
+     keyboard's Done key, which used to be forced by a pointerdown blur that
+     caused mis-tapped buttons (see the note above). Committing every keystroke
+     means the value is already saved whatever the user taps next, and neither
+     handler re-renders, so focus and the keypad are untouched. */
+  const commitField = e => {
     const i = e.target;
     const isCardioField = i.classList.contains('d-inp') || i.classList.contains('sp-inp') ||
                           i.classList.contains('in-inp') || i.classList.contains('k-inp');
@@ -2069,7 +2116,9 @@ function wire() {
     }
     i.classList.remove('pref');
     saveActive();
-  });
+  };
+  $('#aw-body').addEventListener('input', commitField);
+  $('#aw-body').addEventListener('change', commitField);
 
   // minimised workout bar
   $('#mini-open').onclick = reopenActive;
