@@ -110,7 +110,8 @@ function describeError(err) {
   const m = typeof err.message === 'string' ? err.message : '';
   if (m === 'offline') return 'No network connection';
   if (m === 'gsi-load-failed') return 'Could not reach Google. Backup will retry.';
-  if (m === 'auth-suppressed') return 'Google sign-in expired — tap Sync now to reconnect.';
+  if (m === 'auth-needs-gesture' || m === 'auth-suppressed')
+    return 'Backup is waiting for you — tap Sync now.';
   if (m.indexOf('auth') === 0) {
     // The actionable one: only a tap can fix it, so say that rather than
     // "sign-in failed", which reads as something the app might sort out.
@@ -133,11 +134,13 @@ function silentPathDead() {
 
 function noteFailure(err) {
   const m = err && typeof err.message === 'string' ? err.message : '';
-  // A suppressed attempt is us declining to ask, not Google refusing. Keep the
-  // original reason on screen rather than replacing it with a code that would
-  // tell the user nothing about what actually broke.
-  if (m === 'auth-suppressed') {
-    lsSet('ll.driveNeedsAuth', 'true');
+  /* Not a fault: we declined to open a popup without a gesture. Nothing is
+     broken and nothing needs re-authorising -- the backup is simply waiting for
+     a tap. Recorded separately so the UI can say that instead of crying
+     "sign-in expired", which would be a lie and would train the user to ignore
+     it. */
+  if (m === 'auth-needs-gesture' || m === 'auth-suppressed') {
+    lsSet('ll.drivePending', 'true');
     return;
   }
   lastErrorCode = m || 'unknown';
@@ -148,6 +151,7 @@ function noteSuccess() {
   lastErrorCode = null;
   silentAuthBlocked = false;
   lsRemove('ll.driveNeedsAuth');
+  lsRemove('ll.drivePending');
   lsSet('ll.driveLastSync', String(Date.now()));
 }
 
@@ -245,32 +249,47 @@ function requestToken(interactive) {
  * Return a usable access token, refreshing silently when possible.
  * Throws on failure; callers below catch everything.
  */
+/* THE RULE: a token is only ever requested from a user gesture.
+ *
+ * Everything else here is downstream of one fact -- GIS's token client is a
+ * POPUP flow. `requestAccessToken()` opens a window; the `prompt` option only
+ * controls what that window shows, and there is no configuration that makes it
+ * reliably invisible. Access tokens are also memory-only and last about an
+ * hour, so every app launch starts with none.
+ *
+ * Put together, "back up automatically on launch" means "ask Google for a token
+ * on launch", which in practice means the account chooser on launch. That is
+ * exactly what happened: the request SUCCEEDED each time the user signed in, so
+ * the previous guard -- which only suppressed requests after a FAILURE -- never
+ * engaged, and the prompt came back on every single refresh.
+ *
+ * So automatic syncs no longer acquire tokens at all. They use one only if a
+ * gesture earlier in this session already got it. Otherwise they report
+ * `auth-needs-gesture`, the UI shows a "backup pending" card, and one tap backs
+ * everything up and leaves a token live for the rest of the session.
+ *
+ * Do not "restore" a background token request here. There is no silent token in
+ * a browser-only OAuth client; that is a property of the flow, not a bug. */
 async function ensureToken(interactive) {
   if (accessToken && Date.now() < tokenExpiresAt) return accessToken;
 
-  /* Refuse to do any Google work at all on an automatic sync once we know the
-     silent path is not going to work -- either it already failed this session,
-     or a previous session recorded that only a tap can fix it. This runs
-     BEFORE loadGsi(), so a device with a dead grant does not even fetch
-     Google's script, let alone contact it, until the user asks for it. */
-  if (!interactive && (silentAuthBlocked || lsGet('ll.driveNeedsAuth') === 'true')) {
-    throw new Error('auth-suppressed');
+  if (!interactive) {
+    // No live token and no gesture: stop before loadGsi(), so an automatic sync
+    // does not even fetch Google's script, let alone open anything.
+    throw new Error('auth-needs-gesture');
   }
 
   // The script is loaded lazily on connect(); after a fresh app launch it is
-  // not in the page yet, and without this every automatic sync threw
-  // "window.google is undefined" before it ever reached a token request.
+  // not in the page yet.
   await loadGsi();
   try {
-    const tok = await requestToken(false); // silent first, always
+    // Still silent-first even here: when the grant is healthy this resolves
+    // without the user having to pick an account again.
+    const tok = await requestToken(false);
     silentAuthBlocked = false;
     return tok;
   } catch (silentErr) {
-    // One silent attempt per session. Retrying costs a round-trip and, if the
-    // prompt value were ever wrong again, would cost the user a dialog.
     silentAuthBlocked = true;
-    if (!interactive) throw silentErr;
-    // Interactive fallback, only for something the user actually tapped.
     const tok = await requestToken(true);
     silentAuthBlocked = false;
     return tok;
@@ -589,6 +608,30 @@ export const sync = {
   },
 
   /**
+   * True when a backup could not run only because there was no user gesture to
+   * open Google's popup with. Nothing is wrong; one tap clears it. Distinct
+   * from needsAuth(), which means the grant itself is dead.
+   */
+  isPending() {
+    return lsGet('ll.drivePending') === 'true' && !this.needsAuth();
+  },
+
+  /**
+   * Record that a backup could not run for want of a user gesture.
+   * The app-side guard short-circuits before push() is reached, so without this
+   * the pending flag was never written and the Home card that offers the tap
+   * never appeared -- leaving no way at all to trigger a backup.
+   */
+  markPending() {
+    if (this.isConnected() && !this.needsAuth()) lsSet('ll.drivePending', 'true');
+  },
+
+  /** True when a token is live in memory, so a sync can run with no UI at all. */
+  hasLiveToken() {
+    return !!accessToken && Date.now() < tokenExpiresAt;
+  },
+
+  /**
    * Interactive consent flow. User-initiated only.
    * Resolves true on success, false on any failure. Never rejects.
    */
@@ -601,6 +644,7 @@ export const sync = {
       lastErrorCode = null;
       silentAuthBlocked = false;
       lsRemove('ll.driveNeedsAuth');
+      lsRemove('ll.drivePending');
       emitTerminal('ok', 'Google Drive connected');
       return true;
     } catch (err) {
@@ -628,6 +672,7 @@ export const sync = {
     lsRemove('ll.driveConnected');
     lsRemove('ll.driveLastSync');
     lsRemove('ll.driveNeedsAuth');
+    lsRemove('ll.drivePending');
     emitStatus('idle', 'Disconnected from Google Drive');
   },
 

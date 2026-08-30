@@ -384,12 +384,17 @@ function renderHome() {
     || '<p class="muted pad-s">No workouts yet — pick a day above to start.</p>';
   /* A dead backup has to be visible somewhere the user actually looks. Settings
      is not that place -- the whole failure mode was that nobody opened it. */
+  /* Three different states, three different sentences. "Pending" is the normal
+     one now -- the app deliberately will not open Google's popup without a tap,
+     so after a launch the backup simply waits here. Calling that an error would
+     be a lie and would train the card to be ignored. */
   const backupWarn = backupUnhealthy()
-    ? `<button class="nextup warn" id="backup-warn"><svg class="ic"><use href="#i-warn"/></svg>
-        <div><strong>Backup is not up to date.</strong><br><span class="small">${
+    ? `<button class="nextup warn" id="backup-warn"><svg class="ic"><use href="#i-${sync.needsAuth() ? 'warn' : 'up'}"/></svg>
+        <div><strong>${sync.needsAuth() ? 'Backup is not working.' : 'Backup is waiting.'}</strong><br><span class="small">${
           sync.needsAuth()
             ? 'Google sign-in expired. Tap to reconnect.'
-            : 'Last backed up ' + esc(sync.lastSync() ? relTime(sync.lastSync()).toLowerCase() : 'never') + '. Tap to retry.'
+            : 'Tap to back up to Drive' +
+              (sync.lastSync() ? ' — last done ' + esc(relTime(sync.lastSync()).toLowerCase()) : '') + '.'
         }</span></div></button>`
     : '';
 
@@ -1267,7 +1272,7 @@ const BACKUP_STALE_MS = 2 * DAY;
    in BACKUP_STALE_MS. This is what turns a silent failure into a visible one. */
 function backupUnhealthy() {
   if (!sync.isConnected()) return false;
-  if (sync.needsAuth()) return true;
+  if (sync.needsAuth() || sync.isPending()) return true;
   const last = sync.lastSync();
   return last == null || (Date.now() - last) > BACKUP_STALE_MS;
 }
@@ -1287,6 +1292,14 @@ async function backgroundSync(opts) {
      pull/merge/push cycle is skipped rather than run and thrown away, and it
      keeps every one of the eight automatic callers honest without each having
      to remember the check. */
+  /* An automatic sync runs only if a gesture earlier in this session already
+     got a token. Without one it would have to open Google's popup, which is
+     what was prompting the user on every single launch. */
+  if (!interactive && !sync.hasLiveToken()) {
+    sync.markPending();      // so the Home card appears and offers the tap
+    renderDrive();
+    return { ok: false, reason: 'needs-gesture' };
+  }
   if (!interactive && sync.needsAuth()) return { ok: false, reason: 'needs-auth' };
 
   const remote = await sync.pull({ interactive });  // null on failure/offline
@@ -1338,7 +1351,9 @@ async function backupAfterWorkout() {
   if (typeof navigator !== 'undefined' && !navigator.onLine) return;
   toast(sync.needsAuth()
     ? 'Backup needs reconnecting — Settings › Sync now'
-    : 'Backup failed — your workout is saved on this phone');
+    : r.reason === 'needs-gesture'
+      ? 'Saved. Tap “Backup is waiting” on Home to back up.'
+      : 'Backup failed — your workout is saved on this phone');
 }
 
 /* Show which build is actually running. The service-worker cache name carries
@@ -1379,6 +1394,12 @@ function renderDrive() {
     box.innerHTML = '<strong>Backup is not working.</strong> Google sign-in has expired — ' +
       'tap <strong>Sync now</strong> to reconnect. ' + esc(when) +
       (code ? '<br><span class="muted small">Reason: ' + esc(code) + '</span>' : '');
+  } else if (sync.isPending()) {
+    box.innerHTML = '<strong>Backup is waiting for you.</strong> ' + esc(when) +
+      ' Tap <strong>Sync now</strong>.' +
+      '<br><span class="muted small">Google only lets this app sign in when you tap, ' +
+      'so backups after a restart need one tap. It then keeps backing up on its own ' +
+      'for the rest of the session.</span>';
   } else if (bad) {
     box.innerHTML = '<strong>Backup is behind.</strong> ' + esc(when) +
       ' Tap <strong>Sync now</strong>.' +
@@ -2268,10 +2289,12 @@ function wire() {
   renderSettings();
   showView('home');
   if (act) promptResume(act);
-  // Pull anything this device is missing (e.g. a replaced phone). Deferred so
-  // it can never delay first paint, and it fails silently when offline.
-  // backgroundSync itself declines when the sign-in needs a tap, so a device
-  // with a dead grant does no Google work at all on launch.
+  /* Pull anything this device is missing (e.g. a replaced phone). Deferred so
+     it can never delay first paint. On a cold launch there is no token in
+     memory, so backgroundSync declines immediately and NOTHING contacts Google
+     -- that is the point: this used to be the call that put a Google sign-in
+     screen in front of the user on every single refresh. It still earns its
+     place for a soft reload inside a session where a token is live. */
   setTimeout(backgroundSync, 1200);
   /* Retry a failed backup when the phone comes back -- network returning, or
      the app being brought to the foreground. Without this a backup that failed
@@ -2284,6 +2307,9 @@ function wire() {
   const RETRY_COOLDOWN_MS = 15 * 60 * 1000;
   const retryIfBehind = () => {
     if (!sync.isConnected() || sync.needsAuth()) return;
+    // No live token means this would need a popup, which is never allowed
+    // without a tap. The Home card is the retry path in that case.
+    if (!sync.hasLiveToken()) return;
     if (typeof navigator !== 'undefined' && !navigator.onLine) return;
     if (!backupUnhealthy()) return;
     if (Date.now() - lastRetry < RETRY_COOLDOWN_MS) return;
