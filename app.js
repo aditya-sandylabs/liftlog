@@ -10,7 +10,8 @@ import {
   mergeCustomExercises, mergeBodyWeights,
   bodyWeightSeries, bodyWeightSVG, heatmapSVG,
   CARDIO_EXERCISES, isCardio, cardioMode, estimateKcal, latestBodyKg,
-  fmtCardio, workoutKcal
+  fmtCardio, workoutKcal,
+  dropsOf, hasDrops, setVolumeKg, fmtSetChain, dropsToField
 } from './features.js';
 import {
   newTemplate, templateFromWorkout, validateTemplateName, renameTemplate,
@@ -204,10 +205,19 @@ function prevFor(exId, n) {
     // drag a stale note or PR flag into a new set. Cardio fields are part of
     // that snapshot: without them a repeat interval prefills nothing and the
     // "last:" line on a cardio row renders empty.
-    if (s) return s.cardio
-      ? { weightKg: s.weightKg, reps: s.reps, cardio: true, durationSec: s.durationSec,
-          speedKmh: s.speedKmh ?? null, inclinePct: s.inclinePct ?? null, kcal: s.kcal ?? null }
-      : { weightKg: s.weightKg, reps: s.reps };
+    if (s) {
+      if (s.cardio) return {
+        weightKg: s.weightKg, reps: s.reps, cardio: true, durationSec: s.durationSec,
+        speedKmh: s.speedKmh ?? null, inclinePct: s.inclinePct ?? null, kcal: s.kcal ?? null
+      };
+      const out = { weightKg: s.weightKg, reps: s.reps };
+      // Carried so the row can show the whole chain, and so a repeat drop set
+      // rebuilds its rungs instead of being retyped every session.
+      if (Array.isArray(s.drops) && s.drops.length) {
+        out.drops = s.drops.map(d => ({ weightKg: d.weightKg, reps: d.reps }));
+      }
+      return out;
+    }
   }
   return null;
 }
@@ -430,7 +440,17 @@ function makeSet(exId, n, opts) {
     };
   }
   // weightKg/reps pre-filled from history (rendered dimmed until confirmed)
-  return { n, weightKg: p ? p.weightKg : null, reps: p ? p.reps : null, done: false, isWarmup: false, note: '', prev: p, pr: false };
+  const set = { n, weightKg: p ? p.weightKg : null, reps: p ? p.reps : null, done: false, isWarmup: false, note: '', prev: p, pr: false };
+  /* If this set was a drop set last time, lay the rungs out again with their
+     weights filled in and reps blank -- the weights repeat week to week, the
+     failure point does not. */
+  if (p && Array.isArray(p.drops) && p.drops.length) {
+    set.drops = p.drops.map(d => ({
+      weightKg: d.weightKg, reps: null, done: false, prefilled: true,
+      prev: { weightKg: d.weightKg, reps: d.reps }
+    }));
+  }
+  return set;
 }
 function makeEx(te, altId) {
   const exId = altId || te.id;
@@ -569,7 +589,11 @@ function effortMark(ex, s) {
 
 function rowHTML(ex, s, ei, si) {
   if (ex.cardio) return cardioRowHTML(ex, s, ei, si);
-  const prev = s.prev ? `${fmtNum(dispKg(s.prev.weightKg))} × ${s.prev.reps}` : '—';
+  // The "previous" cell shows the whole chain when last time was a drop set,
+  // so you can see what you dropped to without opening history.
+  const prev = s.prev
+    ? fmtSetChain(s.prev, w => fmtNum(dispKg(w)))
+    : '—';
   const wv = s.weightKg == null ? '' : fmtNum(dispKg(s.weightKg));
   const rv = s.reps == null ? '' : String(s.reps);
   const pref = (!s.done && s.prev) ? ' pref' : '';
@@ -589,7 +613,35 @@ function rowHTML(ex, s, ei, si) {
     </span>
     <button class="check${s.done ? ' on' : ''}" data-act="check" aria-pressed="${s.done}" aria-label="${s.done ? 'Uncomplete set' : 'Complete set'}"><svg class="ic"><use href="#i-check"/></svg></button>
     <button class="rowmenu" data-act="rowmenu" aria-label="Set options"><svg class="ic"><use href="#i-dots"/></svg></button>
-  </div>`;
+  </div>` + dropsHTML(ex, s, ei, si);
+}
+
+/* Drop segments render as their own rows under the set they belong to, on the
+   same column grid so the weight and reps fields line up with the parent. They
+   are indented and numbered "↓1, ↓2" rather than given set numbers, because
+   they are not sets -- the whole chain is one set, and counting them as sets
+   would inflate every set count in the app. */
+function dropsHTML(ex, s, ei, si) {
+  const drops = dropsOf(s);
+  if (!drops.length) return '';
+  return drops.map((d, di) => {
+    const wv = d.weightKg == null ? '' : fmtNum(dispKg(d.weightKg));
+    const rv = d.reps == null ? '' : String(d.reps);
+    const pref = (!d.done && d.prefilled) ? ' pref' : '';
+    const dis = d.done ? 'disabled' : '';
+    return `<div class="set-row drop-row${d.done ? ' done' : ''}" data-ei="${ei}" data-si="${si}" data-di="${di}">
+      <span class="c-set drop-n">&#8595;${di + 1}</span>
+      <span class="c-prev">${esc(d.prev ? fmtNum(dispKg(d.prev.weightKg)) + ' × ' + d.prev.reps : '')}</span>
+      <span class="c-inp">
+        <input class="inp dw-inp${pref}" type="text" inputmode="decimal" value="${esc(wv)}" placeholder="0" ${dis} aria-label="Drop ${di + 1} weight (${esc(unit)})">
+      </span>
+      <span class="c-inp">
+        <input class="inp dr-inp${pref}" type="text" inputmode="numeric" value="${esc(rv)}" placeholder="0" ${dis} aria-label="Drop ${di + 1} reps">
+      </span>
+      <button class="check${d.done ? ' on' : ''}" data-act="dropcheck" aria-pressed="${d.done}" aria-label="${d.done ? 'Uncomplete drop' : 'Complete drop'}"><svg class="ic"><use href="#i-check"/></svg></button>
+      <button class="rowmenu" data-act="dropdel" aria-label="Remove drop ${di + 1}"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>`;
+  }).join('');
 }
 
 function renderActive() {
@@ -681,13 +733,76 @@ function toggleSet(ei, si) {
   s.weightKg = weight;
   s.reps = reps;
   s.done = true;
+  // e1RM comes from the TOP segment only. The drops are lighter by definition,
+  // so folding them in could never raise a PR and would only muddy it.
   const cur = e1rm(weight, reps);
   s.pr = cur != null && cur > prior;
-  if (prefs.defaultRest) startRest(parseRest(ex.rest));
+  // With drops attached the set is not over yet -- the rest timer waits for the
+  // last drop (see toggleDrop).
+  if (prefs.defaultRest && !hasDrops(s)) startRest(parseRest(ex.rest));
   saveActive();
   renderActive();
 }
 
+
+/* A fresh drop segment. Seeded from the segment before it -- the previous
+   drop, or the parent set -- because a drop is always lighter than what came
+   before, so the last weight is the only sane starting point to edit down from. */
+function makeDrop(s, prevDrop) {
+  const from = prevDrop || s;
+  return {
+    weightKg: from ? from.weightKg : null,
+    reps: null,          // reps are never carried over: the whole point is that
+                         // you go to failure again and get a different number
+    done: false,
+    prefilled: true,
+    prev: null
+  };
+}
+
+function addDrop(ei, si) {
+  const ex = state.active.exercises[ei], s = ex.sets[si];
+  if (!s || ex.cardio) return;
+  if (!Array.isArray(s.drops)) s.drops = [];
+  const drops = s.drops;
+  drops.push(makeDrop(s, drops[drops.length - 1]));
+  saveActive(true);
+  renderActive();
+  const row = rowEl(ei, si);
+  if (row) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function toggleDrop(ei, si, di) {
+  const ex = state.active.exercises[ei], s = ex.sets[si];
+  const d = dropsOf(s)[di];
+  if (!d) return;
+  if (d.done) { d.done = false; saveActive(); renderActive(); return; }
+  const row = $(`#aw-body .ex-card[data-ei="${ei}"] .drop-row[data-si="${si}"][data-di="${di}"]`);
+  if (row) {
+    const w = parseDisp(row.querySelector('.dw-inp').value);
+    const r = parseInt(row.querySelector('.dr-inp').value, 10);
+    d.weightKg = w == null ? (ex.bodyweight ? 0 : (d.weightKg ?? 0)) : toKg(w);
+    d.reps = isNaN(r) ? (d.reps ?? 0) : r;
+  }
+  d.done = true;
+  d.prefilled = false;
+  if (!state.active.everStarted) timerStart();
+  /* Rest starts only after the LAST drop in the chain. A drop set is worked
+     straight through -- stripping plates is not a rest period -- so starting
+     the timer mid-chain would just have it running while he lifts. */
+  if (prefs.defaultRest && di === dropsOf(s).length - 1) startRest(parseRest(ex.rest));
+  saveActive();
+  renderActive();
+}
+
+function removeDrop(ei, si, di) {
+  const ex = state.active.exercises[ei], s = ex.sets[si];
+  const drops = dropsOf(s);
+  if (!drops[di]) return;
+  drops.splice(di, 1);
+  saveActive(true);
+  renderActive();
+}
 
 function addSet(ei) {
   const ex = state.active.exercises[ei];
@@ -725,6 +840,12 @@ function rowMenu(ei, si) {
     actions: [
       ...(ex.cardio ? [] : [{ label: s.isWarmup ? 'Unmark warm-up' : 'Mark as warm-up', onClick: () => { s.isWarmup = !s.isWarmup; saveActive(); renderActive(); } }]),
       { label: s.note ? 'Edit note' : 'Add note', onClick: () => noteModal(ei, si) },
+      /* Drop set: same set, immediately again at a lower weight, no rest. Not
+         offered on cardio, which has no weight to drop. */
+      ...(ex.cardio ? [] : [{
+        label: hasDrops(s) ? 'Add another drop' : 'Make it a drop set',
+        onClick: () => addDrop(ei, si)
+      }]),
       {
         label: 'Delete set', danger: true, onClick: () => showModal({
           title: 'Delete set?',
@@ -991,7 +1112,7 @@ function finishFlow() {
   const all = a.exercises.flatMap(ex => ex.sets.map(s => ({ ex, s })));
   const done = all.filter(x => x.s.done);
   const inc = all.length - done.length;
-  const vol = done.filter(x => !x.s.isWarmup).reduce((t, x) => t + (x.s.weightKg || 0) * (x.s.reps || 0), 0);
+  const vol = done.filter(x => !x.s.isWarmup).reduce((t, x) => t + setVolumeKg(x.s), 0);
   const body = `<p>${esc(fmtDur((Date.now() - a.startTime) / 1000))} · ${done.length} sets · ${esc(fmtW(vol))} volume</p>` +
     (inc ? `<p class="warnline"><svg class="ic"><use href="#i-warn"/></svg><span>${inc} set${inc > 1 ? 's' : ''} not completed. Finishing will discard them.</span></p>` : '');
   showModal({
@@ -1014,6 +1135,16 @@ function saveWorkout(donePairs) {
     };
     // Cardio fields are added only on cardio rows, so every existing lifting
     // record keeps exactly the shape the exports and merges already expect.
+    /* Only completed drops are saved. An abandoned half-entered drop must not
+       become a phantom 0-rep segment in history, exactly as an incomplete set
+       is discarded on finish. */
+    const drops = dropsOf(s).filter(d => d && d.done);
+    if (drops.length) {
+      row.drops = drops.map(d => ({
+        weightKg: d.weightKg == null ? 0 : d.weightKg,
+        reps: d.reps == null ? 0 : d.reps
+      }));
+    }
     if (s.cardio) {
       row.cardio = true;
       row.durationSec = s.durationSec == null ? 0 : s.durationSec;
@@ -1029,7 +1160,9 @@ function saveWorkout(donePairs) {
     startTime: a.startTime, endTime: end,
     durationSec: Math.round(elapsedMs() / 1000),   // excludes paused time
     sets,
-    volumeKg: sets.filter(s => !s.isWarmup).reduce((t, s) => t + s.weightKg * s.reps, 0),
+    // setVolumeKg folds in the drop segments; without it a session built on
+    // drop sets would read as LIGHTER than the same session without them.
+    volumeKg: sets.filter(s => !s.isWarmup).reduce((t, s) => t + setVolumeKg(s), 0),
     setCount: sets.length,
     kcal: workoutKcal(sets),
     cardioSec: sets.reduce((t, s) => t + (s.durationSec || 0), 0)
@@ -1405,9 +1538,10 @@ function openWod(id) {
           </div>`).join('')
         : `<div class="ro-grid" style="margin-top:6px"><span class="ro-h">SET</span><span class="ro-h">WEIGHT</span><span class="ro-h">REPS</span></div>` +
           sets.map(s => `<div class="ro-grid ro-row${s.isWarmup ? ' warmup' : ''}">
-            <span>${s.setNumber}${s.isWarmup ? ' <span class="badge warm">Warm-up</span>' : ''}${s.pr ? ' <span class="badge pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span>' : ''}</span>
+            <span>${s.setNumber}${s.isWarmup ? ' <span class="badge warm">Warm-up</span>' : ''}${s.pr ? ' <span class="badge pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span>' : ''}${hasDrops(s) ? ' <span class="badge drop">Drop</span>' : ''}</span>
             <span>${s.weightKg > 0 ? esc(fmtW(s.weightKg)) : '—'}</span>
             <span>${s.reps}</span>
+            ${hasDrops(s) ? `<span class="ro-note">${esc(fmtSetChain(s, w => fmtNum(dispKg(w)) + ' ' + unit))}</span>` : ''}
             ${s.note ? `<span class="ro-note">Note: ${esc(s.note)}</span>` : ''}
           </div>`).join('');
       return `<article class="ex-card${cardio ? ' cardio-card' : ''}">
@@ -1671,7 +1805,8 @@ function exportCSV() {
   // Cardio columns are appended, never inserted: anything already parsing this
   // export by column position keeps working.
   const rows = [['date','workout','exercise','set_number','is_warmup','weight_kg','weight_display','unit','reps','estimated_1rm','notes',
-                 'is_cardio','duration_sec','speed_kmh','incline_pct','kcal','kcal_estimated']];
+                 'is_cardio','duration_sec','speed_kmh','incline_pct','kcal','kcal_estimated',
+                 'drops','set_volume_kg']];
   for (const w of sortedAsc())
     for (const s of w.sets) {
       const e = e1rm(s.weightKg, s.reps);
@@ -1682,7 +1817,11 @@ function exportCSV() {
         e == null ? '' : e.toFixed(2), s.note || '',
         s.cardio ? 'true' : 'false',
         s.durationSec ?? '', s.speedKmh ?? '', s.inclinePct ?? '', s.kcal ?? '',
-        s.cardio ? (s.kcalEstimated ? 'true' : 'false') : ''
+        s.cardio ? (s.kcalEstimated ? 'true' : 'false') : '',
+        // One cell rather than extra rows: anything already counting rows in
+        // this export keeps counting the same number of them.
+        dropsToField(s),
+        setVolumeKg(s)
       ]);
     }
   const csv = rows.map(r => r.map(v => {
@@ -1707,7 +1846,7 @@ function exportMD() {
       out += s.cardio
         ? `| ${s.setNumber} | ${s.exerciseName} | ${fmtCardio(s)} | — | ${s.note || ''} |
 `
-        : `| ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' ★PR' : ''} | ${s.exerciseName} | ${s.weightKg > 0 ? fmtW(s.weightKg) : '—'} | ${s.reps} | ${s.note || ''} |
+        : `| ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' ★PR' : ''} | ${s.exerciseName} | ${hasDrops(s) ? fmtSetChain(s, w => fmtNum(dispKg(w)) + ' ' + unit) : (s.weightKg > 0 ? fmtW(s.weightKg) : '—')} | ${hasDrops(s) ? 'drop set' : s.reps} | ${s.note || ''} |
 `;
     out += '\n';
   }
@@ -1726,7 +1865,7 @@ function exportTXT() {
       out += s.cardio
         ? `  Set ${s.setNumber}: ${s.exerciseName} — ${fmtCardio(s)}${s.note ? ' — ' + s.note : ''}
 `
-        : `  Set ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' [PR]' : ''}: ${s.exerciseName} — ${s.weightKg > 0 ? fmtW(s.weightKg) + ' x ' : ''}${s.reps} reps${s.note ? ' — ' + s.note : ''}
+        : `  Set ${s.setNumber}${s.isWarmup ? ' (warm-up)' : ''}${s.pr ? ' [PR]' : ''}: ${s.exerciseName} — ${hasDrops(s) ? fmtSetChain(s, w => fmtNum(dispKg(w)) + ' ' + unit) + ' (drop set)' : (s.weightKg > 0 ? fmtW(s.weightKg) + ' x ' : '') + s.reps + ' reps'}${s.note ? ' — ' + s.note : ''}
 `;
     out += '\n';
   }
@@ -1872,6 +2011,8 @@ function wire() {
     else if (act === 'cardmenu') cardMenu(ei);
     else if (act === 'gloss') openGlossary(b.dataset.term);
     else if (act === 'check') toggleSet(ei, si);
+    else if (act === 'dropcheck') toggleDrop(ei, si, +row.dataset.di);
+    else if (act === 'dropdel') removeDrop(ei, si, +row.dataset.di);
     else if (act === 'rowmenu') rowMenu(ei, si);
     else if (act === 'addset') addSet(ei);
   });
@@ -1880,11 +2021,15 @@ function wire() {
     const i = e.target;
     const isCardioField = i.classList.contains('d-inp') || i.classList.contains('sp-inp') ||
                           i.classList.contains('in-inp') || i.classList.contains('k-inp');
-    if (!isCardioField && !i.classList.contains('w-inp') && !i.classList.contains('r-inp')) return;
+    const isDropField = i.classList.contains('dw-inp') || i.classList.contains('dr-inp');
+    if (!isCardioField && !isDropField &&
+        !i.classList.contains('w-inp') && !i.classList.contains('r-inp')) return;
     const row = i.closest('.set-row');
     const ex = state.active.exercises[+row.dataset.ei];
     const s = ex.sets[+row.dataset.si];
-    if (s.done) return;
+    // A completed parent set can still have live drop rows under it: the top
+    // set is ticked off before the chain is finished, which is the whole flow.
+    if (s.done && !isDropField) return;
     if (isCardioField) {
       readCardioRow(ex, s, row);
       saveActive();
@@ -1898,6 +2043,21 @@ function wire() {
       if (est && !wantEst) est.remove();
       if (!est && wantEst) row.querySelector('.cr-actions')
         .insertAdjacentHTML('afterbegin', '<span class="cr-est">est.</span>');
+      return;
+    }
+    if (i.classList.contains('dw-inp') || i.classList.contains('dr-inp')) {
+      const d = dropsOf(s)[+row.dataset.di];
+      if (!d || d.done) return;
+      if (i.classList.contains('dw-inp')) {
+        const v = parseDisp(i.value);
+        d.weightKg = v == null ? null : toKg(v);
+      } else {
+        const v = parseInt(i.value, 10);
+        d.reps = isNaN(v) ? null : v;
+      }
+      d.prefilled = false;
+      i.classList.remove('pref');
+      saveActive();
       return;
     }
     if (i.classList.contains('w-inp')) {

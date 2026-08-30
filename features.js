@@ -693,3 +693,80 @@ export function workoutKcal(sets) {
   }
   return Math.round(t);
 }
+
+/* ------------------------------------------------------------------ */
+/* Drop sets                                                           */
+/* ------------------------------------------------------------------ */
+/*
+ * A drop set is ONE set taken to failure, then immediately repeated at a lower
+ * weight without rest, as many times as the lifter wants. It is not a superset
+ * -- a superset alternates two different exercises, which this app already
+ * models with `exercise.superset`. Keeping the two words apart matters: they
+ * are different things and both exist here.
+ *
+ * Shape: the set's own weightKg/reps are the FIRST segment, and `drops` holds
+ * the ones after it:
+ *
+ *   { weightKg: 60, reps: 8, drops: [ {weightKg: 45, reps: 6, done: true},
+ *                                     {weightKg: 30, reps: 5, done: true} ] }
+ *
+ * Additive on purpose. A set without `drops` is byte-identical to what every
+ * earlier version wrote, so history, merges, PRs and the Strong import all keep
+ * working untouched.
+ */
+
+/** The drops on a set, always an array, never null. */
+export function dropsOf(set) {
+  return (set && typeof set === 'object' && Array.isArray(set.drops)) ? set.drops : [];
+}
+
+export function hasDrops(set) {
+  return dropsOf(set).length > 0;
+}
+
+function numOr0(v) {
+  const n = typeof v === 'string' ? parseFloat(v) : v;
+  return typeof n === 'number' && isFinite(n) ? n : 0;
+}
+
+/**
+ * Total load moved by one set, INCLUDING every drop segment.
+ *
+ * The drops are real work and have to count towards volume, otherwise a session
+ * built on drop sets reads as lighter than the same session without them --
+ * which would be exactly backwards.
+ */
+export function setVolumeKg(set) {
+  if (!set || typeof set !== 'object') return 0;
+  let total = numOr0(set.weightKg) * numOr0(set.reps);
+  for (const d of dropsOf(set)) {
+    if (!d || typeof d !== 'object') continue;
+    total += numOr0(d.weightKg) * numOr0(d.reps);
+  }
+  return total;
+}
+
+/**
+ * "60 × 8 → 45 × 6 → 30 × 5", or "60 × 8" when there are no drops.
+ * `fmt` renders one weight; the caller owns units.
+ */
+export function fmtSetChain(set, fmt) {
+  if (!set || typeof set !== 'object') return '';
+  const one = (w, r) => (fmt ? fmt(w) : String(w)) + ' \u00d7 ' + (r == null ? 0 : r);
+  const parts = [one(set.weightKg, set.reps)];
+  for (const d of dropsOf(set)) {
+    if (!d || typeof d !== 'object') continue;
+    parts.push(one(d.weightKg, d.reps));
+  }
+  return parts.join(' \u2192 ');
+}
+
+/** Just the drop segments, "45x6;30x5" — compact enough for one CSV cell. */
+export function dropsToField(set, fmt) {
+  const out = [];
+  for (const d of dropsOf(set)) {
+    if (!d || typeof d !== 'object') continue;
+    out.push((fmt ? fmt(d.weightKg) : String(numOr0(d.weightKg))) + 'x' + numOr0(d.reps));
+  }
+  return out.join(';');
+}
