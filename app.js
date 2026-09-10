@@ -20,6 +20,23 @@ import {
   setReps as tplSetReps, setRest as tplSetRest, setDuration as tplSetDuration,
   mergeCustomTemplates, allTemplates, isCustomTemplate
 } from './templates.js';
+import {
+  SLOTS, slotLabel, slotForTime, dbFoodToFood, makeUserFood, energyMismatch,
+  buildFoodIndex, searchFoods, macrosFor, makeEntry, makeRecipe, recipeAddItem,
+  recipeRemoveItem, recipeTotals, recipePerServing, recipeAsFood, recipeGrams,
+  tombstone as nutTombstone, liveOnly as nutLive, sumMacros, entriesForDay,
+  dayBySlot, dayTotals, foodUsage, recentFoods, copyDay, targetProgress,
+  macroSplitPct, suggestTargets, mergeFoodEntries, mergeUserFoods, mergeRecipes,
+  kcalTrendSVG, averageDay, nutritionUid
+} from './nutrition.js';
+import {
+  FIELDS as BODY_FIELDS, FIELD_BY_KEY, fieldsOfKind, POSES, poseLabel, fmtField,
+  makeMeasurement, tombstone as bodyTombstone, liveOnly as bodyLive,
+  collapseByDay, measurementSeries, fieldSeries, latestField, usedFields,
+  makePhotoMeta, photoList, photosByDay, comparePair, photosNeedingUpload,
+  orphanDriveIds, mergeMeasurements, mergePhotos, parseTrackingSheet,
+  measurementsToSheetCsv, measurementSVG, bodyUid
+} from './body.js';
 
 /* ================= tiny helpers ================= */
 const $  = (s, r = document) => r.querySelector(s);
@@ -99,7 +116,10 @@ const DB = {
      screen with nothing in the console. A try/catch cannot catch a hang. */
   open() {
     return new Promise((res, rej) => {
-      const r = indexedDB.open('liftlog', 1);
+      /* v2 added the `photos` store. The bump is what makes an OPEN OLDER TAB
+         block this one -- onblocked below turns that into a readable message
+         instead of a blank screen, which is exactly why that guard exists. */
+      const r = indexedDB.open('liftlog', 2);
       let settled = false;
       const done = (fn, arg) => { if (settled) return; settled = true; clearTimeout(timer); fn(arg); };
       // Long enough that a slow phone under storage pressure is not cut off,
@@ -109,6 +129,12 @@ const DB = {
         const d = r.result;
         if (!d.objectStoreNames.contains('workouts')) d.createObjectStore('workouts', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
+        /* Progress-photo BYTES only, one record per image: {id, blob}.
+           Their metadata lives in kv 'photoMetas' and is what syncs. Images are
+           kept out of the kv arrays because those are serialised whole on every
+           write and sent to Drive on every backup -- a few megabytes of JPEG in
+           there would be rewritten and re-uploaded after every single set. */
+        if (!d.objectStoreNames.contains('photos')) d.createObjectStore('photos', { keyPath: 'id' });
       };
       r.onsuccess = () => { DB.db = r.result; done(res); };
       r.onerror = () => done(rej, r.error || new Error('idb-error'));
@@ -153,7 +179,19 @@ const state = {
   custom: [],       // user-created exercises (synced)
   templates: [],    // user-created workout templates (synced)
   weights: [],      // body-weight entries {ts, kg} (synced)
+  /* Nutrition and body. All four carry TOMBSTONES (see nutrition.js header):
+     a deleted record stays in the array with deleted:true so the delete
+     propagates instead of resurrecting on the next sync. Always read them
+     through nutLive()/bodyLive() -- never assume every element is live. */
+  entries: [],      // logged food items (synced)
+  userFoods: [],    // user-created foods (synced)
+  recipes: [],      // user-created recipes (synced)
+  measurements: [], // body measurements + scale scans (synced)
+  photoMetas: [],   // progress-photo metadata; bytes live in the 'photos' store
+  foodDb: null,     // foods.json, lazy-loaded on first use — 2.7 MB, never at boot
+  foodDbState: 'idle',
   view: 'home',
+  foodDay: null,    // which day the Food view is showing; null means today
   wodId: null
 };
 
@@ -296,8 +334,11 @@ function showView(v) {
   $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v || (v === 'wod' && b.dataset.v === 'history')));
   if (v === 'home') renderHome();
   if (v === 'history') renderHistory();
-  if (v === 'stats') renderStats();
+  if (v === 'food') renderFood();
+  if (v === 'stats') { renderStats(); renderBodySections(); }
   if (v === 'quotes') renderQuotes();
+  // Object URLs for progress photos belong to the Stats view; leaving it frees them.
+  if (v !== 'stats') releasePhotoUrls();
   /* Settings used to be painted once at startup and never again, so the Drive
      box showed whatever was true when the app launched -- including "Not
      connected" or a last-backed-up date that had since gone stale. Opening the
@@ -1232,6 +1273,90 @@ async function saveCustom() {
   await DB.put('kv', state.custom, 'custom');
   rebuildExerciseIndex();
 }
+/* ================= nutrition & body persistence =================
+   Each of these writes one kv array. They are deliberately dumb: no filtering,
+   no compaction, no dropping of tombstones. Compaction happens nowhere at all,
+   because a tombstone that is quietly removed locally is a delete that
+   un-propagates the next time another device syncs. */
+async function saveEntries()   { await DB.put('kv', state.entries, 'foodEntries'); }
+async function saveUserFoods() { await DB.put('kv', state.userFoods, 'userFoods'); foodIndexDirty = true; }
+async function saveRecipes()   { await DB.put('kv', state.recipes, 'recipes'); foodIndexDirty = true; }
+async function savePhotoMetas() { await DB.put('kv', state.photoMetas, 'photoMetas'); }
+
+async function saveMeasurements() {
+  // One record per calendar day, newest wins; the losers are tombstoned rather
+  // than dropped so the collapse converges across devices instead of fighting
+  // a sync that keeps handing the duplicate back.
+  state.measurements = collapseByDay(state.measurements);
+  await DB.put('kv', state.measurements, 'measurements');
+}
+
+/* The shipped food database is 2.7 MB. Fetching it at boot would delay first
+   paint for a screen most launches never open, so it loads on first use and is
+   mirrored into IndexedDB so later launches work offline even before the
+   service worker has it. */
+let foodDbPromise = null;
+async function loadFoodDb() {
+  if (state.foodDb) return state.foodDb;
+  /* Share the in-flight fetch rather than returning null to the second caller.
+     Returning null left whoever asked second painting "Loading the food
+     database…" with nothing scheduled to repaint it — reachable just by
+     closing and reopening the picker quickly. */
+  if (foodDbPromise) return foodDbPromise;
+  foodDbPromise = loadFoodDbImpl().finally(() => { foodDbPromise = null; });
+  return foodDbPromise;
+}
+
+async function loadFoodDbImpl() {
+  state.foodDbState = 'loading';
+  try {
+    const r = await fetch('./foods.json');
+    if (!r.ok) throw new Error('http');
+    const j = await r.json();
+    if (!j || !Array.isArray(j.foods)) throw new Error('shape');
+    state.foodDb = j;
+    state.foodDbState = 'ready';
+    DB.put('kv', j, 'foodDb').catch(() => {});   // mirror; failure is harmless
+  } catch (e) {
+    state.foodDb = (await DB.get('kv', 'foodDb')) || null;
+    state.foodDbState = state.foodDb ? 'ready' : 'error';
+  }
+  foodIndexDirty = true;
+  return state.foodDb;
+}
+
+/* The food index spans the shipped database, the user's foods and their
+   recipes, so it is rebuilt whenever any of those change — same contract as
+   rebuildExerciseIndex. Rebuilding is ~14k rows, so it is done lazily on read
+   rather than eagerly on every write. */
+let foodIx = [];
+let foodIndexDirty = true;
+function foodIndex() {
+  if (foodIndexDirty) {
+    const base = buildFoodIndex({
+      db: state.foodDb,
+      userFoods: state.userFoods,
+      usage: foodUsage(state.entries)
+    });
+    const recipes = nutLive(state.recipes).map(recipeAsFood).filter(Boolean);
+    foodIx = recipes.concat(base);
+    foodIndexDirty = false;
+  }
+  return foodIx;
+}
+
+/** Daily nutrition targets. Trivial scalars, so localStorage like the others. */
+function nutTargets() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('ll.targets') || '{}');
+    return {
+      kcal: Number(raw.kcal) || 0, p: Number(raw.p) || 0,
+      c: Number(raw.c) || 0, f: Number(raw.f) || 0
+    };
+  } catch { return { kcal: 0, p: 0, c: 0, f: 0 }; }
+}
+function setNutTargets(t) { localStorage.setItem('ll.targets', JSON.stringify(t || {})); }
+
 async function saveWeights() {
   // Collapse to one entry per calendar day (latest ts wins) before storing, so
   // storage matches what the chart and export show and self-heals any same-day
@@ -1252,12 +1377,35 @@ async function saveWeights() {
    unreachable, not connected, or errors, the app carries on unchanged. */
 function syncPayload() {
   return {
-    app: 'LiftLog', schemaVersion: 2,
+    /* schemaVersion 3 adds the nutrition and body record types. An older build
+       reading this file ignores the new keys and keeps working; a newer build
+       reading an older file merges against undefined, which every merge here
+       already tolerates. Neither direction loses data. */
+    app: 'LiftLog', schemaVersion: 3,
     exportedAt: new Date().toISOString(),
     workouts: state.workouts,
     customExercises: state.custom,
     bodyWeights: state.weights,
-    customTemplates: state.templates
+    customTemplates: state.templates,
+    foodEntries: state.entries,
+    userFoods: state.userFoods,
+    recipes: state.recipes,
+    measurements: state.measurements,
+    /* Metadata only — the images are separate Drive files, referenced by
+       driveId. Never inline a blob here. */
+    photos: state.photoMetas,
+    /* The readable measurements sheet, written to visible Drive on every sync.
+       Rendered HERE rather than in sync.js so the transport stays ignorant of
+       record types, exactly like the workout CSV.
+
+       Weight is passed in from state.weights -- the app's single weight series
+       -- and never read off a measurement record. Same rule as everywhere else.
+
+       This is what replaces a hand-kept spreadsheet: the app owns the data, and
+       the sheet in Drive is regenerated from it, so the two can never drift. It
+       is written in the SAME layout the importer reads, so it doubles as a
+       restore path. */
+    measurementSheet: measurementsToSheetCsv(state.measurements, state.weights)
   };
 }
 
@@ -1317,6 +1465,37 @@ async function backgroundSync(opts) {
 
   if (custom.length !== state.custom.length) { state.custom = custom; await saveCustom(); }
   if (weights.length !== state.weights.length) { state.weights = weights; await saveWeights(); }
+
+  /* Nutrition and body. These are compared by CONTENT, not by length: a
+     tombstone arriving from another device replaces a live record without
+     changing the count, and a length check would drop it on the floor and
+     leave the deleted meal on screen. */
+  const entries = mergeFoodEntries(state.entries, remote && remote.foodEntries);
+  const uFoods  = mergeUserFoods(state.userFoods, remote && remote.userFoods);
+  const recipes = mergeRecipes(state.recipes, remote && remote.recipes);
+  const meas    = mergeMeasurements(state.measurements, remote && remote.measurements);
+  const photos  = mergePhotos(state.photoMetas, remote && remote.photos);
+
+  if (JSON.stringify(entries) !== JSON.stringify(state.entries)) {
+    state.entries = entries; await saveEntries(); foodIndexDirty = true;
+  }
+  if (JSON.stringify(uFoods) !== JSON.stringify(state.userFoods)) {
+    state.userFoods = uFoods; await saveUserFoods();
+  }
+  if (JSON.stringify(recipes) !== JSON.stringify(state.recipes)) {
+    state.recipes = recipes; await saveRecipes();
+  }
+  if (JSON.stringify(meas) !== JSON.stringify(state.measurements)) {
+    state.measurements = meas; await saveMeasurements();
+  }
+  if (JSON.stringify(photos) !== JSON.stringify(state.photoMetas)) {
+    state.photoMetas = photos; await savePhotoMetas();
+  }
+
+  /* Push any photo bytes this device is holding that Drive has not got yet.
+     Done BEFORE the payload push so the driveIds it assigns are included,
+     rather than waiting a whole sync cycle to be recorded. */
+  await uploadPendingPhotos({ interactive });
   // Templates compare by JSON, not length: a rename arriving from another
   // device changes content without changing the count.
   if (JSON.stringify(tpls) !== JSON.stringify(state.templates)) {
@@ -1938,17 +2117,31 @@ function exportTXT() {
 }
 
 function exportJSON() {
-  /* schemaVersion 2 -- the same four record types the Drive mirror carries.
+  /* schemaVersion 3 -- every record type the Drive mirror carries.
      Version 1 backups held workouts only, which meant a restore silently lost
-     every custom exercise, custom template and body-weight entry. Importing a
-     v1 file still works: the extra keys are simply absent. */
+     every custom exercise, custom template and body-weight entry. v3 adds
+     nutrition and body records. Importing an older file still works: the extra
+     keys are simply absent, and every merge tolerates undefined.
+
+     PHOTOS ARE METADATA ONLY here, exactly as in the Drive payload. A JSON
+     backup must stay small enough to email; the images are separate files in
+     Drive's appDataFolder, and this file records only their ids. Say so in the
+     UI rather than letting someone believe a JSON export carries the pictures. */
   const payload = {
-    app: 'LiftLog', schemaVersion: 2, exportedAt: new Date().toISOString(),
+    app: 'LiftLog', schemaVersion: 3, exportedAt: new Date().toISOString(),
     workouts: state.workouts,
     customExercises: state.custom,
     customTemplates: state.templates,
     bodyWeights: state.weights,
-    settings: { unit, theme: prefs.theme, defaultRest: prefs.defaultRest, swaps: prefs.swaps }
+    foodEntries: state.entries,
+    userFoods: state.userFoods,
+    recipes: state.recipes,
+    measurements: state.measurements,
+    photos: state.photoMetas,
+    settings: {
+      unit, theme: prefs.theme, defaultRest: prefs.defaultRest, swaps: prefs.swaps,
+      targets: nutTargets()
+    }
   };
   download(`liftlog-backup-${stamp()}.json`, 'application/json', JSON.stringify(payload, null, 2));
   toast('Backup exported');
@@ -1969,8 +2162,22 @@ function importJSON(file) {
     const exs  = mergeCustomExercises(state.custom, j.customExercises);
     const tpls = mergeCustomTemplates(state.templates, j.customTemplates);
     const wts  = mergeBodyWeights(state.weights, j.bodyWeights);
+    /* Nutrition and body records (schemaVersion 3). Counted by CONTENT change
+       rather than by length: a tombstone arriving in a backup replaces a live
+       record without changing the count, and a length-only check would report
+       "nothing new" and drop a delete on the floor. */
+    const ents = mergeFoodEntries(state.entries, j.foodEntries);
+    const ufs  = mergeUserFoods(state.userFoods, j.userFoods);
+    const rcps = mergeRecipes(state.recipes, j.recipes);
+    const meas = mergeMeasurements(state.measurements, j.measurements);
+    const phs  = mergePhotos(state.photoMetas, j.photos);
+    const changed = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
+    const extraNew =
+      (changed(ents, state.entries) ? 1 : 0) + (changed(ufs, state.userFoods) ? 1 : 0) +
+      (changed(rcps, state.recipes) ? 1 : 0) + (changed(meas, state.measurements) ? 1 : 0) +
+      (changed(phs, state.photoMetas) ? 1 : 0);
     const extra = (exs.length - state.custom.length) + (tpls.length - state.templates.length) +
-                  (wts.length - state.weights.length);
+                  (wts.length - state.weights.length) + extraNew;
     if (!fresh.length && extra <= 0) { toast('Nothing new — everything is already here'); return; }
     const dates = fresh.map(w => fmtDate(w.startTime)).sort();
     const range = fresh.length ? ` (${esc(dates[0])} → ${esc(dates[dates.length - 1])})` : '';
@@ -1988,10 +2195,19 @@ function importJSON(file) {
             if (exs.length !== state.custom.length) { state.custom = exs; await saveCustom(); }
             if (tpls.length !== state.templates.length) { state.templates = tpls; await saveTemplates(); }
             if (wts.length !== state.weights.length) { state.weights = wts; await saveWeights(); }
+            if (changed(ents, state.entries)) { state.entries = ents; await saveEntries(); }
+            if (changed(ufs, state.userFoods)) { state.userFoods = ufs; await saveUserFoods(); }
+            if (changed(rcps, state.recipes)) { state.recipes = rcps; await saveRecipes(); }
+            if (changed(meas, state.measurements)) { state.measurements = meas; await saveMeasurements(); }
+            if (changed(phs, state.photoMetas)) { state.photoMetas = phs; await savePhotoMetas(); }
+            if (j.settings && j.settings.targets) setNutTargets(j.settings.targets);
+            foodIndexDirty = true;
             rebuildExerciseIndex();
             toast(`Imported ${fresh.length} workout${fresh.length === 1 ? '' : 's'}`);
             if (state.view === 'home') renderHome();
             if (state.view === 'history') renderHistory();
+            if (state.view === 'food') renderFood();
+            if (state.view === 'stats') { renderStats(); renderBodySections(); }
           }
         }
       ]
@@ -2002,7 +2218,21 @@ function importJSON(file) {
 function clearAllFlow() {
   showModal({
     title: 'Clear all data?',
-    body: '<p>This permanently deletes every logged workout on this device. Export a backup first if in doubt.</p>',
+    /* The copy enumerates what actually goes, because this button has always
+       cleared LESS than its label implies -- custom exercises, templates and
+       body weights survive it. That pre-existing behaviour is left alone here,
+       but it is no longer described as "everything".
+
+       Progress photos and food logs ARE cleared: a wipe that leaves photographs
+       of your body on the device is not a wipe. */
+    body: '<p>This permanently deletes, on this device:</p>' +
+      '<ul class="imp-list"><li>every logged workout</li><li>every food entry, ' +
+      'your own foods and recipes</li><li>every measurement and body-composition ' +
+      'entry</li><li>every progress photo</li></ul>' +
+      '<p class="muted">Kept: custom exercises, workout templates, body-weight ' +
+      'history and settings. Anything already backed up to Google Drive is not ' +
+      'touched — this clears the phone, not the backup.</p>' +
+      '<p>Export a backup first if in doubt.</p>',
     actions: [
       { label: 'Cancel' },
       {
@@ -2016,9 +2246,21 @@ function clearAllFlow() {
                 if ($('#del-in').value.trim() !== 'DELETE') { toast('Type DELETE exactly to confirm'); return false; }
                 (async () => {
                   await DB.clear('workouts');
+                  await DB.clear('photos');          // the image bytes
                   await discardActive();
                   state.workouts = [];
-                  toast('All data cleared'); showView('home');
+                  releasePhotoUrls();
+                  /* Cleared to EMPTY, not tombstoned. A tombstone would
+                     propagate the wipe to every other device on the next sync,
+                     and this button is scoped to this phone. The trade-off is
+                     the honest one: a later sync can pull this data back from
+                     Drive, which the copy says. */
+                  state.entries = []; state.userFoods = []; state.recipes = [];
+                  state.measurements = []; state.photoMetas = [];
+                  await Promise.all([saveEntries(), saveUserFoods(), saveRecipes(),
+                                     saveMeasurements(), savePhotoMetas()]);
+                  foodIndexDirty = true;
+                  toast('Data cleared on this device'); showView('home');
                 })();
               }
             }
@@ -2246,6 +2488,23 @@ function wire() {
     e.target.value = '';
     if (f) importStrong(f);
   });
+
+  $('#imp-sheet').addEventListener('change', e => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    if (f) importTrackingSheet(f);
+  });
+
+  $('#imp-paste').onclick = openPasteSheet;
+
+  /* The same text the Drive sync writes, downloadable for anyone who has not
+     connected Drive. One renderer, so the two can never disagree. */
+  $('#exp-sheet').onclick = () => {
+    const csv = measurementsToSheetCsv(state.measurements, state.weights);
+    if (/^No measurements/i.test(csv)) { toast('Nothing measured yet'); return; }
+    download('liftlog-measurements-' + stamp() + '.csv', 'text/csv', csv);
+    toast('Sheet exported');
+  };
   $('#imp-file').addEventListener('change', e => {
     const f = e.target.files[0];
     e.target.value = '';
@@ -2282,6 +2541,13 @@ function wire() {
   state.custom = (await DB.get('kv', 'custom')) || [];
   state.weights = (await DB.get('kv', 'weights')) || [];
   state.templates = (await DB.get('kv', 'templates')) || [];
+  state.entries = (await DB.get('kv', 'foodEntries')) || [];
+  state.userFoods = (await DB.get('kv', 'userFoods')) || [];
+  state.recipes = (await DB.get('kv', 'recipes')) || [];
+  state.measurements = (await DB.get('kv', 'measurements')) || [];
+  state.photoMetas = (await DB.get('kv', 'photoMetas')) || [];
+  /* foods.json is NOT loaded here — it is 2.7 MB and most launches never open
+     the Food screen. loadFoodDb() runs on first use instead. */
   rebuildExerciseIndex();
   const act = await DB.get('kv', 'active');
   if (act) state.active = act;
@@ -2637,6 +2903,912 @@ function startEmptyWorkout() {
   showCheer('start', 'Custom workout', () => openExercisePicker('Add your first exercise', addExerciseToActive));
 }
 
+/* ================= progress photos — bytes =================
+   IndexedDB holds the image; Drive holds a copy as its own file. The metadata
+   record is the only thing that ever enters the sync payload. */
+
+/* Cap on the stored image. A modern phone camera produces 3-8 MB per shot;
+   at a fortnightly cadence that is hundreds of megabytes a year in a storage
+   bucket the browser is free to evict. 1440 px on the long edge at q0.82 is
+   about 250 KB and still far more than enough to see a change in the mirror. */
+const PHOTO_MAX_EDGE = 1440;
+const PHOTO_QUALITY = 0.82;
+
+/** Downscale + re-encode a picked/captured file. Resolves {blob, w, h}. */
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob(b => {
+        if (b) resolve({ blob: b, w, h });
+        else reject(new Error('encode-failed'));
+      }, 'image/jpeg', PHOTO_QUALITY);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode-failed')); };
+    img.src = url;
+  });
+}
+
+/**
+ * Get an image's bytes. Local store first; if this device has metadata but no
+ * bytes — the usual case on a replaced phone — pull it back from Drive and
+ * re-cache it. Resolves null when the image simply is not available.
+ */
+async function photoBlob(meta) {
+  if (!meta || !meta.id) return null;
+  const local = await DB.get('photos', meta.id).catch(() => null);
+  if (local && local.blob) return local.blob;
+  if (!meta.driveId) return null;
+  const blob = await sync.downloadPhoto(meta.driveId);
+  if (blob) await DB.put('photos', { id: meta.id, blob }).catch(() => {});
+  return blob;
+}
+
+/** Object URLs handed to <img>. Revoked when the view that made them is replaced. */
+let photoUrls = [];
+function releasePhotoUrls() {
+  for (const u of photoUrls) { try { URL.revokeObjectURL(u); } catch (_) {} }
+  photoUrls = [];
+}
+function photoUrl(blob) {
+  const u = URL.createObjectURL(blob);
+  photoUrls.push(u);
+  return u;
+}
+
+/**
+ * Upload every photo Drive has not got yet, then delete files whose record is
+ * tombstoned. Both halves are best-effort: a failure leaves the photo on the
+ * device with no driveId and it is simply retried next time.
+ */
+async function uploadPendingPhotos(opts) {
+  if (!sync.isConnected()) return;
+  const pending = photosNeedingUpload(state.photoMetas);
+  let changed = false;
+  for (const meta of pending) {
+    const rec = await DB.get('photos', meta.id).catch(() => null);
+    if (!rec || !rec.blob) continue;      // metadata arrived before the bytes
+    const name = 'liftlog-photo-' + meta.pose + '-' + meta.id + '.jpg';
+    const id = await sync.uploadPhoto(rec.blob, name, opts);
+    if (!id) break;                       // network or auth is down; stop trying
+    const i = state.photoMetas.findIndex(p => p.id === meta.id);
+    if (i >= 0) { state.photoMetas[i] = Object.assign({}, state.photoMetas[i], { driveId: id }); changed = true; }
+  }
+  for (const driveId of orphanDriveIds(state.photoMetas)) {
+    await sync.deletePhoto(driveId, opts);
+  }
+  if (changed) await savePhotoMetas();
+}
+
+/** Store a captured image and its metadata, then kick off a backup. */
+async function addPhoto(file, pose, ts) {
+  const { blob, w, h } = await compressImage(file);
+  const meta = makePhotoMeta({
+    pose, ts: ts || Date.now(), w, h, bytes: blob.size, type: 'image/jpeg',
+    weightKg: bodyKg()
+  });
+  await DB.put('photos', { id: meta.id, blob });
+  state.photoMetas = state.photoMetas.concat([meta]);
+  await savePhotoMetas();
+  backgroundSync();
+  return meta;
+}
+
+/** Tombstone a photo and drop its local bytes. Drive cleanup happens on sync. */
+async function removePhoto(id) {
+  const i = state.photoMetas.findIndex(p => p.id === id);
+  if (i < 0) return;
+  state.photoMetas = state.photoMetas.map(p => p.id === id ? bodyTombstone(p) : p);
+  await DB.del('photos', id).catch(() => {});
+  await savePhotoMetas();
+  backgroundSync();
+}
+
+/* ================= Food view ================= */
+
+function foodDayTs() { return state.foodDay == null ? startOfDay(Date.now()) : state.foodDay; }
+
+function fmtKcal(v) { return String(Math.round(Number(v) || 0)); }
+function fmtG(v) { return (Math.round((Number(v) || 0) * 10) / 10) + ' g'; }
+
+/** One macro's progress row. Value carries the meaning; colour never does. */
+function macroBarHTML(label, cell, unitLabel) {
+  const pct = cell.goal ? Math.min(100, Math.max(0, cell.pct)) : 0;
+  const over = cell.over;
+  return '<div class="mb-row">' +
+    '<span class="mb-lab">' + esc(label) + '</span>' +
+    '<span class="mb-val">' + esc(fmtG(cell.have)) +
+      (cell.goal ? ' <span class="muted">/ ' + esc(fmtG(cell.goal)) + '</span>' : '') + '</span>' +
+    '<span class="mb-track' + (over ? ' mb-over' : '') + '">' +
+      '<span class="mb-fill" style="width:' + pct + '%"></span></span>' +
+  '</div>';
+}
+
+function renderFood() {
+  const el = $('#food-body');
+  if (!el) return;
+  releasePhotoUrls();
+
+  const day = foodDayTs();
+  const isToday = day === startOfDay(Date.now());
+  const totals = dayTotals(state.entries, day);
+  const targets = nutTargets();
+  const prog = targetProgress(totals, targets);
+  const split = macroSplitPct(totals);
+  const slots = dayBySlot(state.entries, day);
+  const avg = averageDay(state.entries, { days: 7 });
+
+  const kcalLine = targets.kcal > 0
+    ? '<div class="kcal-big"><strong>' + esc(fmtKcal(totals.kcal)) + '</strong>' +
+      '<span class="muted"> / ' + esc(fmtKcal(targets.kcal)) + ' kcal</span></div>' +
+      '<div class="kcal-sub' + (prog.kcal.over ? ' is-over' : '') + '">' +
+        (prog.kcal.over
+          ? esc(fmtKcal(Math.abs(prog.kcal.left))) + ' kcal over'
+          : esc(fmtKcal(prog.kcal.left)) + ' kcal left') + '</div>'
+    : '<div class="kcal-big"><strong>' + esc(fmtKcal(totals.kcal)) + '</strong>' +
+      '<span class="muted"> kcal</span></div>' +
+      '<div class="kcal-sub muted">No target set</div>';
+
+  const slotsHtml = slots.map(s =>
+    '<section class="slot">' +
+      '<header class="slot-head">' +
+        '<h3>' + esc(s.label) + '</h3>' +
+        '<span class="slot-kcal">' + (s.items.length ? esc(fmtKcal(s.totals.kcal)) + ' kcal' : '') + '</span>' +
+      '</header>' +
+      (s.items.length
+        ? '<ul class="fe-list">' + s.items.map(e =>
+            '<li class="fe-row" data-entry="' + esc(e.id) + '">' +
+              '<span class="fe-name">' + esc(e.name) +
+                (e.servings ? ' <span class="muted">× ' + esc(String(e.servings)) + '</span>' : '') +
+              '</span>' +
+              '<span class="fe-amt muted">' + (e.grams > 0 ? esc(fmtG(e.grams)) : '') + '</span>' +
+              '<span class="fe-kcal">' + esc(fmtKcal(e.kcal)) + '</span>' +
+            '</li>').join('') + '</ul>'
+        : '') +
+      '<button class="btn slim" data-add-slot="' + esc(s.id) + '">' +
+        '<svg class="ic"><use href="#i-plus"/></svg>Add to ' + esc(s.label.toLowerCase()) + '</button>' +
+    '</section>').join('');
+
+  el.innerHTML =
+    '<div class="day-nav">' +
+      '<button class="icon-btn" id="fd-prev" aria-label="Previous day">‹</button>' +
+      '<button class="day-label" id="fd-pick">' +
+        esc(isToday ? 'Today' : fmtDate(day)) + '</button>' +
+      '<button class="icon-btn" id="fd-next" aria-label="Next day"' +
+        (isToday ? ' disabled' : '') + '>›</button>' +
+    '</div>' +
+
+    '<div class="kcal-card">' + kcalLine +
+      '<div class="mb-wrap">' +
+        macroBarHTML('Protein', prog.p) +
+        macroBarHTML('Carbs', prog.c) +
+        macroBarHTML('Fat', prog.f) +
+      '</div>' +
+      (totals.kcal > 0
+        ? '<p class="muted small split-line">' + split.p + '% protein · ' + split.c +
+          '% carbs · ' + split.f + '% fat' +
+          (totals.fib != null ? ' · ' + esc(fmtG(totals.fib)) + ' fibre' : '') + '</p>'
+        : '') +
+    '</div>' +
+
+    slotsHtml +
+
+    '<div class="btn-col">' +
+      '<button class="btn" id="fd-copy">Copy a previous day</button>' +
+      '<button class="btn" id="fd-targets">' +
+        (targets.kcal > 0 ? 'Targets: ' + esc(fmtKcal(targets.kcal)) + ' kcal' : 'Set daily targets') +
+      '</button>' +
+    '</div>' +
+
+    '<h2 class="sec">Last 14 days</h2>' +
+    '<div class="kc-wrap">' + kcalTrendSVG(state.entries, { days: 14, goalKcal: targets.kcal }) + '</div>' +
+    (avg.days > 0
+      ? '<p class="muted small">Average over the ' + avg.days + ' day' + (avg.days === 1 ? '' : 's') +
+        ' you logged in the last week: <strong>' + esc(fmtKcal(avg.kcal)) + ' kcal</strong>, ' +
+        esc(fmtG(avg.p)) + ' protein. Days with nothing logged are left out rather than counted as zero.</p>'
+      : '');
+
+  $('#fd-prev').onclick = () => { state.foodDay = foodDayTs() - DAY; renderFood(); };
+  $('#fd-next').onclick = () => {
+    const next = foodDayTs() + DAY;
+    state.foodDay = next >= startOfDay(Date.now()) ? null : next;
+    renderFood();
+  };
+  $('#fd-pick').onclick = () => { state.foodDay = null; renderFood(); };
+  $('#fd-copy').onclick = openCopyDay;
+  $('#fd-targets').onclick = openTargets;
+  $$('#food-body [data-add-slot]').forEach(b => {
+    b.onclick = () => openFoodPicker(b.dataset.addSlot);
+  });
+  $$('#food-body [data-entry]').forEach(row => {
+    row.onclick = () => openEntryActions(row.dataset.entry);
+  });
+}
+
+/* ---------- food picker ---------- */
+
+function foodRowHTML(f) {
+  const per = f.per100 || {};
+  const badge = f.isRecipe ? 'Recipe'
+    : f.source === 'user' ? 'Mine'
+    : f.source === 'ifct' ? 'IFCT'
+    : f.source === 'fndds' ? 'Cooked'
+    : '';
+  const sub = f.isRecipe
+    ? fmtKcal((f.perServing || {}).kcal) + ' kcal per ' + esc(String(f.portions && f.portions[0] ? f.portions[0].label.replace(/^1 /, '') : 'serving'))
+    : fmtKcal(per.kcal) + ' kcal · P ' + (per.p || 0) + ' C ' + (per.c || 0) + ' F ' + (per.f || 0) + ' per 100 g';
+  // Structure matches the exercise picker's .pick-row so it inherits its layout.
+  return '<button class="pick-row" data-food="' + esc(f.id) + '">' +
+    '<span class="pick-main">' +
+      '<strong>' + esc(f.name) + '</strong>' +
+      '<span class="pick-sub muted">' + sub + '</span>' +
+    '</span>' +
+    (badge ? '<span class="src-badge">' + esc(badge) + '</span>' : '') +
+  '</button>';
+}
+
+function foodRowsHTML(q, mode) {
+  if (state.foodDbState === 'loading') return '<p class="muted pad-s">Loading the food database…</p>';
+  let list;
+  if (mode === 'recent') {
+    const ix = foodIndex();
+    const byId = new Map(ix.map(f => [f.id, f]));
+    list = recentFoods(state.entries, { limit: 40 })
+      .map(e => byId.get(e.foodId))
+      .filter(Boolean);
+    if (q) list = searchFoods(list, q, { limit: 60 });
+  } else if (mode === 'mine') {
+    list = searchFoods(foodIndex().filter(f => f.source === 'user'), q, { limit: 60 });
+  } else if (mode === 'recipes') {
+    list = searchFoods(foodIndex().filter(f => f.isRecipe), q, { limit: 60 });
+  } else {
+    list = searchFoods(foodIndex(), q, { limit: 60 });
+  }
+  if (!list.length) {
+    return '<p class="muted pad-s">' +
+      (q ? 'Nothing matched “' + esc(q) + '”.' : 'Nothing here yet.') + '</p>';
+  }
+  return list.map(foodRowHTML).join('');
+}
+
+async function openFoodPicker(slot) {
+  const day = foodDayTs();
+  openSheet(
+    '<h2>Add food</h2>' +
+    '<input id="fp-q" class="inp wide" type="search" placeholder="Search foods…" ' +
+      'autocomplete="off" autocapitalize="none" aria-label="Search foods">' +
+    '<div class="seg" id="fp-mode">' +
+      '<button data-v="all" class="on">All</button>' +
+      '<button data-v="recent">Recent</button>' +
+      '<button data-v="mine">Mine</button>' +
+      '<button data-v="recipes">Recipes</button>' +
+    '</div>' +
+    '<div id="fp-list" class="pick-list">' + foodRowsHTML('', 'all') + '</div>' +
+    '<div class="btn-col">' +
+      '<button class="btn" id="fp-new"><svg class="ic"><use href="#i-plus"/></svg>Create a food</button>' +
+      '<button class="btn" id="fp-recipe"><svg class="ic"><use href="#i-plus"/></svg>Build a recipe</button>' +
+    '</div>');
+
+  let mode = 'all';
+  const list = $('#fp-list');
+  const wireRows = () => $$('#fp-list [data-food]').forEach(b => {
+    b.onclick = () => {
+      const f = foodIndex().find(x => x.id === b.dataset.food);
+      if (f) openLogAmount(f, slot, day);
+    };
+  });
+  const repaint = () => { list.innerHTML = foodRowsHTML($('#fp-q').value, mode); wireRows(); };
+  wireRows();
+
+  $('#fp-q').addEventListener('input', repaint);
+  $$('#fp-mode button').forEach(b => b.onclick = () => {
+    mode = b.dataset.v;
+    $$('#fp-mode button').forEach(x => x.classList.toggle('on', x === b));
+    repaint();
+  });
+  $('#fp-new').onclick = () => openCreateFood(f => openLogAmount(f, slot, day));
+  $('#fp-recipe').onclick = () => openRecipeEditor(null, r => {
+    const asFood = recipeAsFood(r);
+    if (asFood) openLogAmount(asFood, slot, day);
+  });
+
+  // The database is only fetched when this screen is first opened.
+  if (!state.foodDb) { await loadFoodDb(); repaint(); }
+}
+
+/** Amount screen: portion chips, a grams field, and a live macro preview. */
+function openLogAmount(food, slot, day) {
+  const isRecipe = !!food.isRecipe;
+  const portions = food.portions || [];
+  const defGrams = portions.length ? portions[0].grams : 100;
+
+  openSheet(
+    '<h2>' + esc(food.name) + '</h2>' +
+    (isRecipe
+      ? '<label class="fld"><span>Servings</span>' +
+        '<input id="la-serv" class="inp wide" type="text" inputmode="decimal" value="1"></label>'
+      : (portions.length
+          ? '<div class="chips" id="la-chips">' + portions.map((p, i) =>
+              '<button class="chip' + (i === 0 ? ' on' : '') + '" data-g="' + p.grams + '">' +
+              esc(p.label) + '</button>').join('') +
+            '<button class="chip" data-g="100">100 g</button></div>'
+          : '') +
+        '<label class="fld"><span>Grams</span>' +
+        '<input id="la-g" class="inp wide" type="text" inputmode="decimal" value="' +
+          defGrams + '"></label>') +
+    '<div id="la-prev" class="macro-prev"></div>' +
+    '<div class="btn-col">' +
+      '<button class="btn primary" id="la-add">Add to ' + esc(slotLabel(slot).toLowerCase()) + '</button>' +
+    '</div>');
+
+  const preview = () => {
+    let m;
+    if (isRecipe) {
+      const n = parseDisp($('#la-serv').value) || 0;
+      const per = food.perServing || recipePerServing(food);
+      m = { kcal: per.kcal * n, p: per.p * n, c: per.c * n, f: per.f * n };
+    } else {
+      m = macrosFor(food, parseDisp($('#la-g').value) || 0);
+    }
+    $('#la-prev').innerHTML =
+      '<strong>' + esc(fmtKcal(m.kcal)) + '</strong> kcal' +
+      '<span class="muted"> · P ' + esc(fmtG(m.p)) + ' · C ' + esc(fmtG(m.c)) +
+      ' · F ' + esc(fmtG(m.f)) + '</span>';
+  };
+  preview();
+
+  if (isRecipe) $('#la-serv').addEventListener('input', preview);
+  else {
+    $('#la-g').addEventListener('input', preview);
+    $$('#la-chips .chip').forEach(c => c.onclick = () => {
+      $$('#la-chips .chip').forEach(x => x.classList.toggle('on', x === c));
+      $('#la-g').value = c.dataset.g;
+      preview();
+    });
+  }
+
+  $('#la-add').onclick = () => {
+    let entry;
+    // The time-of-day is kept when logging onto a past date so the entry sorts
+    // sensibly, but the DAY is whichever day the view is showing.
+    const now = new Date();
+    const ts = day + (now.getHours() * 3600 + now.getMinutes() * 60) * 1000;
+    try {
+      entry = isRecipe
+        ? makeEntry(food, null, { servings: parseDisp($('#la-serv').value), slot, ts })
+        : makeEntry(food, parseDisp($('#la-g').value), { slot, ts });
+    } catch (e) { toast(e.message || 'Check the amount'); return; }
+    state.entries = state.entries.concat([entry]);
+    foodIndexDirty = true;
+    saveEntries().then(() => { renderFood(); backgroundSync(); });
+    closeSheet();
+    toast('Added ' + fmtKcal(entry.kcal) + ' kcal');
+  };
+}
+
+function openEntryActions(entryId) {
+  const e = nutLive(state.entries).find(x => x.id === entryId);
+  if (!e) return;
+  showModal({
+    title: e.name,
+    body: '<p>' + esc(fmtKcal(e.kcal)) + ' kcal · P ' + esc(fmtG(e.p)) +
+      ' · C ' + esc(fmtG(e.c)) + ' · F ' + esc(fmtG(e.f)) + '</p>' +
+      (e.grams > 0 ? '<p class="muted">' + esc(fmtG(e.grams)) + ' · ' +
+        esc(slotLabel(e.slot)) + '</p>' : ''),
+    actions: [
+      { label: 'Close' },
+      { label: 'Delete', danger: true, onClick: () => {
+          state.entries = state.entries.map(x => x.id === entryId ? nutTombstone(x) : x);
+          foodIndexDirty = true;
+          saveEntries().then(() => { renderFood(); backgroundSync(); });
+          toast('Removed');
+        } }
+    ]
+  });
+}
+
+function openCopyDay() {
+  const target = foodDayTs();
+  // Offer the most recent days that actually have something logged. A list of
+  // empty dates would be a list of things that do nothing.
+  const candidates = [];
+  for (let i = 1; i <= 14 && candidates.length < 7; i++) {
+    const d = target - i * DAY;
+    const t = dayTotals(state.entries, d);
+    if (t.kcal > 0) candidates.push({ day: d, kcal: t.kcal });
+  }
+  if (!candidates.length) { toast('No earlier day has any food logged'); return; }
+  showModal({
+    title: 'Copy a day',
+    body: '<p class="muted">Copies every item onto ' +
+      esc(target === startOfDay(Date.now()) ? 'today' : fmtDate(target)) + '.</p>' +
+      '<div class="btn-col">' + candidates.map(c =>
+        '<button class="btn" data-copy="' + c.day + '">' + esc(fmtDate(c.day)) +
+        ' <span class="muted">· ' + esc(fmtKcal(c.kcal)) + ' kcal</span></button>').join('') +
+      '</div>',
+    actions: [{ label: 'Cancel' }]
+  });
+  $$('#modal [data-copy]').forEach(b => b.onclick = () => {
+    const copied = copyDay(state.entries, Number(b.dataset.copy), target);
+    if (!copied.length) { toast('Nothing to copy'); return; }
+    state.entries = state.entries.concat(copied);
+    foodIndexDirty = true;
+    saveEntries().then(() => { renderFood(); backgroundSync(); });
+    closeModal();
+    toast('Copied ' + copied.length + ' item' + (copied.length === 1 ? '' : 's'));
+  });
+}
+
+function openTargets() {
+  const t = nutTargets();
+  const fld = (id, label, val, sfx) =>
+    '<label class="fld"><span>' + esc(label) + '</span>' +
+    '<input id="' + id + '" class="inp wide" type="text" inputmode="decimal" value="' +
+    (val > 0 ? val : '') + '" placeholder="' + esc(sfx) + '"></label>';
+  showModal({
+    title: 'Daily targets',
+    body: fld('tg-k', 'Energy (kcal)', t.kcal, 'e.g. 2200') +
+      fld('tg-p', 'Protein (g)', t.p, 'e.g. 160') +
+      fld('tg-c', 'Carbs (g)', t.c, 'e.g. 220') +
+      fld('tg-f', 'Fat (g)', t.f, 'e.g. 60') +
+      '<button class="btn slim" id="tg-suggest">Suggest from my body weight</button>' +
+      '<p class="muted pad-s">Leave any field blank to stop tracking it. ' +
+      'Nothing here is enforced — the app shows what you ate against what you ' +
+      'said you wanted, and that is all.</p>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Save', primary: true, onClick: () => {
+          setNutTargets({
+            kcal: parseDisp($('#tg-k').value) || 0, p: parseDisp($('#tg-p').value) || 0,
+            c: parseDisp($('#tg-c').value) || 0, f: parseDisp($('#tg-f').value) || 0
+          });
+          renderFood();
+          toast('Targets saved');
+        } }
+    ]
+  });
+  $('#tg-suggest').onclick = () => {
+    const kg = bodyKg();
+    if (!kg) { toast('Log a body weight first'); return; }
+    const cm = parseFloat(localStorage.getItem('ll.heightCm') || '');
+    const age = parseFloat(localStorage.getItem('ll.age') || '');
+    if (!isFinite(cm) || !isFinite(age)) { openBodyBasics(); return; }
+    const s = suggestTargets({
+      kg, cm, age, sex: localStorage.getItem('ll.sex') || 'male',
+      activity: 'moderate', goal: 'lose'
+    });
+    if (!s) { toast('Need height and age'); return; }
+    $('#tg-k').value = s.kcal; $('#tg-p').value = s.p;
+    $('#tg-c').value = s.c; $('#tg-f').value = s.f;
+    toast('Estimated from ' + fmtW(kg) + ' — edit freely');
+  };
+}
+
+/** Height/age/sex, needed only for the BMR suggestion. Never inferred. */
+function openBodyBasics() {
+  showModal({
+    title: 'A few details',
+    body: '<p class="muted">Only used to estimate a starting calorie target. ' +
+      'Stored on this device.</p>' +
+      '<label class="fld"><span>Height (cm)</span><input id="bb-h" class="inp wide" ' +
+      'type="text" inputmode="decimal" value="' + esc(localStorage.getItem('ll.heightCm') || '') + '"></label>' +
+      '<label class="fld"><span>Age</span><input id="bb-a" class="inp wide" ' +
+      'type="text" inputmode="numeric" value="' + esc(localStorage.getItem('ll.age') || '') + '"></label>' +
+      '<label class="fld"><span>Sex</span><select id="bb-s" class="inp wide">' +
+      '<option value="male">Male</option><option value="female">Female</option></select></label>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Save', primary: true, onClick: () => {
+          const h = parseDisp($('#bb-h').value), a = parseDisp($('#bb-a').value);
+          if (!h || !a) { toast('Enter height and age'); return false; }
+          localStorage.setItem('ll.heightCm', String(h));
+          localStorage.setItem('ll.age', String(a));
+          localStorage.setItem('ll.sex', $('#bb-s').value);
+          openTargets();
+        } }
+    ]
+  });
+  const s = localStorage.getItem('ll.sex');
+  if (s) $('#bb-s').value = s;
+}
+
+/* ---------- creating a food ---------- */
+
+function openCreateFood(onDone) {
+  openSheet(
+    '<h2>Create a food</h2>' +
+    '<label class="fld"><span>Name</span><input id="cf-n" class="inp wide" type="text" ' +
+      'autocapitalize="sentences" placeholder="e.g. Mum&rsquo;s rajma"></label>' +
+    '<label class="fld"><span>These numbers are for…</span>' +
+      '<input id="cf-basis" class="inp wide" type="text" inputmode="decimal" value="100"></label>' +
+    '<p class="muted small pad-s">grams. Put 100 to copy a per-100&nbsp;g table, or the ' +
+      'serving size in grams to copy a label.</p>' +
+    '<label class="fld"><span>Energy (kcal)</span><input id="cf-k" class="inp wide" type="text" inputmode="decimal"></label>' +
+    '<label class="fld"><span>Protein (g)</span><input id="cf-p" class="inp wide" type="text" inputmode="decimal"></label>' +
+    '<label class="fld"><span>Carbs (g)</span><input id="cf-c" class="inp wide" type="text" inputmode="decimal"></label>' +
+    '<label class="fld"><span>Fat (g)</span><input id="cf-f" class="inp wide" type="text" inputmode="decimal"></label>' +
+    '<label class="fld"><span>Fibre (g, optional)</span><input id="cf-fb" class="inp wide" type="text" inputmode="decimal"></label>' +
+    '<div class="btn-col"><button class="btn primary" id="cf-save">Save food</button></div>');
+
+  $('#cf-save').onclick = () => {
+    let food;
+    try {
+      food = makeUserFood($('#cf-n').value, {
+        kcal: parseDisp($('#cf-k').value) || 0,
+        p: parseDisp($('#cf-p').value) || 0,
+        c: parseDisp($('#cf-c').value) || 0,
+        f: parseDisp($('#cf-f').value) || 0,
+        fib: $('#cf-fb').value.trim() === '' ? null : parseDisp($('#cf-fb').value)
+      }, {
+        basis: parseDisp($('#cf-basis').value) || 100,
+        portionGrams: parseDisp($('#cf-basis').value) || 0,
+        portionLabel: '1 serving'
+      });
+    } catch (e) { toast(e.message || 'Check the numbers'); return; }
+
+    // Advisory only — a real label can disagree with Atwater for real reasons.
+    const warn = energyMismatch(food.per100);
+    state.userFoods = state.userFoods.concat([food]);
+    saveUserFoods().then(() => backgroundSync());
+    closeSheet();
+    if (warn) toast(warn); else toast('Saved “' + food.name + '”');
+    if (onDone) onDone(food);
+  };
+}
+
+/* ---------- recipes ---------- */
+
+function openRecipeEditor(existing, onDone) {
+  let draft = existing || makeRecipe('Untitled recipe', { servings: 1 });
+
+  const paint = () => {
+    const totals = recipeTotals(draft);
+    const per = recipePerServing(draft);
+    openSheet(
+      '<h2>' + (existing ? 'Edit recipe' : 'Build a recipe') + '</h2>' +
+      '<p class="muted small">Add the ingredients once, say how many servings it ' +
+        'makes, and log it in one tap from then on.</p>' +
+      '<label class="fld"><span>Name</span><input id="re-n" class="inp wide" type="text" ' +
+        'value="' + esc(draft.name) + '"></label>' +
+      '<label class="fld"><span>Makes how many servings</span>' +
+        '<input id="re-s" class="inp wide" type="text" inputmode="decimal" value="' +
+        esc(String(draft.servings)) + '"></label>' +
+      (draft.items.length
+        ? '<ul class="fe-list">' + draft.items.map(i =>
+            '<li class="fe-row"><span class="fe-name">' + esc(i.name) + '</span>' +
+            '<span class="fe-amt muted">' + esc(fmtG(i.grams)) + '</span>' +
+            '<span class="fe-kcal">' + esc(fmtKcal(i.kcal)) + '</span>' +
+            '<button class="icon-btn" data-del="' + esc(i.id) + '" aria-label="Remove ' +
+              esc(i.name) + '">×</button></li>').join('') + '</ul>'
+        : '<p class="muted pad-s">No ingredients yet.</p>') +
+      '<button class="btn slim" id="re-add"><svg class="ic"><use href="#i-plus"/></svg>Add ingredient</button>' +
+      (draft.items.length
+        ? '<div class="macro-prev"><strong>' + esc(fmtKcal(per.kcal)) + '</strong> kcal per serving' +
+          '<span class="muted"> · P ' + esc(fmtG(per.p)) + ' · C ' + esc(fmtG(per.c)) +
+          ' · F ' + esc(fmtG(per.f)) + '</span><br>' +
+          '<span class="muted small">Whole recipe: ' + esc(fmtKcal(totals.kcal)) + ' kcal, ' +
+          esc(fmtG(recipeGrams(draft))) + '</span></div>'
+        : '') +
+      '<div class="btn-col"><button class="btn primary" id="re-save">Save recipe</button></div>');
+
+    const commit = () => {
+      draft = Object.assign({}, draft, {
+        name: $('#re-n').value.trim() || draft.name,
+        servings: parseDisp($('#re-s').value) || draft.servings
+      });
+    };
+    $('#re-n').addEventListener('change', commit);
+    $('#re-s').addEventListener('change', commit);
+
+    $('#re-add').onclick = () => {
+      commit();
+      openIngredientPicker(f => {
+        openIngredientAmount(f, grams => {
+          try { draft = recipeAddItem(draft, f, grams); }
+          catch (e) { toast(e.message); return; }
+          paint();
+        });
+      });
+    };
+    $$('#sheet-inner [data-del]').forEach(b => b.onclick = () => {
+      commit();
+      draft = recipeRemoveItem(draft, b.dataset.del);
+      paint();
+    });
+    $('#re-save').onclick = () => {
+      commit();
+      if (!draft.items.length) { toast('Add at least one ingredient'); return; }
+      if (!draft.name.trim() || draft.name === 'Untitled recipe') { toast('Give it a name'); return; }
+      const i = state.recipes.findIndex(r => r.id === draft.id);
+      state.recipes = i >= 0
+        ? state.recipes.map(r => r.id === draft.id ? draft : r)
+        : state.recipes.concat([draft]);
+      saveRecipes().then(() => backgroundSync());
+      closeSheet();
+      toast('Saved “' + draft.name + '”');
+      if (onDone) onDone(draft);
+    };
+  };
+  paint();
+}
+
+/** Ingredient picker — foods only; a recipe cannot contain another recipe. */
+async function openIngredientPicker(onPick) {
+  openSheet(
+    '<h2>Add ingredient</h2>' +
+    '<input id="ip-q" class="inp wide" type="search" placeholder="Search foods…" ' +
+      'autocomplete="off" aria-label="Search foods">' +
+    '<div id="ip-list" class="pick-list"></div>');
+
+  const repaint = () => {
+    const q = $('#ip-q').value;
+    const list = searchFoods(foodIndex().filter(f => !f.isRecipe), q, { limit: 60 });
+    $('#ip-list').innerHTML = list.length
+      ? list.map(foodRowHTML).join('')
+      : '<p class="muted pad-s">Nothing matched.</p>';
+    $$('#ip-list [data-food]').forEach(b => b.onclick = () => {
+      const f = foodIndex().find(x => x.id === b.dataset.food);
+      if (f) onPick(f);
+    });
+  };
+  if (!state.foodDb) { $('#ip-list').innerHTML = '<p class="muted pad-s">Loading…</p>'; await loadFoodDb(); }
+  repaint();
+  $('#ip-q').addEventListener('input', repaint);
+}
+
+function openIngredientAmount(food, onOk) {
+  showModal({
+    title: food.name,
+    body: '<label class="fld"><span>Grams in the recipe</span>' +
+      '<input id="ia-g" class="inp wide" type="text" inputmode="decimal" value="100"></label>' +
+      '<p class="muted small">Raw weight, as it goes in.</p>',
+    actions: [
+      { label: 'Cancel' },
+      { label: 'Add', primary: true, onClick: () => {
+          const g = parseDisp($('#ia-g').value);
+          if (!g || g <= 0) { toast('Enter grams'); return false; }
+          onOk(g);
+        } }
+    ]
+  });
+}
+
+/* ================= body: measurements & photos ================= */
+
+function renderBodySections() {
+  const el = $('#body-body');
+  if (!el) return;
+
+  const used = usedFields(state.measurements);
+  const chartKey = localStorage.getItem('ll.msField') ||
+    (used.includes('waist') ? 'waist' : (used[0] || 'waist'));
+  const series = fieldSeries(state.measurements, chartKey);
+  const groups = photosByDay(state.photoMetas);
+  const latestRec = measurementSeries(state.measurements).slice(-1)[0] || null;
+
+  const summary = used.length
+    ? '<div class="ms-cells">' + used.map(k => {
+        const s = fieldSeries(state.measurements, k);
+        const f = FIELD_BY_KEY[k];
+        const ch = s.change;
+        return '<button class="ms-cell' + (k === chartKey ? ' on' : '') + '" data-field="' + esc(k) + '">' +
+          '<span class="ms-lab">' + esc(f.label) + '</span>' +
+          '<span class="ms-num">' + esc(fmtField(k, s.last ? s.last.value : null)) + '</span>' +
+          (ch != null && ch !== 0
+            ? '<span class="ms-chg">' + (ch > 0 ? '▲ +' : '▼ ') + esc(String(ch)) + '</span>'
+            : '<span class="ms-chg muted">—</span>') +
+        '</button>';
+      }).join('') + '</div>'
+    : '<p class="muted pad-s">Nothing measured yet. Log a tape measurement or a ' +
+      'scale reading, or import your tracking sheet from Settings.</p>';
+
+  const chart = used.length
+    ? '<h3 class="sub">' + esc(FIELD_BY_KEY[chartKey] ? FIELD_BY_KEY[chartKey].label : chartKey) + '</h3>' +
+      '<div class="ms-wrap">' + measurementSVG(state.measurements, chartKey) + '</div>' +
+      (series.change != null
+        ? '<p class="muted small">' + (series.change > 0 ? 'Up ' : 'Down ') +
+          esc(fmtField(chartKey, Math.abs(series.change))) +
+          ' since ' + esc(fmtDate(series.first.ts)) + '.</p>'
+        : '')
+    : '';
+
+  const photoHtml = groups.length
+    ? groups.slice(0, 6).map(g =>
+        '<div class="ph-day"><h4>' + esc(fmtDate(g.day)) + '</h4>' +
+        '<div class="ph-row">' + g.items.map(p =>
+          '<figure class="ph-fig" data-photo="' + esc(p.id) + '">' +
+            '<img class="ph-img" alt="' + esc(poseLabel(p.pose) + ' on ' + fmtDate(p.ts)) +
+              '" data-blob="' + esc(p.id) + '" loading="lazy">' +
+            '<figcaption>' + esc(poseLabel(p.pose)) +
+              (p.driveId ? '' : ' <span class="ph-local" title="Not backed up yet">•</span>') +
+            '</figcaption>' +
+          '</figure>').join('') + '</div></div>').join('')
+    : '<p class="muted pad-s">No photos yet. The same pose, same spot, same light ' +
+      'is what makes them comparable.</p>';
+
+  el.innerHTML =
+    '<h2 class="sec">Measurements</h2>' +
+    summary + chart +
+    '<div class="btn-col">' +
+      '<button class="btn primary" id="ms-tape"><svg class="ic"><use href="#i-plus"/></svg>Log measurements</button>' +
+      '<button class="btn" id="ms-scan">Log a scale reading</button>' +
+    '</div>' +
+    /* relTime() falls back to a formatted DATE when the entry is old, so
+       lower-casing it turns "Aug 15, 2026" into "aug 15, 2026". Keep the
+       string as relTime returns it and put the lead-in before a colon. */
+    (latestRec ? '<p class="muted small">Last entry: ' + esc(relTime(latestRec.ts)) + '.</p>' : '') +
+
+    '<h2 class="sec">Progress photos</h2>' +
+    photoHtml +
+    '<div class="btn-col">' +
+      POSES.map(p => '<button class="btn" data-shoot="' + esc(p.id) + '">' +
+        '<svg class="ic"><use href="#i-plus"/></svg>Add ' + esc(p.label.toLowerCase()) + ' photo</button>').join('') +
+      (comparePair(state.photoMetas, 'front') || comparePair(state.photoMetas, 'side') ||
+       comparePair(state.photoMetas, 'rear')
+        ? '<button class="btn" id="ph-compare">Compare first and latest</button>' : '') +
+    '</div>';
+
+  $$('#body-body [data-field]').forEach(b => b.onclick = () => {
+    localStorage.setItem('ll.msField', b.dataset.field);
+    renderBodySections();
+  });
+  $('#ms-tape').onclick = () => openMeasureForm('tape');
+  $('#ms-scan').onclick = () => openMeasureForm('scan');
+  $$('#body-body [data-shoot]').forEach(b => b.onclick = () => shootPhoto(b.dataset.shoot));
+  const cmp = $('#ph-compare');
+  if (cmp) cmp.onclick = openCompare;
+  $$('#body-body [data-photo]').forEach(f => f.onclick = () => openPhotoActions(f.dataset.photo));
+
+  hydratePhotoImages();
+}
+
+/** Fill the <img> elements from IndexedDB (or Drive) after the DOM exists. */
+async function hydratePhotoImages() {
+  const imgs = $$('#body-body img[data-blob]');
+  for (const img of imgs) {
+    const meta = state.photoMetas.find(p => p.id === img.dataset.blob);
+    if (!meta) continue;
+    const blob = await photoBlob(meta);
+    if (!blob) { img.classList.add('ph-missing'); img.alt = 'Image not on this device'; continue; }
+    if (!document.body.contains(img)) return;   // view changed while we were awaiting
+    img.src = photoUrl(blob);
+  }
+}
+
+function openMeasureForm(kind) {
+  const fields = fieldsOfKind(kind);
+  const last = measurementSeries(state.measurements).slice(-1)[0];
+  const row = f => {
+    const prev = latestField(state.measurements, f.key);
+    return '<label class="fld"><span>' + esc(f.label) +
+      (f.unit ? ' <span class="muted">(' + esc(f.unit) + ')</span>' : '') + '</span>' +
+      '<input id="mf-' + esc(f.key) + '" class="inp wide" type="text" ' +
+      (f.text ? '' : 'inputmode="decimal" ') +
+      'placeholder="' + (prev != null ? esc(String(prev)) : '') + '"></label>';
+  };
+  openSheet(
+    '<h2>' + (kind === 'tape' ? 'Log measurements' : 'Log a scale reading') + '</h2>' +
+    '<p class="muted small">' +
+      (kind === 'tape'
+        ? 'Leave anything you did not measure blank — a blank is recorded as “not measured”, never as zero.'
+        : 'Copy the numbers off the scale. They are stored exactly as it reports them and never recalculated.') +
+    '</p>' +
+    (kind === 'scan'
+      ? '<p class="muted small">Body weight has its own entry on the Stats screen — ' +
+        'log it there so there is only ever one weight history.</p>'
+      : '') +
+    fields.map(row).join('') +
+    '<div class="btn-col"><button class="btn primary" id="mf-save">Save</button></div>');
+
+  $('#mf-save').onclick = () => {
+    const vals = {};
+    for (const f of fields) {
+      const raw = $('#mf-' + f.key).value.trim();
+      if (raw === '') continue;
+      vals[f.key] = f.text ? raw : parseDisp(raw);
+    }
+    if (!Object.keys(vals).length) { toast('Nothing entered'); return; }
+
+    // Merge into an existing same-day record rather than replacing it, so
+    // logging tape in the morning and the scale at night keeps both.
+    const today = startOfDay(Date.now());
+    const existing = measurementSeries(state.measurements)
+      .find(r => startOfDay(r.day != null ? r.day : r.ts) === today);
+    const merged = makeMeasurement(
+      Object.assign({}, existing ? existing.fields : {}, vals),
+      { ts: Date.now(), id: existing ? existing.id : undefined });
+
+    state.measurements = existing
+      ? state.measurements.map(r => r.id === existing.id ? merged : r)
+      : state.measurements.concat([merged]);
+    saveMeasurements().then(() => { renderBodySections(); backgroundSync(); });
+    closeSheet();
+    toast('Saved');
+  };
+}
+
+/* Photo capture. `capture="environment"` asks the phone for the camera; on a
+   desktop it degrades to a normal file picker, which is the right fallback. */
+function shootPhoto(pose) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.setAttribute('capture', 'environment');
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    toast('Saving photo…');
+    try {
+      await addPhoto(file, pose);
+      renderBodySections();
+      toast(poseLabel(pose) + ' photo saved');
+    } catch (e) {
+      toast('Could not read that image');
+    }
+  };
+  input.click();
+}
+
+function openPhotoActions(id) {
+  const meta = bodyLive(state.photoMetas).find(p => p.id === id);
+  if (!meta) return;
+  showModal({
+    title: poseLabel(meta.pose) + ' · ' + fmtDate(meta.ts),
+    body: '<p class="muted">' +
+      (meta.weightKg ? esc(fmtW(meta.weightKg)) + ' · ' : '') +
+      (meta.bytes ? Math.round(meta.bytes / 1024) + ' KB' : '') +
+      (meta.driveId ? ' · backed up' : ' · on this device only') + '</p>',
+    actions: [
+      { label: 'Close' },
+      { label: 'Delete', danger: true, onClick: () => {
+          removePhoto(id).then(() => { renderBodySections(); });
+          toast('Photo deleted');
+        } }
+    ]
+  });
+}
+
+function openCompare(wantPose) {
+  const pose = (wantPose && comparePair(state.photoMetas, wantPose))
+    ? wantPose
+    : POSES.map(p => p.id).find(p => comparePair(state.photoMetas, p));
+  if (!pose) { toast('Need two photos of the same pose'); return; }
+  const pair = comparePair(state.photoMetas, pose);
+  openSheet(
+    '<h2>' + esc(poseLabel(pose)) + ' — then and now</h2>' +
+    '<div class="cmp-row">' +
+      '<figure><img class="cmp-img" data-blob="' + esc(pair.before.id) + '" alt="Earliest ' +
+        esc(poseLabel(pose)) + '"><figcaption>' + esc(fmtDate(pair.before.ts)) +
+        (pair.before.weightKg ? ' · ' + esc(fmtW(pair.before.weightKg)) : '') + '</figcaption></figure>' +
+      '<figure><img class="cmp-img" data-blob="' + esc(pair.after.id) + '" alt="Latest ' +
+        esc(poseLabel(pose)) + '"><figcaption>' + esc(fmtDate(pair.after.ts)) +
+        (pair.after.weightKg ? ' · ' + esc(fmtW(pair.after.weightKg)) : '') + '</figcaption></figure>' +
+    '</div>' +
+    '<div class="seg" id="cmp-pose">' + POSES.filter(p => comparePair(state.photoMetas, p.id))
+      .map(p => '<button data-v="' + esc(p.id) + '"' + (p.id === pose ? ' class="on"' : '') + '>' +
+        esc(p.label) + '</button>').join('') + '</div>');
+
+  (async () => {
+    for (const img of $$('#sheet-inner img[data-blob]')) {
+      const meta = state.photoMetas.find(p => p.id === img.dataset.blob);
+      const blob = meta ? await photoBlob(meta) : null;
+      if (blob && document.body.contains(img)) img.src = photoUrl(blob);
+    }
+  })();
+
+  $$('#cmp-pose button').forEach(b => b.onclick = () => {
+    if (comparePair(state.photoMetas, b.dataset.v)) openCompare(b.dataset.v);
+  });
+}
+
 /* ================= stats: heatmap + body weight ================= */
 function renderStats() {
   const el = $('#stats-body');
@@ -2853,6 +4025,112 @@ function showCheer(kind, sub, onGo) {
 /* Union-only, like every other write path here: workouts merge by id, custom
    exercises merge by id, and re-importing the same export is a no-op because
    the parser derives stable ids from Strong's own workout numbers. */
+/**
+ * Import the fortnightly tracking sheet.
+ *
+ * Two separate destinations, and keeping them separate is the whole job:
+ *   - measurement fields go to state.measurements
+ *   - the Weight row goes through mergeBodyWeights into the EXISTING
+ *     body-weight history, so there is never a second weight series
+ *
+ * Re-importing the same file is safe: measurement ids are derived from the
+ * column date, so a second import updates those rows instead of duplicating
+ * them, and body weights are keyed by timestamp by their own merge.
+ */
+/**
+ * Paste route into the same importer.
+ *
+ * Getting a CSV off a phone is genuinely awkward: Sheets → ⋮ → Share & export →
+ * Save as → download → find it in Files → come back → Import. Copying the cells
+ * straight out of Sheets and pasting them here is four taps and no file system.
+ * A spreadsheet paste is TAB-separated, which `parseCsv` now auto-detects.
+ */
+function openPasteSheet() {
+  openSheet(
+    '<h2>Paste tracking sheet</h2>' +
+    '<p class="muted small">In Google Sheets or Excel, select the whole table ' +
+    '<em>including</em> the top row of dates and the left column of labels, copy, ' +
+    'and paste it below. You get the same preview before anything is saved.</p>' +
+    '<textarea id="ps-in" class="inp wide ps-area" rows="8" ' +
+      'placeholder="Paste here…" autocapitalize="none" spellcheck="false"></textarea>' +
+    '<div class="btn-col"><button class="btn primary" id="ps-go">Read it</button></div>');
+  $('#ps-in').focus();
+  $('#ps-go').onclick = () => {
+    const raw = $('#ps-in').value;
+    if (!raw.trim()) { toast('Nothing pasted'); return; }
+    closeSheet();
+    reviewTrackingSheet(raw);
+  };
+}
+
+function importTrackingSheet(file) {
+  const reader = new FileReader();
+  reader.onerror = () => toast('Could not read that file');
+  reader.onload = () => reviewTrackingSheet(String(reader.result || ''));
+  reader.readAsText(file);
+}
+
+/** Parse, show what was found, and only write on confirmation. */
+function reviewTrackingSheet(raw) {
+  {
+    const res = parseTrackingSheet(raw, {
+      idFor: ts => 'sheet-' + startOfDay(ts)
+    });
+    if (res.error) { toast(res.error); return; }
+    if (!res.measurements.length && !res.weights.length) {
+      toast('No data found in that sheet'); return;
+    }
+
+    const unmappedNote = res.unmapped.length
+      ? '<p class="muted small"><strong>Not imported</strong> (no matching field): ' +
+        esc(res.unmapped.join(', ')) + '. Rename the row in the sheet to match, ' +
+        'or these stay out.</p>'
+      : '';
+    const photoNote = res.skipped.length
+      ? '<p class="muted small">Photo rows (' + esc(res.skipped.join(', ')) +
+        ') carry no data in a CSV — add those from the Stats screen.</p>'
+      : '';
+
+    showModal({
+      title: 'Import tracking sheet',
+      body: '<p>Found <strong>' + res.columns.length + '</strong> dated column' +
+        (res.columns.length === 1 ? '' : 's') + ':</p>' +
+        '<ul class="imp-list">' + res.columns.map(c =>
+          '<li>' + esc(c.label) + ' — ' + c.fields + ' field' + (c.fields === 1 ? '' : 's') +
+          (c.weight ? ', weight ' + esc(fmtW(c.weight)) : '') + '</li>').join('') + '</ul>' +
+        '<p class="muted small">Body weights merge into your existing weight history. ' +
+        'Nothing already recorded is replaced or deleted.</p>' +
+        unmappedNote + photoNote,
+      actions: [
+        { label: 'Cancel' },
+        { label: 'Import', primary: true, onClick: () => {
+            const beforeM = measurementSeries(state.measurements).length;
+            const beforeW = state.weights.length;
+
+            state.measurements = mergeMeasurements(state.measurements, res.measurements);
+            state.weights = mergeBodyWeights(state.weights, res.weights);
+
+            Promise.all([saveMeasurements(), saveWeights()]).then(() => {
+              renderBodySections();
+              if (state.view === 'stats') renderStats();
+              backgroundSync();
+            });
+            const addedM = measurementSeries(state.measurements).length - beforeM;
+            const addedW = state.weights.length - beforeW;
+            /* The expected fortnightly flow is to re-paste the WHOLE sheet, which
+               is mostly rows already held. Reporting "0 new" for a true duplicate
+               reads like a failure, so say what actually happened. */
+            toast(addedM === 0 && addedW === 0
+              ? 'Already up to date — ' + res.measurements.length + ' entries checked'
+              : 'Imported ' + res.measurements.length + ' entries · ' +
+                addedM + ' new date' + (addedM === 1 ? '' : 's') +
+                (addedW ? ', ' + addedW + ' new weight' + (addedW === 1 ? '' : 's') : ''));
+          } }
+      ]
+    });
+  }
+}
+
 function importStrong(file) {
   file.text().then(txt => {
     const res = parseStrongCsv(txt, { now: Date.now() });

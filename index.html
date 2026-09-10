@@ -27,6 +27,7 @@
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></symbol>
   <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 3"/><path d="M17 6h3a3 3 0 0 1-3 3"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="8" y1="21" x2="16" y2="21"/></symbol>
   <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><line x1="12" y1="2.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="21.5" y2="12"/><line x1="5.3" y1="5.3" x2="7.4" y2="7.4"/><line x1="16.6" y1="16.6" x2="18.7" y2="18.7"/><line x1="18.7" y1="5.3" x2="16.6" y2="7.4"/><line x1="7.4" y1="16.6" x2="5.3" y2="18.7"/></symbol>
+  <symbol id="i-food" viewBox="0 0 24 24"><path d="M3.5 11h17a8.5 8.5 0 0 1-8.5 8 8.5 8.5 0 0 1-8.5-8z"/><line x1="2" y1="21.5" x2="22" y2="21.5"/><path d="M9 7.5c0-1.5 1.5-1.8 1.5-3.3"/><path d="M13 7.5c0-1.5 1.5-1.8 1.5-3.3"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></symbol>
   <symbol id="i-history" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4v4.5H8"/><polyline points="12 7.5 12 12 15.5 14"/></symbol>
   <symbol id="i-swap" viewBox="0 0 24 24"><polyline points="16 3 20 7 16 11"/><line x1="20" y1="7" x2="5" y2="7"/><polyline points="8 13 4 17 8 21"/><line x1="4" y1="17" x2="19" y2="17"/></symbol>
@@ -79,9 +80,15 @@
       <div class="pad" id="wod-body"></div>
     </section>
 
+    <section id="view-food" class="view" aria-label="Food">
+      <header class="topbar"><h1>Food</h1></header>
+      <div class="pad" id="food-body"></div>
+    </section>
+
     <section id="view-stats" class="view" aria-label="Stats">
       <header class="topbar"><h1>Stats</h1></header>
       <div class="pad" id="stats-body"></div>
+      <div class="pad" id="body-body"></div>
     </section>
 
     <section id="view-quotes" class="view" aria-label="Stoic quotes">
@@ -158,6 +165,7 @@
           <button class="btn" id="exp-csv"><svg class="ic"><use href="#i-down"/></svg>Export CSV</button>
           <button class="btn" id="exp-md"><svg class="ic"><use href="#i-down"/></svg>Export Markdown</button>
           <button class="btn" id="exp-txt"><svg class="ic"><use href="#i-down"/></svg>Export TXT</button>
+          <button class="btn" id="exp-sheet"><svg class="ic"><use href="#i-down"/></svg>Export measurements sheet</button>
           <button class="btn" id="exp-json"><svg class="ic"><use href="#i-down"/></svg>Backup (JSON)</button>
         </div>
 
@@ -166,7 +174,12 @@
         <input type="file" id="imp-file" accept=".json,application/json" hidden>
         <label class="btn" for="imp-strong"><svg class="ic"><use href="#i-up"/></svg>Import from Strong (CSV)</label>
         <input type="file" id="imp-strong" accept=".csv,text/csv" hidden>
-        <p class="muted pad-s">Import merges by workout — existing data is never replaced or deleted.</p>
+        <label class="btn" for="imp-sheet"><svg class="ic"><use href="#i-up"/></svg>Import tracking sheet (CSV)</label>
+        <input type="file" id="imp-sheet" accept=".csv,text/csv" hidden>
+        <button class="btn" id="imp-paste"><svg class="ic"><use href="#i-note"/></svg>Paste tracking sheet</button>
+        <p class="muted pad-s">Import merges — existing data is never replaced or deleted.
+        The tracking sheet is the fortnightly measurements/body-composition CSV; its
+        Weight row is merged into your body-weight history, not stored twice.</p>
 
         <h2 class="sec">Danger zone</h2>
         <button class="btn danger" id="btn-clear"><svg class="ic"><use href="#i-trash"/></svg>Clear all data</button>
@@ -178,6 +191,7 @@
 
   <nav id="tabbar" aria-label="Main navigation">
     <button data-v="home"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></button>
+    <button data-v="food"><svg class="ic"><use href="#i-food"/></svg><span>Food</span></button>
     <button data-v="history"><svg class="ic"><use href="#i-history"/></svg><span>History</span></button>
     <button data-v="stats"><svg class="ic"><use href="#i-chart"/></svg><span>Stats</span></button>
     <button data-v="quotes"><img class="ic-img" src="./marcus.png" alt="" width="22" height="22"><span>Stoic</span></button>

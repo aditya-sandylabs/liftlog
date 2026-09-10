@@ -38,6 +38,11 @@ const SCOPES =
 
 const BACKUP_NAME = 'liftlog-backup.json';
 const CSV_NAME = 'LiftLog Workout History.csv';
+/* The measurements sheet. Written in the SAME wide layout the importer reads,
+   so it is both a readable record and a restore path -- see
+   body.js measurementsToSheetCsv(). The app builds the text (sync.js stays
+   ignorant of record types); this module only ships it. */
+const SHEET_NAME = 'LiftLog Body Measurements.csv';
 
 const DRIVE_API = 'https://www.googleapis.com/drive/v3';
 const DRIVE_UPLOAD = 'https://www.googleapis.com/upload/drive/v3';
@@ -402,6 +407,65 @@ async function upsertFile(fileId, metadata, payload, payloadMime, token) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Binary files (progress photos)                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Multipart body for a BINARY payload.
+ *
+ * buildMultipartBody() above concatenates strings, which is correct for JSON
+ * and wrong for an image: pushing arbitrary bytes through a JS string mangles
+ * anything that is not valid UTF-16, and the uploaded file is quietly corrupt.
+ * So the binary path assembles a Blob from parts instead and never stringifies
+ * the image.
+ */
+function buildMultipartBlob(metadata, blob) {
+  const boundary = 'liftlogimg' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const crlf = '\r\n';
+  const head =
+    '--' + boundary + crlf +
+    'Content-Type: application/json; charset=UTF-8' + crlf + crlf +
+    JSON.stringify(metadata) + crlf +
+    '--' + boundary + crlf +
+    'Content-Type: ' + (blob.type || 'application/octet-stream') + crlf + crlf;
+  const tail = crlf + '--' + boundary + '--';
+  return {
+    contentType: 'multipart/related; boundary=' + boundary,
+    body: new Blob([head, blob, tail]),
+  };
+}
+
+/**
+ * Upload one image to appDataFolder as its own file. Returns the Drive file id.
+ *
+ * One file per photo, deliberately. The JSON backup is rewritten in full after
+ * every workout; an image embedded in it would be re-uploaded every time. Here
+ * each image moves exactly once and the backup blob only ever carries its id.
+ */
+async function uploadBlobImpl(blob, name, interactive) {
+  const token = await ensureToken(!!interactive);
+  const mp = buildMultipartBlob({ name: name, parents: ['appDataFolder'] }, blob);
+  const response = await driveFetch(
+    DRIVE_UPLOAD + '/files?uploadType=multipart&fields=id',
+    { method: 'POST', headers: { 'Content-Type': mp.contentType }, body: mp.body },
+    token
+  );
+  if (!response.ok) throw new Error('drive-photo-upload-failed-' + response.status);
+  const data = await response.json().catch(() => null);
+  if (!data || !data.id) throw new Error('drive-photo-upload-no-id');
+  return data.id;
+}
+
+/** Fetch one file's bytes back as a Blob. */
+async function downloadBlobImpl(fileId, interactive) {
+  const token = await ensureToken(!!interactive);
+  const response = await driveFetch(
+    DRIVE_API + '/files/' + encodeURIComponent(fileId) + '?alt=media', {}, token);
+  if (!response.ok) throw new Error('drive-photo-download-failed-' + response.status);
+  return await response.blob();
+}
+
+/* ------------------------------------------------------------------ */
 /* Pull                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -453,6 +517,25 @@ async function pushImpl(payload, interactive) {
     'text/csv',
     token
   );
+
+  /* 3. The measurements sheet, also in visible Drive. This is what replaces a
+        hand-kept spreadsheet: it is rewritten from the app's own records on
+        every sync, so there is never a second copy to keep in step.
+
+        payload.measurementSheet is prepared by the app. If it is absent --
+        an older build, or a device with nothing recorded -- the file is left
+        exactly as it is rather than being overwritten with a blank one. */
+  if (typeof payload.measurementSheet === 'string' && payload.measurementSheet.trim()) {
+    const sheetId = await findFileId(
+      "name='" + SHEET_NAME + "' and trashed=false", null, token);
+    await upsertFile(
+      sheetId,
+      { name: SHEET_NAME }, // deliberately NO parents
+      payload.measurementSheet,
+      'text/csv',
+      token
+    );
+  }
 
   return true;
 }
@@ -795,6 +878,59 @@ export const sync = {
     }
 
     return result;
+  },
+
+  /* ---------------- progress photos ----------------
+     Each of these resolves rather than rejecting, like everything else here.
+     A photo that fails to upload stays on the device with no driveId and is
+     retried on the next sync -- it is never lost, and it never blocks. */
+
+  /** Upload one image. Resolves the Drive file id, or null on any failure. */
+  async uploadPhoto(blob, name, opts) {
+    if (!this.isConnected() || !blob) return null;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
+    try {
+      const id = await uploadBlobImpl(blob, name || ('photo-' + Date.now() + '.jpg'),
+                                      opts && opts.interactive);
+      noteSuccess();
+      return id;
+    } catch (err) {
+      noteFailure(err);
+      return null;
+    }
+  },
+
+  /** Fetch one image back. Resolves a Blob, or null on any failure. */
+  async downloadPhoto(fileId, opts) {
+    if (!this.isConnected() || !fileId) return null;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
+    try {
+      return await downloadBlobImpl(fileId, opts && opts.interactive);
+    } catch (err) {
+      noteFailure(err);
+      return null;
+    }
+  },
+
+  /**
+   * Delete one Drive file. Used ONLY for images whose photo record is
+   * tombstoned and which no live record still references — see
+   * body.js orphanDriveIds(). Resolves true/false; never rejects.
+   */
+  async deletePhoto(fileId, opts) {
+    if (!this.isConnected() || !fileId) return false;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
+    try {
+      const token = await ensureToken(!!(opts && opts.interactive));
+      const response = await driveFetch(
+        DRIVE_API + '/files/' + encodeURIComponent(fileId),
+        { method: 'DELETE' }, token);
+      // 404 means it is already gone, which is the outcome we wanted.
+      return response.ok || response.status === 404;
+    } catch (err) {
+      noteFailure(err);
+      return false;
+    }
   },
 
   /** Subscribe to {state, message} updates. Returns an unsubscribe function. */
