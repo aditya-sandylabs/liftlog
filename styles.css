@@ -447,9 +447,98 @@ body.has-mini #restbar{
 .q-anim{transition:transform .2s ease}
 @media (prefers-reduced-motion: reduce){ .q-anim{transition:none} }
 
-/* ---------- 5 tabs ---------- */
-#tabbar{grid-template-columns:repeat(6,1fr)}
-#tabbar button span{font-size:.66rem}
+/* ---------- 7 tabs ----------
+   Seven columns at 375px leaves ~53px per tab, so the label has to shrink or
+   "Exercises" wraps and the row grows taller than its neighbours. */
+#tabbar{grid-template-columns:repeat(7,1fr)}
+#tabbar button span{font-size:.56rem;letter-spacing:-.01em;white-space:nowrap}
+#tabbar button{padding-left:1px;padding-right:1px}
+@media (min-width:430px){ #tabbar button span{font-size:.64rem} }
+
+/* ---------- exercises browser ---------- */
+/* The search field and chips stay put while the long list scrolls under them,
+   which is the whole point of a 300-row A-Z list on a phone. */
+.ex-tools{
+  position:sticky;top:56px;z-index:19;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:8px 14px 10px;display:flex;flex-direction:column;gap:8px;
+}
+/* A horizontally scrolling row, NOT the wrapping `.chips` the food portion
+   picker uses (styles.css ~849) — that one is a short list in a sheet, this is
+   twelve filters above a long list and wrapping it to three rows would eat the
+   whole sticky header. Different name, so neither can shadow the other. */
+.mchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mchips::-webkit-scrollbar{display:none}
+/* Selected state is weight + a solid border + an inset rule, never hue alone. */
+.mchip{
+  flex:none;min-height:34px;padding:0 12px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);font-size:.8rem;font-weight:600;white-space:nowrap;
+}
+.mchip[aria-pressed="true"]{
+  color:var(--text);font-weight:800;
+  border:2px solid var(--text);box-shadow:inset 0 -2px 0 var(--text);
+}
+.exb-letter{
+  position:sticky;top:0;z-index:5;
+  margin:14px 0 6px;padding:2px 2px;
+  font-size:.8rem;font-weight:800;letter-spacing:.08em;color:var(--muted);
+  background:var(--bg);border-bottom:1px solid var(--border);
+}
+.exb-count{margin:0 0 6px;font-size:.8rem}
+.exb-row{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  min-height:56px;padding:8px 10px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);margin-bottom:4px;
+}
+.exb-row:active{background:var(--surface2)}
+.exb-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.exb-main strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exb-n{font-weight:800;font-variant-numeric:tabular-nums;font-size:.8rem;flex:none}
+
+/* ---------- exercise detail ---------- */
+/* Two frames cross-faded in place: the start and end of the movement. The pair
+   is the animation, so the box keeps a fixed aspect ratio and neither frame
+   may reflow the page as it decodes. */
+.exd-anim{
+  position:relative;width:100%;aspect-ratio:4/3;
+  border-radius:var(--radius);overflow:hidden;
+  background:var(--surface2);border:1px solid var(--border);margin-bottom:12px;
+}
+.exd-anim img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  opacity:0;transition:opacity .18s linear;
+}
+.exd-anim img.on{opacity:1}
+@media (prefers-reduced-motion: reduce){
+  /* No flipping: show the first frame and leave it. */
+  .exd-anim img{transition:none}
+}
+.exd-noanim{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;aspect-ratio:4/3;border-radius:var(--radius);
+  background:var(--surface2);border:1px dashed var(--border);
+  color:var(--muted);font-size:.9rem;margin-bottom:12px;text-align:center;padding:0 16px;
+}
+.exd-frame-n{
+  position:absolute;right:8px;bottom:6px;
+  font-size:.7rem;font-weight:700;color:var(--muted);
+  background:var(--bg);border-radius:6px;padding:1px 6px;
+}
+.keytip{
+  display:flex;gap:10px;align-items:flex-start;
+  background:var(--accent-soft);border:1px solid var(--border);
+  border-left:4px solid var(--accent);
+  border-radius:var(--radius);padding:12px 14px;margin:10px 0;font-size:.92rem;
+}
+.keytip .kt-ico{font-size:1.1rem;line-height:1.2;flex:none}
+.keytip .kt-body{min-width:0}
+.keytip strong{display:block;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.exd-steps{margin:0 0 4px;padding-left:1.3em;font-size:.92rem;line-height:1.55}
+.exd-steps li{margin-bottom:8px}
+.exd-tips{margin:0 0 4px;padding-left:1.2em;font-size:.92rem;line-height:1.55}
+.exd-tips li{margin-bottom:6px}
+.exd-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
 
 /* ---------- exercise picker ---------- */
 .inp.wide{width:100%;text-align:left;padding:0 12px;height:48px}
@@ -470,8 +559,12 @@ body.has-mini #restbar{
 select.inp{appearance:none;background:var(--surface2)}
 
 /* ---------- stats ---------- */
-.hm-wrap,.bw-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-.hm-wrap svg,.bw-wrap svg{display:block;min-width:0}
+/* The heatmap can still be wider than the phone, so it scrolls; the body-weight
+   chart is responsive (viewBox + width:100%) and must never scroll. */
+.hm-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.bw-wrap{overflow-x:hidden;padding-bottom:4px}
+.hm-wrap svg{display:block;min-width:0}
+.bw-wrap svg{display:block;width:100%;max-width:100%;height:auto}
 /* Single-hue luminance ramp: levels differ by lightness, never by hue, so the
    grid is readable with any colour-vision deficiency. */
 .hm-l0{fill:var(--surface2)}
@@ -479,10 +572,16 @@ select.inp{appearance:none;background:var(--surface2)}
 .hm-l2{fill:var(--accent);fill-opacity:.52}
 .hm-l3{fill:var(--accent);fill-opacity:.76}
 .hm-l4{fill:var(--accent);fill-opacity:1}
-.hm-lbl,.bw-ax{fill:var(--muted);font-size:9px}
+.hm-lbl,.hm-ax,.bw-ax{fill:var(--muted);font-size:9px}
+/* Point values: brighter and bolder than the axis so they read as data, and
+   tabular figures so a column of labels lines up. */
+.bw-val{fill:var(--text);font-size:9px;font-weight:700;font-variant-numeric:tabular-nums}
 .bw-line{fill:none;stroke:var(--accent);stroke-width:2}
 .bw-dot{fill:var(--accent)}
 .bw-goal{fill:none;stroke:var(--text);stroke-width:1.5;stroke-dasharray:5 4}
+/* The caption must NOT inherit .bw-goal's stroke-dasharray, or the glyphs
+   themselves render as dashed outlines and stop being readable. */
+.bw-goal-lbl{fill:var(--muted);stroke:none;font-size:9px;font-weight:700}
 .bw-head{display:flex;align-items:baseline;gap:8px;margin:2px 0 8px}
 .bw-head strong{font-size:1.5rem;font-variant-numeric:tabular-nums}
 
@@ -627,6 +726,29 @@ body.has-mini .pad{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
   font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--muted);
 }
 .tpl-f .inp{height:42px;font-size:.95rem}
+select.inp.tf-ss{
+  /* Native select, so it inherits the platform picker on a phone. */
+  -webkit-appearance:none;appearance:none;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:0 8px;
+}
+.tpl-f-ss{flex:0 0 96px}
+
+/* ---------- template editor: superset grouping ----------
+   Deliberately NOT a colour cue. Aditya is red/green colourblind, so the
+   grouping is carried by a 3px left rule, an indent and a text badge reading
+   the letter — all of which survive any simulation. Mirrors the bracket the
+   workout screen draws around the same rows. */
+.tpl-ex.tpl-ss{
+  border-left:3px solid var(--accent);
+  margin-left:10px;border-radius:0 var(--radius) var(--radius) 0;
+}
+.tpl-ex.tpl-ss + .tpl-ex.tpl-ss{margin-top:-8px}
+.tpl-ss-badge{
+  align-self:flex-start;letter-spacing:.04em;
+  color:var(--text);border-color:var(--accent);
+}
+.tpl-ex-main strong + .tpl-ss-badge{margin-top:3px}
 
 /* ---------- backup health warning ----------
    The whole failure mode was that a dead backup looked exactly like a working

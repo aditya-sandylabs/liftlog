@@ -40,6 +40,8 @@
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="12" y1="11" x2="12" y2="16.5"/></symbol>
   <symbol id="i-min" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
   <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20.5h19z"/><line x1="12" y1="10" x2="12" y2="14.5"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><rect x="2.5" y="8.5" width="3.5" height="7" rx="1"/><rect x="18" y="8.5" width="3.5" height="7" rx="1"/><rect x="6" y="10.5" width="2.5" height="3"/><rect x="15.5" y="10.5" width="2.5" height="3"/><line x1="8.5" y1="12" x2="15.5" y2="12"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.5a6 6 0 1 1 6 0v1.5H9z"/><line x1="9.5" y1="21.5" x2="14.5" y2="21.5"/><line x1="10.5" y1="13.5" x2="13.5" y2="13.5"/></symbol>
 </svg>
 
 <div id="app">
@@ -83,6 +85,24 @@
     <section id="view-food" class="view" aria-label="Food">
       <header class="topbar"><h1>Food</h1></header>
       <div class="pad" id="food-body"></div>
+    </section>
+
+    <section id="view-exercises" class="view" aria-label="Exercises">
+      <header class="topbar"><h1>Exercises</h1></header>
+      <div class="ex-tools">
+        <input id="exb-q" class="inp wide" type="search" placeholder="Search name or muscle&hellip;"
+               autocomplete="off" autocapitalize="none" aria-label="Search exercises by name or muscle group">
+        <div id="exb-chips" class="mchips" role="group" aria-label="Filter by muscle group"></div>
+      </div>
+      <div class="pad" id="exb-body"></div>
+    </section>
+
+    <section id="view-exdetail" class="view" aria-label="Exercise detail">
+      <header class="topbar">
+        <button class="icon-btn" id="exd-back" aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button>
+        <h1 id="exd-title">Exercise</h1>
+      </header>
+      <div class="pad" id="exd-body"></div>
     </section>
 
     <section id="view-stats" class="view" aria-label="Stats">
@@ -193,6 +213,7 @@
     <button data-v="home"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></button>
     <button data-v="food"><svg class="ic"><use href="#i-food"/></svg><span>Food</span></button>
     <button data-v="history"><svg class="ic"><use href="#i-history"/></svg><span>History</span></button>
+    <button data-v="exercises"><svg class="ic"><use href="#i-dumbbell"/></svg><span>Exercises</span></button>
     <button data-v="stats"><svg class="ic"><use href="#i-chart"/></svg><span>Stats</span></button>
     <button data-v="quotes"><img class="ic-img" src="./marcus.png" alt="" width="22" height="22"><span>Stoic</span></button>
     <button data-v="settings"><svg class="ic"><use href="#i-gear"/></svg><span>Settings</span></button>

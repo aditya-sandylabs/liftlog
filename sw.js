@@ -1,7 +1,7 @@
 /* LiftLog service worker — precaches the app shell + data.json, cache-first, versioned. */
 'use strict';
 
-const VERSION = 'liftlog-v202609101904';
+const VERSION = 'liftlog-v202609220947';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
   './body.js',
   './data.json',
   './foods.json',
+  './guides.json',
   './quotes.json',
   './marcus.png',
   './manifest.webmanifest',
@@ -70,6 +71,12 @@ self.addEventListener('fetch', event => {
   }
 
   // Everything else same-origin: cache-first, refresh the cache copy in the background.
+  // This is what serves the 194 exercise-guide frames under ./media/exercises/.
+  // They are ~5.9 MB in total and are deliberately NOT in ASSETS: precaching
+  // them would put the whole set on the install critical path for a screen most
+  // launches never open. The first view of an exercise fetches its two frames
+  // and this branch keeps them from then on, so the guide works offline after
+  // it has been looked at once.
   event.respondWith(
     caches.match(req, { ignoreSearch: true }).then(cached => {
       if (cached) {

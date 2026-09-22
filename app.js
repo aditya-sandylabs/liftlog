@@ -6,7 +6,7 @@
 import { sync, mergeWorkouts } from './sync.js';
 import { parseStrongCsv } from './strong.js';
 import {
-  buildExerciseIndex, searchExercises, makeCustomExercise,
+  buildExerciseIndex, searchExercises, makeCustomExercise, groupExercisesAlpha,
   mergeCustomExercises, mergeBodyWeights,
   bodyWeightSeries, bodyWeightSVG, heatmapSVG,
   CARDIO_EXERCISES, isCardio, cardioMode, estimateKcal, latestBodyKg,
@@ -18,6 +18,7 @@ import {
   addExercise as tplAddExercise, removeExercise as tplRemoveExercise,
   setSets as tplSetSets, moveExercise as tplMoveExercise,
   setReps as tplSetReps, setRest as tplSetRest, setDuration as tplSetDuration,
+  setSuperset as tplSetSuperset,
   mergeCustomTemplates, allTemplates, isCustomTemplate
 } from './templates.js';
 import {
@@ -190,9 +191,14 @@ const state = {
   photoMetas: [],   // progress-photo metadata; bytes live in the 'photos' store
   foodDb: null,     // foods.json, lazy-loaded on first use — 2.7 MB, never at boot
   foodDbState: 'idle',
+  guides: null,     // guides.json, lazy-loaded like foodDb — instructions/tips/frames
+  guidesState: 'idle',
   view: 'home',
   foodDay: null,    // which day the Food view is showing; null means today
-  wodId: null
+  wodId: null,
+  exQuery: '',      // Exercises tab: search text
+  exMuscle: null,   // Exercises tab: selected muscle chip; null means All
+  exDetailId: null  // which exercise the detail view is showing
 };
 
 /* The searchable exercise index is derived from data.json + custom + history,
@@ -331,10 +337,17 @@ function resolveExercise(id, te) {
 function showView(v) {
   state.view = v;
   $$('.view').forEach(x => x.classList.toggle('active', x.id === 'view-' + v));
-  $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v || (v === 'wod' && b.dataset.v === 'history')));
+  $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v
+    || (v === 'wod' && b.dataset.v === 'history')
+    // The exercise detail is a child of the Exercises tab, so the tab stays lit.
+    || (v === 'exdetail' && b.dataset.v === 'exercises')));
   if (v === 'home') renderHome();
   if (v === 'history') renderHistory();
   if (v === 'food') renderFood();
+  if (v === 'exercises') renderExerciseBrowser();
+  if (v === 'exdetail') renderExerciseDetail();
+  // The two-frame guide animation is an interval; leaving the view stops it.
+  if (v !== 'exdetail') stopGuideAnim();
   if (v === 'stats') { renderStats(); renderBodySections(); }
   if (v === 'quotes') renderQuotes();
   // Object URLs for progress photos belong to the Stats view; leaving it frees them.
@@ -575,6 +588,7 @@ function cardHTML(ex, ei) {
   return `<article class="ex-card${ex.cardio ? ' cardio-card' : ''}" data-ei="${ei}">
     <header class="ex-head">
       <button class="ex-name" data-act="detail" data-ei="${ei}"><span>${esc(ex.name)}</span><svg class="ic chev"><use href="#i-chev"/></svg></button>
+      <button class="icon-btn" data-act="tips" data-ei="${ei}" aria-label="Tips for ${esc(ex.name)}"><svg class="ic"><use href="#i-bulb"/></svg></button>
       <button class="icon-btn" data-act="cardmenu" data-ei="${ei}" aria-label="Exercise options"><svg class="ic"><use href="#i-dots"/></svg></button>
     </header>
     <div class="ex-target">
@@ -698,13 +712,20 @@ function renderActive() {
   while (i < a.exercises.length) {
     const ex = a.exercises[i];
     if (ex.superset) {
-      // bracket consecutive members sharing a superset letter
+      // Bracket consecutive members sharing a superset letter. A superset needs
+      // at least two exercises to mean anything, so a run of ONE — left behind
+      // by removing or reordering its partner — renders as a plain card. The
+      // letter is deliberately kept on the record: the partner may come back,
+      // and silently clearing it would lose what the user set.
       let j = i;
       const letter = ex.superset;
-      let group = '';
-      while (j < a.exercises.length && a.exercises[j].superset === letter) { group += cardHTML(a.exercises[j], j); j++; }
-      html += `<div class="superset"><div class="ss-label">SUPERSET ${esc(letter)} — go straight to the next exercise</div>${group}</div>`;
-      i = j;
+      while (j < a.exercises.length && a.exercises[j].superset === letter) j++;
+      if (j - i >= 2) {
+        let group = '';
+        for (let k = i; k < j; k++) group += cardHTML(a.exercises[k], k);
+        html += `<div class="superset"><div class="ss-label">SUPERSET ${esc(letter)} — go straight to the next exercise</div>${group}</div>`;
+        i = j;
+      } else { html += cardHTML(ex, i); i++; }
     } else { html += cardHTML(ex, i); i++; }
   }
   if (!a.exercises.length) {
@@ -949,15 +970,64 @@ function noteModal(ei, si) {
 
 function cardMenu(ei) {
   const ex = state.active.exercises[ei];
-  showModal({
-    title: ex.name,
-    actions: [
-      { label: 'Exercise details', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) },
-      { label: 'Swap exercise', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) },
-      { label: 'Remove exercise', danger: true, onClick: () => removeExerciseConfirm(ei) },
-      { label: 'Cancel' }
-    ]
-  });
+  const list = state.active.exercises;
+  const acts = [
+    { label: 'Exercise details', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) },
+    { label: 'Swap exercise', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) }
+  ];
+  /* A superset pairs this card with the one BELOW it, so the last card has
+     nothing to pair with and the action is simply absent rather than offered
+     and then refused. */
+  if (ei < list.length - 1) {
+    acts.push({ label: 'Superset with next exercise', onClick: () => supersetWithNext(ei) });
+  }
+  if (ex.superset) {
+    acts.push({ label: 'Remove from superset', onClick: () => clearSuperset(ei) });
+  }
+  acts.push({ label: 'Remove exercise', danger: true, onClick: () => removeExerciseConfirm(ei) });
+  acts.push({ label: 'Cancel' });
+  showModal({ title: ex.name, actions: acts });
+}
+
+/* First letter A..Z not already in use anywhere in the live workout. Mirrors
+   nextSupersetLetter in templates.js, which works on template rows rather than
+   on the workout exercises this reads. */
+function nextActiveLetter() {
+  const used = new Set(state.active.exercises.map(e => e.superset).filter(Boolean));
+  for (let c = 65; c <= 90; c++) {
+    const ch = String.fromCharCode(c);
+    if (!used.has(ch)) return ch;
+  }
+  return null;
+}
+
+/* Join this card and the one below it into one superset. Reuses this card's
+   letter when it already has one, so tagging a third exercise extends the
+   existing group instead of starting a rival one next to it. */
+function supersetWithNext(ei) {
+  const list = state.active.exercises;
+  const ex = list[ei], nx = list[ei + 1];
+  if (!ex || !nx) return;
+  const letter = ex.superset || nextActiveLetter();
+  if (!letter) { toast('No superset letters left'); return; }
+  ex.superset = letter;
+  nx.superset = letter;
+  saveActive(true);
+  renderActive();
+  toast('Superset ' + letter + ' — ' + ex.name + ' + ' + nx.name);
+}
+
+/* Take one card out of its group. If that leaves a single card still carrying
+   the letter, renderActive draws it as a plain card, so there is nothing else
+   to tidy up here. */
+function clearSuperset(ei) {
+  const ex = state.active.exercises[ei];
+  if (!ex || !ex.superset) return;
+  const letter = ex.superset;
+  ex.superset = null;
+  saveActive(true);
+  renderActive();
+  toast(ex.name + ' removed from superset ' + letter);
 }
 
 /* Drop a whole exercise from the live workout.
@@ -1222,6 +1292,12 @@ function saveWorkout(donePairs) {
       weightKg: s.weightKg == null ? 0 : s.weightKg, reps: s.reps == null ? 0 : s.reps,
       isWarmup: !!s.isWarmup, note: s.note || '', pr: !!s.pr
     };
+    /* The superset letter rides on the set rows so "Save as template" can carry
+       the grouping back out (templateFromWorkout reads the first row of each
+       exercise bucket). Added only when there IS one, so a normal set stays
+       byte-identical to what every earlier version wrote — the same rule the
+       drop-set and cardio fields follow. */
+    if (ex.superset) row.superset = ex.superset;
     // Cardio fields are added only on cardio rows, so every existing lifting
     // record keeps exactly the shape the exports and merges already expect.
     /* Only completed drops are saved. An abandoned half-entered drop must not
@@ -1289,6 +1365,43 @@ async function saveMeasurements() {
   // a sync that keeps handing the duplicate back.
   state.measurements = collapseByDay(state.measurements);
   await DB.put('kv', state.measurements, 'measurements');
+}
+
+/* The exercise guides (instructions, tips, two-frame media paths) are 226 kB —
+   small next to foods.json but still a screen most launches never open, so the
+   same lazy + shared-in-flight-promise contract applies. Mirrored into IDB so a
+   later offline launch still has the tips even before the SW precache lands. */
+let guidesPromise = null;
+async function loadGuides() {
+  if (state.guides) return state.guides;
+  if (guidesPromise) return guidesPromise;
+  guidesPromise = loadGuidesImpl().finally(() => { guidesPromise = null; });
+  return guidesPromise;
+}
+
+async function loadGuidesImpl() {
+  state.guidesState = 'loading';
+  try {
+    const r = await fetch('./guides.json');
+    if (!r.ok) throw new Error('http');
+    const j = await r.json();
+    if (!j || !j.exercises || typeof j.exercises !== 'object') throw new Error('shape');
+    state.guides = j;
+    state.guidesState = 'ready';
+    DB.put('kv', j, 'guides').catch(() => {});   // mirror; failure is harmless
+  } catch (e) {
+    state.guides = (await DB.get('kv', 'guides')) || null;
+    state.guidesState = state.guides ? 'ready' : 'error';
+  }
+  return state.guides;
+}
+
+/* One guide record, or null. Keyed by the same slugify() ids the index uses, so
+   a brand-new custom exercise simply has no entry — every caller must cope. */
+function guideFor(exId) {
+  const g = state.guides && state.guides.exercises;
+  if (!g || !exId) return null;
+  return g[exId] || null;
 }
 
 /* The shipped food database is 2.7 MB. Fetching it at boot would delay first
@@ -1685,6 +1798,7 @@ function trendSVG(pts, fmtY, label) {
 }
 
 function openExerciseSheet(exId, ctx = {}) {
+  sheetExId = exId;
   const ex = resolveExercise(exId, null);
   const yt = ex.video
     ? `<a class="btn yt" href="https://www.youtube.com/watch?v=${esc(ex.video)}" target="_blank" rel="noopener"><svg class="ic"><use href="#i-play"/></svg>Watch on YouTube</a>` : '';
@@ -1704,6 +1818,10 @@ function openExerciseSheet(exId, ctx = {}) {
   openSheet(`
     <h2>${esc(ex.name)}</h2>
     ${ex.muscle ? `<span class="tag">${esc(ex.muscle)}</span>` : ''}
+    ${/* The guide's key tip and coaching cues must be reachable from a live
+          workout card too, not only from the Exercises tab — this sheet is the
+          in-workout route to them. */''}
+    ${guideSheetHTML(exId, ex.name)}
     <div class="btn-col" style="margin:10px 0">${yt}${tut}</div>
     ${steps ? `<h3 class="sec">How to</h3>${steps}` : ''}
     ${alts ? `<h3 class="sec">Alternatives</h3><div class="alt-list">${alts}</div>` : ''}
@@ -1716,11 +1834,235 @@ function openExerciseSheet(exId, ctx = {}) {
   $$('#sheet-inner [data-alt]').forEach(b => {
     b.onclick = () => openSwapConfirm(ctx.ei, b.dataset.alt, b.dataset.altname);
   });
+  const full = $('#sheet-inner [data-fullguide]');
+  if (full) full.onclick = () => { closeSheet(); openExerciseDetail(exId); };
+  /* The guide file loads lazily, so the first open of the sheet in a session
+     usually has no tips yet. Fetch it and repaint this same sheet once — only
+     if the sheet is still showing this exercise. */
+  if (!state.guides && state.guidesState !== 'error') {
+    loadGuides().then(() => {
+      if (!$('#sheet-wrap').hidden && sheetExId === exId) openExerciseSheet(exId, ctx);
+    });
+  }
+}
+
+/* Which exercise the detail sheet is currently showing — guards the async
+   repaint above from overwriting a sheet the user has since changed. */
+let sheetExId = null;
+
+/* Key tip + tips + a route to the full guide, for the in-workout sheet. */
+function guideSheetHTML(exId, name) {
+  const g = guideFor(exId);
+  const loading = !state.guides && state.guidesState === 'loading';
+  const body = loading
+    ? '<p class="muted small">Loading tips\u2026</p>'
+    : tipsBodyHTML(g);
+  return body +
+    `<button class="btn small" data-fullguide="1" style="margin:6px 0 2px">` +
+    `<svg class="ic"><use href="#i-bulb"/></svg>Open full guide</button>`;
 }
 
 function openGlossary(term) {
   const g = (state.data.program && state.data.program.glossary) || {};
   openSheet(`<h2>${esc(term)}</h2><p>${esc(g[term] || 'No explanation available.')}</p>`);
+}
+
+/* ================= exercises browser (Strong-style A–Z) ================= */
+/* The chip row is fixed, not derived from the data: a stable set of filters the
+   user learns once beats a row that reshuffles as custom exercises arrive.
+   Everything not covered by a chip is still reachable through search and the
+   All chip. */
+const EXB_MUSCLES = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Quads',
+                     'Hamstrings', 'Glutes', 'Calves', 'Core', 'Cardio'];
+
+function exbChipsHTML() {
+  const sel = state.exMuscle;
+  const one = (label, value) =>
+    `<button class="mchip" data-muscle="${esc(value == null ? '' : value)}" ` +
+    `aria-pressed="${sel === value}">${esc(label)}</button>`;
+  return one('All', null) + EXB_MUSCLES.map(m => one(m, m)).join('');
+}
+
+/* One row. The muscle tag and the times-logged count are both text, so nothing
+   here depends on hue. */
+function exbRowHTML(x) {
+  const bits = [x.muscle || 'Other'];
+  if (x.cardio) bits.push('time-based');
+  if (x.custom) bits.push('custom');
+  else if (x.isAlternative) bits.push('alternative');
+  const n = x.timesLogged > 0
+    ? `<span class="exb-n">${x.timesLogged}\u00d7 logged</span>` : '';
+  return `<button class="exb-row" data-exb="${esc(x.id)}">
+    <span class="exb-main"><strong>${esc(x.name)}</strong>
+      <span class="muted small">${esc(bits.join(' \u00b7 '))}</span></span>
+    ${n}<svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>`;
+}
+
+function renderExerciseBrowser() {
+  const box = $('#exb-body');
+  if (!box) return;
+  // Warm the guide file while the user is browsing, so the first detail tap
+  // does not sit on a spinner. Fire and forget; every reader copes with null.
+  if (!state.guides && state.guidesState === 'idle') loadGuides();
+  $('#exb-chips').innerHTML = exbChipsHTML();
+  const q = state.exQuery || '';
+  /* searchExercises already matches muscle as well as name (rank 4), which is
+     exactly what "typing chest lists every chest exercise" needs. No limit
+     here: this screen IS the full list. */
+  const hits = searchExercises(exIndex, q, state.exMuscle ? { muscle: state.exMuscle } : {});
+  if (!hits.length) {
+    box.innerHTML = '<p class="muted pad-s">No exercise matches that. Try a muscle group, or add it from a workout.</p>';
+    return;
+  }
+  const groups = groupExercisesAlpha(hits);
+  const head = `<p class="muted exb-count">${hits.length} exercise${hits.length === 1 ? '' : 's'}</p>`;
+  box.innerHTML = head + groups.map(g =>
+    `<h2 class="exb-letter" data-letter="${esc(g.letter)}">${esc(g.letter)}</h2>` +
+    g.items.map(exbRowHTML).join('')
+  ).join('');
+}
+
+/* ================= exercise detail view ================= */
+/* The "animation" is two stills — the start and the end of the movement —
+   alternated on an interval. One interval at a time, cleared on leaving the
+   view, so a dozen visits do not leave a dozen timers running. */
+let guideAnimT = null;
+function stopGuideAnim() {
+  if (guideAnimT != null) { clearInterval(guideAnimT); guideAnimT = null; }
+}
+function startGuideAnim() {
+  stopGuideAnim();
+  const frames = $$('#exd-body .exd-anim img');
+  if (frames.length < 2) return;
+  // Respect the OS setting: no flipping for anyone who asked for less motion.
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let i = 0;
+  guideAnimT = setInterval(() => {
+    i = (i + 1) % frames.length;
+    frames.forEach((f, k) => f.classList.toggle('on', k === i));
+    const n = $('#exd-body .exd-frame-n');
+    if (n) n.textContent = (i === 0 ? 'start' : 'end');
+  }, 900);
+}
+
+function guideMediaHTML(g, name) {
+  const imgs = g && g.media && Array.isArray(g.media.images) ? g.media.images : [];
+  if (imgs.length < 1) {
+    return `<div class="exd-noanim" role="img" aria-label="No animation yet for ${esc(name)}">No animation yet</div>`;
+  }
+  const alt = (i) => `${name} — ${i === 0 ? 'start' : 'end'} position`;
+  return `<div class="exd-anim">` + imgs.slice(0, 2).map((src, i) =>
+    `<img class="${i === 0 ? 'on' : ''}" src="./${esc(src)}" alt="${esc(alt(i))}" loading="lazy" decoding="async">`
+  ).join('') + `<span class="exd-frame-n">start</span></div>`;
+}
+
+function openExerciseDetail(exId) {
+  state.exDetailId = exId;
+  showView('exdetail');
+  // The guide file may not be in yet; repaint when it lands.
+  if (!state.guides) loadGuides().then(() => {
+    if (state.view === 'exdetail' && state.exDetailId === exId) renderExerciseDetail();
+  });
+}
+
+function renderExerciseDetail() {
+  const box = $('#exd-body');
+  if (!box) return;
+  const exId = state.exDetailId;
+  const ex = resolveExercise(exId, null);
+  const ix = exIndex.find(x => x.id === exId) || null;
+  const g = guideFor(exId);
+  $('#exd-title').textContent = ex.name || exId || 'Exercise';
+
+  if (!state.guides && state.guidesState === 'loading') {
+    box.innerHTML = `<h2>${esc(ex.name)}</h2><p class="muted">Loading the exercise guide\u2026</p>`;
+    return;
+  }
+
+  const muscle = (g && g.muscle) || ex.muscle || (ix && ix.muscle) || '';
+  const tags = [
+    muscle ? `<span class="tag">${esc(muscle)}</span>` : '',
+    g && g.equipment ? `<span class="tag">${esc(g.equipment)}</span>` : '',
+    g && Array.isArray(g.secondary) && g.secondary.length
+      ? `<span class="muted small">also: ${esc(g.secondary.join(', '))}</span>` : ''
+  ].filter(Boolean).join('');
+
+  const keyTip = g && g.keyTip
+    ? `<div class="keytip"><span class="kt-ico" aria-hidden="true">\u{1F4A1}</span>
+        <span class="kt-body"><strong>Key tip</strong>${esc(g.keyTip)}</span></div>` : '';
+
+  const instructions = g && Array.isArray(g.instructions) && g.instructions.length
+    ? `<h3 class="sec">Instructions</h3><ol class="exd-steps">` +
+      g.instructions.map(s => `<li>${esc(s)}</li>`).join('') + `</ol>` : '';
+
+  const tips = g && Array.isArray(g.tips) && g.tips.length
+    ? `<h3 class="sec">Tips</h3><ul class="exd-tips">` +
+      g.tips.map(s => `<li>${esc(s)}</li>`).join('') + `</ul>` : '';
+
+  /* data.json's step-by-step guide text is a different, PDF-sourced body of
+     copy from guides.json. Keep it when it exists — it is the routine author's
+     own coaching, not a generic description. */
+  const steps = (ex.steps || []).length
+    ? `<h3 class="sec">How the programme describes it</h3>` +
+      ex.steps.map(st => `<section class="step-sec"><h3>${esc(st.heading)}</h3><p>${esc(st.body)}</p></section>`).join('')
+    : '';
+
+  const yt = ex.video
+    ? `<a class="btn yt" href="https://www.youtube.com/watch?v=${esc(ex.video)}" target="_blank" rel="noopener"><svg class="ic"><use href="#i-play"/></svg>Watch on YouTube</a>` : '';
+
+  const logged = ix && ix.timesLogged > 0
+    ? `${ix.timesLogged} workout${ix.timesLogged === 1 ? '' : 's'} \u00b7 ${ix.setsLogged} set${ix.setsLogged === 1 ? '' : 's'}` +
+      (ix.lastLoggedTs ? ` \u00b7 last ${esc(fmtDate(ix.lastLoggedTs))}` : '')
+    : 'Never logged yet';
+
+  const noGuide = !g
+    ? `<p class="muted pad-s">No written guide for this exercise yet \u2014 it is one of your own. The history below still tracks it.</p>` : '';
+
+  box.innerHTML = `
+    ${guideMediaHTML(g, ex.name || String(exId))}
+    <h2>${esc(ex.name)}</h2>
+    <div class="exd-meta">${tags}</div>
+    <p class="muted small">${logged}</p>
+    ${keyTip}
+    ${yt ? `<div class="btn-col" style="margin:10px 0">${yt}</div>` : ''}
+    ${noGuide}
+    ${instructions}
+    ${tips}
+    ${steps}
+    <h3 class="sec">History</h3>
+    ${exerciseHistoryHTML(exId)}`;
+  startGuideAnim();
+}
+
+/* ================= 💡 tips popup (from a live workout card) ================= */
+/* Deliberately a modal, not the detail view: mid-set the user wants one
+   sentence, not a screen change that loses their place in the workout. */
+function tipsBodyHTML(g) {
+  if (!g) return '<p class="muted">No tips yet for this exercise.</p>';
+  const key = g.keyTip
+    ? `<div class="keytip"><span class="kt-ico" aria-hidden="true">\u{1F4A1}</span>
+        <span class="kt-body"><strong>Key tip</strong>${esc(g.keyTip)}</span></div>` : '';
+  const rest = Array.isArray(g.tips) && g.tips.length
+    ? `<ul class="exd-tips">${g.tips.map(s => `<li>${esc(s)}</li>`).join('')}</ul>` : '';
+  if (!key && !rest) return '<p class="muted">No tips yet for this exercise.</p>';
+  return key + rest;
+}
+
+function openTipsPopup(exId) {
+  const ex = resolveExercise(exId, null);
+  const paint = () => showModal({
+    title: ex.name || String(exId),
+    body: tipsBodyHTML(guideFor(exId)),
+    actions: [
+      { label: 'Open full guide', onClick: () => { closeModal(); openExerciseDetail(exId); } },
+      { label: 'Close', primary: true }
+    ]
+  });
+  if (state.guides) { paint(); return; }
+  showModal({ title: ex.name || String(exId), body: '<p class="muted">Loading tips\u2026</p>', actions: [{ label: 'Close', primary: true }] });
+  // Repaint over the placeholder once the file lands; skip it if the user
+  // already dismissed the dialog.
+  loadGuides().then(() => { if (!$('#modal-wrap').hidden) paint(); });
 }
 
 /* ================= history & read-only workout view ================= */
@@ -1842,19 +2184,38 @@ function tplField(cls, label, value, hint, i) {
 function templateEditorRowsHTML() {
   if (!tplDraft.exercises.length)
     return '<p class="muted pad-s">No exercises yet — add one below.</p>';
-  return tplDraft.exercises.map((e, i) => {
+  const rows = tplDraft.exercises;
+  return rows.map((e, i) => {
     // A cardio row prescribes minutes; reps and rest mean nothing for it.
     const fields = e.cardio
       ? tplField('tf-dur', 'MINUTES', dispMin(e.durationSec), '30', i)
       : tplField('tf-reps', 'REPS', e.reps, '8-12', i) +
         tplField('tf-rest', 'REST', e.rest, '2-3 min', i);
+    /* Grouping is carried by position, exactly as the workout screen does it:
+       a row is bracketed only when the row above OR below shares its letter, so
+       a lone letter left by a reorder shows as a badge and nothing more. */
+    const L = e.superset || null;
+    const prevSame = i > 0 && L && rows[i - 1].superset === L;
+    const nextSame = i < rows.length - 1 && L && rows[i + 1].superset === L;
+    const grouped = prevSame || nextSame;
+    const cls = 'tpl-ex' + (grouped ? ' tpl-ss' : '') +
+      (grouped && !prevSame ? ' tpl-ss-first' : '') +
+      (grouped && !nextSame ? ' tpl-ss-last' : '');
+    const badge = L
+      ? `<span class="tag tpl-ss-badge">SUPERSET ${esc(L)}</span>`
+      : '';
+    const opts = ['', 'A', 'B', 'C', 'D'].map(v =>
+      `<option value="${esc(v)}"${v === (L || '') ? ' selected' : ''}>${v ? esc(v) : '—'}</option>`).join('');
     return `
-    <div class="tpl-ex" data-i="${i}">
+    <div class="${cls}" data-i="${i}">
       <div class="tpl-ex-main">
-        <strong>${esc(e.name)}</strong>
+        <strong>${esc(e.name)}</strong>${badge}
         ${e.cardio ? '<span class="muted small">Cardio — logged by time</span>' : ''}
       </div>
-      <div class="tpl-ex-fields">${fields}</div>
+      <div class="tpl-ex-fields">${fields}
+        <label class="tpl-f tpl-f-ss"><span>SUPERSET</span>
+          <select class="inp tf-ss" data-i="${i}" aria-label="Superset group for ${esc(e.name)}">${opts}</select></label>
+      </div>
       <div class="tpl-ex-sets">
         <button class="btn tiny" data-te="dec" aria-label="Fewer sets"><svg class="ic"><use href="#i-minus"/></svg></button>
         <span class="tpl-ex-n">${e.sets}<span class="muted small"> ${e.cardio ? (e.sets === 1 ? 'interval' : 'intervals') : 'sets'}</span></span>
@@ -1869,9 +2230,9 @@ function templateEditorRowsHTML() {
   }).join('');
 }
 
-/* Read every reps / rest / minutes field in the editor back into the draft.
-   Called before anything that re-renders the list or saves, so a value typed
-   and not blurred is never silently dropped. */
+/* Read every reps / rest / minutes / superset field in the editor back into the
+   draft. Called before anything that re-renders the list or saves, so a value
+   typed or picked and not blurred is never silently dropped. */
 function commitTplFields() {
   if (!tplDraft) return;
   const now = Date.now();
@@ -1883,6 +2244,10 @@ function commitTplFields() {
     const sec = parseMin(el.value);
     if (sec != null) tplDraft = tplSetDuration(tplDraft, +el.dataset.i, sec, { now });
   }
+  // '' is the "—" option and clears the letter, so it is passed through as null
+  // rather than skipped — otherwise clearing a superset would never commit.
+  for (const el of $$('#tpl-ex-list .tf-ss'))
+    tplDraft = tplSetSuperset(tplDraft, +el.dataset.i, el.value || null, { now });
 }
 
 function renderTemplateEditor(isExisting) {
@@ -1924,6 +2289,11 @@ function renderTemplateEditor(isExisting) {
   $('#tpl-ex-list').addEventListener('change', ev => {
     if (!ev.target.classList.contains('inp')) return;
     commitTplFields();
+    /* A superset pick changes the GROUPING, so the list has to be redrawn for
+       the badge and the bracket to appear. Only the select does this: redrawing
+       on a reps/rest change would rip the field out from under the keyboard. */
+    if (ev.target.classList.contains('tf-ss'))
+      $('#tpl-ex-list').innerHTML = templateEditorRowsHTML();
   });
 
   $('#tpl-add').onclick = () => {
@@ -2304,6 +2674,25 @@ function wire() {
     if (b) openWod(b.dataset.wod);
   });
 
+  // exercises browser
+  $('#exb-q').addEventListener('input', e => {
+    state.exQuery = e.target.value;
+    renderExerciseBrowser();
+  });
+  $('#exb-chips').addEventListener('click', e => {
+    const b = e.target.closest('[data-muscle]');
+    if (!b) return;
+    const v = b.dataset.muscle || null;
+    // Tapping the selected chip again clears it, so the filter is never a trap.
+    state.exMuscle = (state.exMuscle === v) ? null : v;
+    renderExerciseBrowser();
+  });
+  $('#exb-body').addEventListener('click', e => {
+    const b = e.target.closest('[data-exb]');
+    if (b) openExerciseDetail(b.dataset.exb);
+  });
+  $('#exd-back').onclick = () => showView('exercises');
+
   // active workout — one delegated listener for all card interactions
   $('#aw-body').addEventListener('click', e => {
     const b = e.target.closest('[data-act]');
@@ -2314,6 +2703,7 @@ function wire() {
     const ei = card ? +card.dataset.ei : -1;
     const si = row ? +row.dataset.si : -1;
     if (act === 'detail') openExerciseSheet(state.active.exercises[ei].exerciseId, { ei });
+    else if (act === 'tips') openTipsPopup(state.active.exercises[ei].exerciseId);
     else if (act === 'cardmenu') cardMenu(ei);
     else if (act === 'gloss') openGlossary(b.dataset.term);
     else if (act === 'check') toggleSet(ei, si);

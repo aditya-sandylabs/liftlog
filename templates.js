@@ -171,7 +171,11 @@ export function templateFromWorkout(workout, name, opts) {
       reps: deriveReps(bucket),
       rest: '2-3 min',
       efforts: [],
-      superset: null
+      // Supersets survive "Save as template". The letter is stored on every set
+      // row of the exercise by saveWorkout, so the first row of the bucket is
+      // authoritative; a workout logged before this existed simply has none and
+      // normalises to null.
+      superset: supersetLetter(first.superset)
     };
     // A cardio row logged time, not reps: prescribe the longest duration the
     // workout actually recorded rather than a meaningless rep range.
@@ -325,6 +329,60 @@ export function setDuration(tpl, index, seconds, opts) {
   } else {
     next.exercises[i] = blankRow({ sets: 1, cardio: true, durationSec: clamped });
   }
+  next.updatedAt = optNow(opts);
+  return next;
+}
+
+/* ---------------------------------------------------------------- supersets
+
+   A superset is TWO OR MORE DIFFERENT EXERCISES performed back to back, marked
+   by a shared letter on consecutive rows ('A', 'B', ...). It is NOT a drop set
+   (one exercise, descending weight) — see `drops` in features.js. The two words
+   are kept apart deliberately in both the code and the UI.
+
+   The letter is the whole model: the renderer brackets a run of CONSECUTIVE
+   rows sharing one, so ordering carries the grouping and no extra id is stored.
+   That keeps the record JSON-safe and keeps moveExercise/removeExercise working
+   without any superset-specific bookkeeping. */
+
+// Canonical form of a superset marker: a single uppercase letter A..Z, or null.
+// Everything else — numbers, '', 'AB', junk, objects — normalises to null, so a
+// corrupt value can never reach the renderer.
+function supersetLetter(v) {
+  if (typeof v !== 'string') return null;
+  var s = v.trim().toUpperCase();
+  if (s.length !== 1) return null;
+  if (s < 'A' || s > 'Z') return null;
+  return s;
+}
+
+// The first letter A..Z not already used by any row of the template. Null when
+// all twenty-six are taken, which no real workout will ever reach.
+export function nextSupersetLetter(tpl) {
+  var list = isObj(tpl) && Array.isArray(tpl.exercises) ? tpl.exercises : [];
+  var used = Object.create(null);
+  for (var i = 0; i < list.length; i++) {
+    if (!isObj(list[i])) continue;
+    var L = supersetLetter(list[i].superset);
+    if (L) used[L] = true;
+  }
+  for (var c = 65; c <= 90; c++) {
+    var ch = String.fromCharCode(c);
+    if (!used[ch]) return ch;
+  }
+  return null;
+}
+
+// Set or clear one row's superset letter. Passing null (or any unusable value)
+// clears it, which is what "—" in the editor means. Same rules as every other
+// setter here: no mutation, tolerant of junk, JSON-safe out.
+export function setSuperset(tpl, index, letter, opts) {
+  var i = editRow(tpl, index);
+  if (i === null) return cloneTemplate(tpl);
+  var v = supersetLetter(letter);
+  var next = cloneTemplate(tpl);
+  if (isObj(next.exercises[i])) next.exercises[i].superset = v;
+  else next.exercises[i] = blankRow({ superset: v });
   next.updatedAt = optNow(opts);
   return next;
 }

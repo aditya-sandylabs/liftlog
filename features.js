@@ -227,6 +227,36 @@ export function searchExercises(index, query, opts = {}) {
   return res;
 }
 
+/**
+ * Alphabetical sections for the Exercises browser, Strong-style.
+ * Sorts A→Z by name (case/accent-insensitive) and groups by first letter.
+ * Anything that does not start with a letter lands in a trailing '#' group, so
+ * "3-Point Dumbbell Row" is findable instead of inventing a "3" heading between
+ * the letters. Returns [] for junk input rather than throwing.
+ */
+export function groupExercisesAlpha(list) {
+  if (!Array.isArray(list)) return [];
+  const items = list.filter((it) => it && typeof it === 'object');
+  items.sort((a, b) => String(a.name == null ? '' : a.name)
+    .localeCompare(String(b.name == null ? '' : b.name), undefined, { sensitivity: 'base' }));
+  const groups = [];
+  const byLetter = new Map();
+  for (const it of items) {
+    const first = String(it.name == null ? '' : it.name).trim().charAt(0).toUpperCase();
+    const letter = /^[A-Z]$/.test(first) ? first : '#';
+    let g = byLetter.get(letter);
+    if (!g) { g = { letter, items: [] }; byLetter.set(letter, g); groups.push(g); }
+    g.items.push(it);
+  }
+  // Letters in order, '#' last — it is a catch-all, not a letter.
+  groups.sort((a, b) => {
+    if (a.letter === '#') return 1;
+    if (b.letter === '#') return -1;
+    return a.letter < b.letter ? -1 : a.letter > b.letter ? 1 : 0;
+  });
+  return groups;
+}
+
 export function makeCustomExercise(name, muscle, opts = {}) {
   const trimmed = String(name == null ? '' : name).trim();
   if (!trimmed) throw new Error('Exercise name is required.');
@@ -342,7 +372,11 @@ export function mergeCustomExercises(local, remote) {
 /* ------------------------------------------------------------------ */
 
 /**
- * GitHub-style contribution grid, last 53 weeks, as an SVG string.
+ * GitHub-style contribution grid as an SVG string.
+ *
+ * The grid starts at the Monday of the week containing the EARLIEST workout
+ * and ends at the week containing endTs, capped at 53 weeks. With no workouts
+ * at all it falls back to a short 8-week window rather than 53 empty columns.
  *
  * Bucketing: a day's level comes from total durationSec that day, scaled
  * against the busiest day in the visible range:
@@ -366,8 +400,9 @@ export function heatmapSVG(workouts, opts = {}) {
     }
   }
 
-  // Grid geometry: 53 columns (weeks) x 7 rows (Mon top … Sun bottom),
-  // ending on the Sunday of the week containing endTs.
+  // Grid geometry: N columns (weeks) x 7 rows (Mon top … Sun bottom),
+  // ending on the Sunday of the week containing endTs and starting on the
+  // Monday of the week containing the earliest workout (capped at 53 weeks).
   const CELL = 13;
   const GAP = 2;
   const PITCH = CELL + GAP;
@@ -375,16 +410,43 @@ export function heatmapSVG(workouts, opts = {}) {
   const PAD_T = 20;
   const PAD_R = 6;
   const PAD_B = 6;
-  const COLS = 53;
+  const MAX_COLS = 53;
+  const DEFAULT_COLS = 8; // no workouts at all: a short window, not 53 empties
   const ROWS = 7;
-  const width = PAD_L + COLS * PITCH - GAP + PAD_R;
-  const height = PAD_T + ROWS * PITCH - GAP + PAD_B;
 
   const end = new Date(endTs);
   end.setHours(0, 0, 0, 0);
   const dow = (end.getDay() + 6) % 7; // 0 = Monday
-  const start = new Date(end);
-  start.setDate(start.getDate() - dow - 52 * 7); // Monday of the first column
+  const endMonday = new Date(end);
+  endMonday.setDate(endMonday.getDate() - dow); // Monday of the last column
+
+  // Earliest workout (ignoring anything after endTs, which cannot be shown).
+  let firstTs = Infinity;
+  if (Array.isArray(workouts)) {
+    for (const w of workouts) {
+      if (!w || typeof w !== 'object' || !Number.isFinite(w.startTime)) continue;
+      if (w.startTime > endTs) continue;
+      if (w.startTime < firstTs) firstTs = w.startTime;
+    }
+  }
+
+  let COLS;
+  if (!Number.isFinite(firstTs)) {
+    COLS = DEFAULT_COLS;
+  } else {
+    const fd = new Date(firstTs);
+    fd.setHours(0, 0, 0, 0);
+    fd.setDate(fd.getDate() - ((fd.getDay() + 6) % 7)); // Monday of that week
+    // Round the day difference: DST makes some weeks 167 or 169 hours long.
+    const weeks = Math.round((endMonday.getTime() - fd.getTime()) / (7 * 864e5));
+    COLS = Math.max(1, Math.min(MAX_COLS, weeks + 1));
+  }
+
+  const width = PAD_L + COLS * PITCH - GAP + PAD_R;
+  const height = PAD_T + ROWS * PITCH - GAP + PAD_B;
+
+  const start = new Date(endMonday);
+  start.setDate(start.getDate() - (COLS - 1) * 7); // Monday of the first column
 
   // Step with setDate (+1 day) rather than adding ms, so DST shifts cannot
   // skew a cell off its weekday.
@@ -408,8 +470,15 @@ export function heatmapSVG(workouts, opts = {}) {
     return Math.min(4, 1 + Math.floor((4 * dur) / maxDur));
   };
 
+  const rangeStr = (ts) => {
+    const d = new Date(ts);
+    return MONTHS[d.getMonth()] + ' ' + d.getDate() + ' ' + d.getFullYear();
+  };
+  const hmLabel = 'Workout activity heatmap, ' + COLS + (COLS === 1 ? ' week' : ' weeks')
+    + ' from ' + rangeStr(start.getTime()) + ' to ' + rangeStr(endTs);
+
   const out = [];
-  out.push('<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Workout activity heatmap for the last 53 weeks">');
+  out.push('<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="' + esc(hmLabel) + '">');
 
   // Month labels: label a column when its Monday begins a new month,
   // suppressing labels that would collide with the previous one.
@@ -483,12 +552,15 @@ export function bodyWeightSVG(entries, opts = {}) {
       + '</svg>';
   }
 
-  const W = 640;
-  const H = 240;
-  const PL = 52;
-  const PR = 18;
-  const PT = 18;
-  const PB = 30;
+  // Responsive: the SVG scales to its container via width="100%" + viewBox.
+  // The viewBox width defaults to something that fits a 375px phone without
+  // horizontal scrolling; callers may override with opts.width.
+  const W = Number.isFinite(opts.width) && opts.width > 120 ? Math.round(opts.width) : 343;
+  const H = 236;
+  const PL = 40;
+  const PR = 12;
+  const PT = 26; // room for the value label above the highest dot
+  const PB = 52; // room for rotated date labels
 
   let rawLo = Infinity;
   let rawHi = -Infinity;
@@ -507,42 +579,110 @@ export function bodyWeightSVG(entries, opts = {}) {
 
   const t0 = points[0].ts;
   const t1 = points[points.length - 1].ts;
-  const tSpan = t1 - t0 || 1;
-  const xOf = (ts) => PL + ((ts - t0) / tSpan) * (W - PL - PR);
+  const n = points.length;
+
+  // CATEGORICAL x: every reading is equidistant, whatever the date gaps, so a
+  // fortnight's break never squashes a run of daily weigh-ins into one blob.
+  const plotW = W - PL - PR;
+  const gapX = n > 1 ? plotW / (n - 1) : 0;
+  const xOf = (i) => PL + i * gapX;
   const yOf = (kg) => PT + (1 - (kg - lo) / (hi - lo)) * (H - PT - PB);
-  const r1 = (n) => Math.round(n * 10) / 10;
+  const r1 = (v) => Math.round(v * 10) / 10;
 
-  const ptsAttr = points.map((p) => r1(xOf(p.ts)) + ',' + r1(yOf(p.kg))).join(' ');
+  // Short axis dates: "12 Mar" normally, "12 Mar 26" when the series spans
+  // more than one calendar year and the year is therefore load-bearing.
+  const multiYear = new Date(t0).getFullYear() !== new Date(t1).getFullYear();
+  const shortDate = (ts) => {
+    const d = new Date(ts);
+    return d.getDate() + ' ' + MONTHS[d.getMonth()]
+      + (multiYear ? ' ' + String(d.getFullYear() % 100).padStart(2, '0') : '');
+  };
 
-  const ariaLabel = 'Body weight line chart: ' + points.length + ' measurements from '
+  // Rough advance width at font-size 9px; only used to decide how many labels
+  // fit, so an approximation is fine and keeps this DOM-free.
+  const textW = (s) => s.length * 5.2;
+
+  // Greedy label picker: `must` indices always survive; the rest are added in
+  // order only where their box clears everything already placed by `minGap`.
+  const pick = (must, minGap, widthOf) => {
+    const chosen = [];
+    const clears = (i) => chosen.every((j) =>
+      Math.abs(xOf(i) - xOf(j)) >= (widthOf(i) + widthOf(j)) / 2 + minGap);
+    const uniq = Array.from(new Set(must)).filter((i) => i >= 0 && i < n).sort((a, b) => a - b);
+    for (const i of uniq) chosen.push(i);
+    for (let i = 0; i < n; i++) {
+      if (chosen.indexOf(i) !== -1) continue;
+      if (clears(i)) chosen.push(i);
+    }
+    return chosen.sort((a, b) => a - b);
+  };
+
+  let minIdx = 0;
+  let maxIdx = 0;
+  for (let i = 1; i < n; i++) {
+    if (points[i].kg < points[minIdx].kg) minIdx = i;
+    if (points[i].kg > points[maxIdx].kg) maxIdx = i;
+  }
+
+  const valTxt = (i) => fmt(points[i].kg);
+  const dateTxt = (i) => shortDate(points[i].ts);
+
+  // First, last, min and max are always labelled; everything else fills in
+  // wherever it does not collide.
+  const valIdx = pick([0, n - 1, minIdx, maxIdx], 4, (i) => textW(valTxt(i)));
+  // Dates render rotated -38°, so their horizontal footprint is ~cos(38°).
+  const dateIdx = pick([0, n - 1], 4, (i) => textW(dateTxt(i)) * 0.79);
+
+  const ptsAttr = points.map((p, i) => r1(xOf(i)) + ',' + r1(yOf(p.kg))).join(' ');
+
+  const ariaLabel = 'Body weight line chart: ' + n + ' measurements, equally spaced, from '
     + dateStr(t0) + ' (' + fmt(points[0].kg) + ' ' + unit + ') to '
-    + dateStr(t1) + ' (' + fmt(points[points.length - 1].kg) + ' ' + unit + ')'
+    + dateStr(t1) + ' (' + fmt(points[n - 1].kg) + ' ' + unit + ')'
     + (goal != null ? ', goal ' + fmt(goal) + ' ' + unit : '');
 
   const parts = [];
-  parts.push('<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(ariaLabel) + '">');
+  parts.push('<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + esc(ariaLabel) + '">');
 
   // Baseline
   parts.push('<line class="bw-ax" x1="' + PL + '" y1="' + (H - PB) + '" x2="' + (W - PR) + '" y2="' + (H - PB) + '"></line>');
 
   // Y axis: min and max data values
-  parts.push('<text class="bw-ax" x="' + (PL - 8) + '" y="' + r1(yOf(rawHi) + 4) + '" text-anchor="end">' + esc(fmt(rawHi) + ' ' + unit) + '</text>');
-  parts.push('<text class="bw-ax" x="' + (PL - 8) + '" y="' + r1(yOf(rawLo) + 4) + '" text-anchor="end">' + esc(fmt(rawLo) + ' ' + unit) + '</text>');
-
-  // X axis: first and last dates
-  parts.push('<text class="bw-ax" x="' + PL + '" y="' + (H - 8) + '">' + esc(dateStr(t0)) + '</text>');
-  parts.push('<text class="bw-ax" x="' + (W - PR) + '" y="' + (H - 8) + '" text-anchor="end">' + esc(dateStr(t1)) + '</text>');
+  parts.push('<text class="bw-ax" x="' + (PL - 6) + '" y="' + r1(yOf(rawHi) + 4) + '" text-anchor="end">' + esc(fmt(rawHi)) + '</text>');
+  parts.push('<text class="bw-ax" x="' + (PL - 6) + '" y="' + r1(yOf(rawLo) + 4) + '" text-anchor="end">' + esc(fmt(rawLo)) + '</text>');
+  parts.push('<text class="bw-ax" x="' + (PL - 6) + '" y="' + (PT - 14) + '" text-anchor="end">' + esc(unit) + '</text>');
 
   // Goal line — dashed so it reads as "target", not data, without colour.
   if (goal != null) {
     const gy = r1(yOf(goal));
     parts.push('<line class="bw-goal" x1="' + PL + '" y1="' + gy + '" x2="' + (W - PR) + '" y2="' + gy + '" stroke-dasharray="7 5"></line>');
-    parts.push('<text class="bw-goal" x="' + (W - PR) + '" y="' + r1(gy - 6) + '" text-anchor="end">' + esc('Goal ' + fmt(goal) + ' ' + unit) + '</text>');
+    parts.push('<text class="bw-goal-lbl" x="' + (W - PR) + '" y="' + r1(gy - 5) + '" text-anchor="end">' + esc('Goal ' + fmt(goal) + ' ' + unit) + '</text>');
   }
 
   parts.push('<polyline class="bw-line" fill="none" points="' + ptsAttr + '"></polyline>');
-  for (const p of points) {
-    parts.push('<circle class="bw-dot" cx="' + r1(xOf(p.ts)) + '" cy="' + r1(yOf(p.kg)) + '" r="2.5"><title>' + esc(dateStr(p.ts) + ' — ' + fmt(p.kg) + ' ' + unit) + '</title></circle>');
+  for (let i = 0; i < n; i++) {
+    const p = points[i];
+    parts.push('<circle class="bw-dot" cx="' + r1(xOf(i)) + '" cy="' + r1(yOf(p.kg)) + '" r="2.5"><title>' + esc(dateStr(p.ts) + ' — ' + fmt(p.kg) + ' ' + unit) + '</title></circle>');
+  }
+
+  // Exact value beside every labelled point. Sits above the dot, and flips
+  // below when the dot is close to the top edge.
+  for (const i of valIdx) {
+    const txt = valTxt(i);
+    const half = textW(txt) / 2;
+    let x = xOf(i);
+    let anchor = 'middle';
+    if (x - half < PL) { x = PL; anchor = 'start'; }
+    else if (x + half > W - 2) { x = W - 2; anchor = 'end'; }
+    const dotY = yOf(points[i].kg);
+    const y = dotY - 8 < 9 ? dotY + 14 : dotY - 8;
+    parts.push('<text class="bw-val" x="' + r1(x) + '" y="' + r1(y) + '" text-anchor="' + anchor + '">' + esc(txt) + '</text>');
+  }
+
+  // Dates on the x axis, rotated so they stay legible at phone width.
+  const dy = H - PB + 12;
+  for (const i of dateIdx) {
+    const x = r1(xOf(i));
+    parts.push('<text class="bw-ax" x="' + x + '" y="' + dy + '" text-anchor="end" transform="rotate(-38 ' + x + ' ' + dy + ')">' + esc(dateTxt(i)) + '</text>');
   }
 
   parts.push('</svg>');
