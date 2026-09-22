@@ -340,7 +340,7 @@ function showView(v) {
   $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v
     || (v === 'wod' && b.dataset.v === 'history')
     // The exercise detail is a child of the Exercises tab, so the tab stays lit.
-    || (v === 'exdetail' && b.dataset.v === 'exercises')));
+    || ((v === 'exercises' || v === 'exdetail') && b.dataset.v === 'home')));
   if (v === 'home') renderHome();
   if (v === 'history') renderHistory();
   if (v === 'food') renderFood();
@@ -463,9 +463,16 @@ function renderHome() {
       ${cards}
       <button class="addex" data-tplnew="1"><svg class="ic"><use href="#i-plus"/></svg>Create a template</button>
     </div>
+    <h2 class="sec">Exercises</h2>
+    <div class="list">
+      <button class="tpl" id="home-exercises"><span class="tpl-name">Exercise library</span>
+        <span class="tpl-meta">Browse every exercise — guides, tips and animations</span>
+        <svg class="ic chev"><use href="#i-chev"/></svg></button>
+    </div>
     <h2 class="sec">Recent workouts</h2>
     <div class="list">${recent}</div>`;
   $('#start-empty').onclick = startEmptyWorkout;
+  $('#home-exercises').onclick = () => showView('exercises');
   const bw = $('#backup-warn');
   // The tap IS the user gesture the interactive token request needs, so this
   // is a real fix-it button, not just a link to Settings.
@@ -1656,11 +1663,22 @@ async function renderBuildStamp() {
   const el = $('#build-stamp');
   if (!el) return;
   let v = 'unknown';
+  // Ask the worker that actually controls this page. Reading cache names
+  // reported a half-installed cache's version while old code was running.
   try {
-    const keys = await caches.keys();
-    const hit = keys.find(k => k.startsWith('liftlog-v'));
-    if (hit) v = hit.replace('liftlog-v', '');
-  } catch (e) { /* caches unavailable */ }
+    const ctl = navigator.serviceWorker && navigator.serviceWorker.controller;
+    if (ctl) {
+      v = await new Promise(resolve => {
+        const ch = new MessageChannel();
+        const t = setTimeout(() => resolve('unknown'), 1500);
+        ch.port1.onmessage = e => {
+          clearTimeout(t);
+          resolve(String((e.data && e.data.version) || 'unknown').replace('liftlog-v', ''));
+        };
+        ctl.postMessage({ type: 'version' }, [ch.port2]);
+      });
+    }
+  } catch (e) { /* no worker */ }
   el.textContent = 'LiftLog · build ' + v;
 }
 
@@ -2692,6 +2710,7 @@ function wire() {
     if (b) openExerciseDetail(b.dataset.exb);
   });
   $('#exd-back').onclick = () => showView('exercises');
+  $('#exb-back').onclick = () => showView('home');
 
   // active workout — one delegated listener for all card interactions
   $('#aw-body').addEventListener('click', e => {

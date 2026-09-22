@@ -447,13 +447,6 @@ body.has-mini #restbar{
 .q-anim{transition:transform .2s ease}
 @media (prefers-reduced-motion: reduce){ .q-anim{transition:none} }
 
-/* ---------- 7 tabs ----------
-   Seven columns at 375px leaves ~53px per tab, so the label has to shrink or
-   "Exercises" wraps and the row grows taller than its neighbours. */
-#tabbar{grid-template-columns:repeat(7,1fr)}
-#tabbar button span{font-size:.56rem;letter-spacing:-.01em;white-space:nowrap}
-#tabbar button{padding-left:1px;padding-right:1px}
-@media (min-width:430px){ #tabbar button span{font-size:.64rem} }
 
 /* ---------- exercises browser ---------- */
 /* The search field and chips stay put while the long list scrolls under them,

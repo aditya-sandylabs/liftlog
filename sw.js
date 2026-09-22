@@ -1,7 +1,7 @@
 /* LiftLog service worker — precaches the app shell + data.json, cache-first, versioned. */
 'use strict';
 
-const VERSION = 'liftlog-v202609220947';
+const VERSION = 'liftlog-v202609221020';
 const ASSETS = [
   './',
   './index.html',
@@ -23,10 +23,22 @@ const ASSETS = [
   './icon-512.png'
 ];
 
+/* The page asks the controlling worker which build it is. Reading cache names
+   from the page reported a half-installed cache's version while old code was
+   still running, so the stamp said "latest" over a stale app. */
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'version' && event.ports && event.ports[0])
+    event.ports[0].postMessage({ type: 'version', version: VERSION });
+});
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(VERSION)
-      .then(cache => cache.addAll(ASSETS))
+      /* cache:'reload' bypasses the browser's HTTP cache. GitHub Pages sends
+         max-age=600, so without it a worker installed within ten minutes of a
+         visit precached the PREVIOUS build's files under the NEW version name
+         -- the build stamp claimed the latest build while old code ran. */
+      .then(cache => cache.addAll(ASSETS.map(u => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -80,7 +92,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(req, { ignoreSearch: true }).then(cached => {
       if (cached) {
-        fetch(req).then(res => {
+        fetch(req, { cache: 'no-cache' }).then(res => {
           if (res && res.ok) caches.open(VERSION).then(c => c.put(req, res));
         }).catch(() => { /* offline — cached copy already served */ });
         return cached;
