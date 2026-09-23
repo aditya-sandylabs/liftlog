@@ -22,6 +22,8 @@ completely separate data.
 | `styles.css` | All styling; light + dark, manual override |
 | `data.json` | **Generated, read-only.** The routine, exercise guides and video links |
 | `foods.json` | **Generated, read-only.** 13,766-food offline nutrition database |
+| `guides.json` | **Generated, read-only.** Instructions, tips and a key tip for all 155 exercises, plus picture-animation paths |
+| `media/exercises/` | 2-frame start/end pictures for 131 exercises (public-domain free-exercise-db), cached on first view |
 | `quotes.json` | 20 Stoic passages with their sources |
 | `sw.js` | Service worker — offline caching |
 | `manifest.webmanifest` | PWA manifest |
@@ -51,6 +53,19 @@ exercises with the same ids on different pages. The build scripts live in
 If the routine ever changes, regenerate the file rather than editing it by hand.
 Never hand-edit it, and never have a model rewrite it: a fabricated video id is
 indistinguishable from a correct one until someone taps it in a gym.
+
+## `guides.json` is generated too — same rule
+
+Exercise instructions, tips, the one-line **key tip** shown behind the 💡 button on
+every workout card, and the picture animations all come from `guides.json`, built by
+`build/build_guides.py`. Text for the 21 programme lifts is the PDF guide verbatim;
+most of the rest starts from the public-domain
+[free-exercise-db](https://github.com/yuhonas/free-exercise-db) and is normalised;
+the remainder is authored in `build/authored/`. Pictures are matched **by hand** in
+`build/authored/media_map.json` — a wrong picture is worse than none, so 24
+exercises deliberately have no animation. Regenerate with
+`python build/build_guides.py [path/to/strong-export.csv]`; never hand-edit the
+output.
 
 ## `foods.json` is generated too — same rule
 
@@ -156,10 +171,11 @@ It is already set up. The site is live at
 **https://aditya-sandylabs.github.io/liftlog/** and publishing is one command:
 
 ```bash
-cd "/d/Sandy Labs/_Personal/liftlog" && ./deploy.sh
+cd "/d/Sandy Labs/_Personal/liftlog" && LIFTLOG_REPO="C:/Users/adity/liftlog-pages" ./deploy.sh
 ```
 
-Run it from Git Bash. It stamps a new service-worker cache version each time, so
+Run it from Git Bash. `LIFTLOG_REPO` is needed on this machine because the
+default `$HOME/liftlog-pages` is an MSYS path that native git cannot `cd` into. It stamps a new service-worker cache version each time, so
 phones pick up the new build instead of serving the old one from cache.
 
 Setting it up from scratch elsewhere would be
@@ -172,6 +188,12 @@ Setting it up from scratch elsewhere would be
 > commit, so run `./deploy.sh` after re-enabling.
 >
 > No training data is ever committed — only the app itself.
+>
+> **A third trap, hit 2026-09-22.** GitHub Pages caches files for 10 minutes
+> (`max-age=600`). The service worker now precaches with `cache: 'reload'` so a
+> new build never installs with the previous build's files; before that fix a
+> phone could show the new build stamp while running old code. If that ever
+> recurs, clear the site data once (export JSON first if Drive is not connected).
 
 ## Setting it up on a phone (the one-time bit)
 

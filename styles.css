@@ -533,6 +533,34 @@ body.has-mini #restbar{
 .exd-tips li{margin-bottom:6px}
 .exd-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
 
+/* ---------- muscles worked (muscles.js) ----------
+   Primary vs secondary is NEVER hue alone: primary = solid fill + bold label +
+   ● glyph; secondary = diagonal hatch + regular label + ◍ glyph. */
+.mm-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 4px;margin:4px 0 8px}
+.mm{display:block;width:100%;height:auto;max-height:340px}
+.mm-outline{fill:none;stroke:var(--muted);stroke-width:3;opacity:.55}
+.mm-base{fill:var(--surface2);stroke:var(--border);stroke-width:1.5}
+.mm-pri{fill:var(--accent);stroke:var(--text);stroke-width:2.5}
+.mm-sec{stroke:var(--accent);stroke-width:2}
+.mm-sec-bg{fill:var(--accent-soft)}
+.mm-sec-line{stroke:var(--accent);stroke-width:6}
+.mm-mid{stroke:var(--muted);stroke-width:3;stroke-dasharray:10 8;opacity:.6}
+.mm-view{fill:var(--muted);font-size:30px;font-weight:700;letter-spacing:4px}
+.mm-lead{fill:none;stroke:var(--muted);stroke-width:2.5}
+.mm-dot{fill:var(--text)}
+.mm-lab{fill:var(--text)}
+.mm-lab-p{font-weight:800}
+.mm-lab-s{font-weight:500}
+.mm-lists{display:flex;flex-wrap:wrap;gap:4px 24px;font-size:.92rem}
+.mm-lists h4{margin:6px 0 2px;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mm-lists ul{list-style:none;padding:0;margin:0}
+.mm-lists li{margin:3px 0}
+.mm-lists li .small{display:block;margin-left:1.35em;line-height:1.2}
+.mm-g{display:inline-block;width:1.35em}
+.mm-bias{margin:8px 0 4px;font-size:.92rem;line-height:1.5}
+.mm-bias strong{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.modal-body .mm{max-height:260px}
+
 /* ---------- exercise picker ---------- */
 .inp.wide{width:100%;text-align:left;padding:0 12px;height:48px}
 .pick-list{max-height:52vh;overflow-y:auto;margin:10px 0;display:flex;flex-direction:column;gap:4px}

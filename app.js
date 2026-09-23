@@ -38,6 +38,7 @@ import {
   orphanDriveIds, mergeMeasurements, mergePhotos, parseTrackingSheet,
   measurementsToSheetCsv, measurementSVG, bodyUid
 } from './body.js';
+import { musclesFor, musclesBlockHTML } from './muscles.js';
 
 /* ================= tiny helpers ================= */
 const $  = (s, r = document) => r.querySelector(s);
@@ -1405,10 +1406,27 @@ async function loadGuidesImpl() {
 
 /* One guide record, or null. Keyed by the same slugify() ids the index uses, so
    a brand-new custom exercise simply has no entry — every caller must cope. */
+/* "Muscles worked" block for any exercise screen. bodymap.js ships in the app
+   shell, so unlike guides.json this never waits on a fetch. Custom and
+   Strong-imported exercises fall back to their coarse muscle group, which the
+   block marks as an estimate. */
+function musclesHTML(exId) {
+  const ex = resolveExercise(exId, null);
+  const ix = exIndex.find(x => x.id === exId);
+  const info = musclesFor(exId, ex.muscle || (ix && ix.muscle) || null, ex.name);
+  const block = musclesBlockHTML(info);
+  return block ? `<section class="mm-sec-box"><h3 class="sec">Muscles worked</h3>${block}</section>` : '';
+}
+
 function guideFor(exId) {
   const g = state.guides && state.guides.exercises;
   if (!g || !exId) return null;
-  return g[exId] || null;
+  if (g[exId]) return g[exId];
+  /* guides.json keys on slugify(name), but 16 of the 21 PDF main lifts carry a
+     shorter data.json id ('pull-up' for "Pull-Ups"). Without this fallback the
+     core routine's lifts never showed their key tip or instructions. */
+  const ex = state.data && state.data.exercises && state.data.exercises[exId];
+  return (ex && ex.name && g[slug(ex.name)]) || null;
 }
 
 /* The shipped food database is 2.7 MB. Fetching it at boot would delay first
@@ -1840,6 +1858,7 @@ function openExerciseSheet(exId, ctx = {}) {
           workout card too, not only from the Exercises tab — this sheet is the
           in-workout route to them. */''}
     ${guideSheetHTML(exId, ex.name)}
+    ${musclesHTML(exId)}
     <div class="btn-col" style="margin:10px 0">${yt}${tut}</div>
     ${steps ? `<h3 class="sec">How to</h3>${steps}` : ''}
     ${alts ? `<h3 class="sec">Alternatives</h3><div class="alt-list">${alts}</div>` : ''}
@@ -2041,6 +2060,7 @@ function renderExerciseDetail() {
     <h2>${esc(ex.name)}</h2>
     <div class="exd-meta">${tags}</div>
     <p class="muted small">${logged}</p>
+    ${musclesHTML(exId)}
     ${keyTip}
     ${yt ? `<div class="btn-col" style="margin:10px 0">${yt}</div>` : ''}
     ${noGuide}
@@ -2070,7 +2090,7 @@ function openTipsPopup(exId) {
   const ex = resolveExercise(exId, null);
   const paint = () => showModal({
     title: ex.name || String(exId),
-    body: tipsBodyHTML(guideFor(exId)),
+    body: tipsBodyHTML(guideFor(exId)) + musclesHTML(exId),
     actions: [
       { label: 'Open full guide', onClick: () => { closeModal(); openExerciseDetail(exId); } },
       { label: 'Close', primary: true }
