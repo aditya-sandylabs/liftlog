@@ -1,7 +1,7 @@
 /* LiftLog service worker — precaches the app shell + data.json, cache-first, versioned. */
 'use strict';
 
-const VERSION = 'liftlog-v202609231239';
+const VERSION = 'liftlog-v202609232016';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
   './body.js',
   './muscles.js',
   './bodymap.js',
+  './exlib.js',
   './data.json',
   './foods.json',
   './guides.json',

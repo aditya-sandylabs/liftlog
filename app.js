@@ -13,6 +13,7 @@ import {
   fmtCardio, workoutKcal,
   dropsOf, hasDrops, setVolumeKg, fmtSetChain, dropsToField
 } from './features.js';
+import { LIBRARY } from './exlib.js';
 import {
   newTemplate, templateFromWorkout, validateTemplateName, renameTemplate,
   addExercise as tplAddExercise, removeExercise as tplRemoveExercise,
@@ -207,7 +208,7 @@ const state = {
 let exIndex = [];
 function rebuildExerciseIndex() {
   exIndex = buildExerciseIndex({
-    data: state.data, custom: state.custom, workouts: state.workouts
+    data: state.data, custom: state.custom, workouts: state.workouts, library: LIBRARY
   });
 }
 
@@ -331,6 +332,14 @@ function resolveExercise(id, te) {
   }
 
   if (te && d[te.id]) return d[te.id];
+
+  /* The guided library (exlib.js): an exercise added to the main list resolves
+     here on a phone that never created it as a custom exercise. */
+  const lib = LIBRARY.find(x => x.id === id);
+  if (lib) return {
+    id, name: lib.name, muscle: lib.muscle || '', bodyweight: !!lib.bodyweight,
+    video: null, tutorial: null, steps: [], alternatives: []
+  };
   return { id, name: te ? te.name : id, muscle: '', bodyweight: false, video: null, tutorial: null, steps: [], alternatives: [] };
 }
 

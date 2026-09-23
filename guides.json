@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-09-23T10:33:51Z",
+ "generatedAt": "2026-09-23T20:10:04Z",
  "exercises": {
   "3-point-dumbbell-row": {
    "name": "3 Point Dumbbell Row",
@@ -30,6 +30,57 @@
    },
    "mediaSource": "exercisedb:C0MA9bC",
    "sourceNotes": "exercisedb:C0MA9bC"
+  },
+  "abductor-machine": {
+   "name": "Abductor Machine",
+   "muscle": "Glutes",
+   "secondary": [],
+   "equipment": "Machine",
+   "instructions": [
+    "Adjust the seat height so that your knees are at a 90-degree angle.",
+    "Sit on the machine with your back against the backrest and your feet on the footrests.",
+    "Place your hands on the side handles for stability.",
+    "Engage your abductors and slowly push your legs apart, away from the midline of your body.",
+    "Pause for a moment at the end of the movement, then slowly bring your legs back together to the starting position."
+   ],
+   "tips": [
+    "Leaning forward biases the upper glute; sitting upright targets the side of the hip more.",
+    "Do not slam the pads out — control both directions.",
+    "Pause at the widest point for a beat."
+   ],
+   "keyTip": "Lean your torso slightly forward and pause at the outer position — that forward lean is what shifts this from hip flexor to glute medius work.",
+   "media": {
+    "type": "gif",
+    "src": "media/edb/CHpahtl.gif"
+   },
+   "mediaSource": "exercisedb:CHpahtl",
+   "sourceNotes": "exercisedb:CHpahtl"
+  },
+  "adductor-machine": {
+   "name": "Adductor Machine",
+   "muscle": "Adductors",
+   "secondary": [
+    "Glutes"
+   ],
+   "equipment": "Machine",
+   "instructions": [
+    "Adjust the seat height and position yourself on the machine with your back against the backrest.",
+    "Place your feet on the footrests and grasp the handles for stability.",
+    "Engage your adductor muscles and slowly bring your legs together, squeezing your inner thighs.",
+    "Pause for a moment at the peak contraction, then slowly return to the starting position."
+   ],
+   "tips": [
+    "Start with a modest range and widen it over a few sessions — the stretched position is where strains happen.",
+    "Keep your back on the pad; rocking the torso forward turns it into momentum.",
+    "Higher reps (12–20) with control suit this machine better than heavy singles."
+   ],
+   "keyTip": "Control the opening phase and own the stretch — the lowering half, with the thighs wide, is where the adductors grow.",
+   "media": {
+    "type": "gif",
+    "src": "media/edb/oHsrypV.gif"
+   },
+   "mediaSource": "exercisedb:oHsrypV",
+   "sourceNotes": "exercisedb:oHsrypV"
   },
   "back-extension": {
    "name": "Back Extension",
@@ -397,6 +448,33 @@
     "closest": "barbell rear delt row"
    },
    "mediaSource": "exercisedb:S9zHIvU",
+   "sourceNotes": "authored"
+  },
+  "bayesian-bicep-curls": {
+   "name": "Bayesian Bicep Curls",
+   "muscle": "Biceps",
+   "secondary": [
+    "Forearms"
+   ],
+   "equipment": "Cable",
+   "instructions": [
+    "Set a single handle on a low pulley, face away from the stack and take a staggered stance with the cable hand behind you.",
+    "Let the cable pull your working arm back so your upper arm sits slightly behind your torso and the biceps is stretched.",
+    "Curl the handle forward and up towards your shoulder, keeping your elbow in place behind your body.",
+    "Lower slowly back to full elbow extension, letting the arm settle behind you before the next rep."
+   ],
+   "tips": [
+    "Step far enough forward that the weight is still off the stack at the bottom of each rep.",
+    "Keep your shoulder down and back rather than letting it roll forward at the bottom.",
+    "Do one arm at a time so you can match reps and focus on the stretch."
+   ],
+   "keyTip": "Keep the elbow behind your torso the whole set — that arm-behind position is what loads the biceps long head at full stretch, the whole point of the Bayesian curl.",
+   "media": {
+    "type": "gif",
+    "src": "media/edb/YTur5nR.gif",
+    "closest": "cable one arm curl"
+   },
+   "mediaSource": "exercisedb:YTur5nR",
    "sourceNotes": "authored"
   },
   "behind-body-cable-curls": {
@@ -2685,6 +2763,33 @@
    "mediaSource": "exercisedb:v3xmPAR",
    "sourceNotes": "exercisedb:v3xmPAR"
   },
+  "preacher-back-supported-curl": {
+   "name": "Preacher Back Supported Curl",
+   "muscle": "Biceps",
+   "secondary": [
+    "Forearms"
+   ],
+   "equipment": "Machine",
+   "instructions": [
+    "Adjust the seat so your back rests against the pad and your upper arms lie flat on the arm pad with your elbows at its edge.",
+    "Grip the handles with palms up and start with your arms almost straight.",
+    "Curl the handles up towards your shoulders while keeping your back and upper arms against the pads.",
+    "Lower slowly under control to almost full extension, feeling the stretch at the bottom."
+   ],
+   "tips": [
+    "The back pad removes body English — if you have to lift your back off it, the weight is too heavy.",
+    "Line your elbows up with the machine's pivot point so the resistance stays even through the rep.",
+    "Pause briefly at the bottom instead of bouncing out of the stretch."
+   ],
+   "keyTip": "Keep your back pinned to the pad and slow down the bottom half — the supported setup lets you push the biceps close to failure without cheating.",
+   "media": {
+    "type": "gif",
+    "src": "media/edb/b6hQYMb.gif",
+    "closest": "lever preacher curl"
+   },
+   "mediaSource": "exercisedb:b6hQYMb",
+   "sourceNotes": "authored"
+  },
   "preacher-curl-barbell": {
    "name": "Preacher Curl (Barbell)",
    "muscle": "Biceps",
@@ -2824,6 +2929,35 @@
    },
    "mediaSource": "exercisedb:lBDjFxJ",
    "sourceNotes": "data.json steps"
+  },
+  "push-ups-pike": {
+   "name": "Push ups pike",
+   "muscle": "Shoulders",
+   "secondary": [
+    "Triceps",
+    "Chest",
+    "Core"
+   ],
+   "equipment": "Bodyweight",
+   "instructions": [
+    "Start in a push-up position, then walk your feet in and lift your hips high so your body forms an upside-down V.",
+    "Place your hands slightly wider than shoulder width with your head between your arms.",
+    "Bend your elbows to lower the top of your head towards the floor just in front of your hands.",
+    "Press back up through your palms to straight arms, keeping your hips high throughout."
+   ],
+   "tips": [
+    "The more vertical your torso, the more it trains the shoulders — elevating your feet makes it harder.",
+    "Keep your elbows angled slightly forward rather than flaring straight out.",
+    "Lower your head in front of your hands, not straight down between them, to move like an overhead press."
+   ],
+   "keyTip": "Keep your hips stacked high over your shoulders — if they drop, it turns back into a regular push-up and the chest takes over from the shoulders.",
+   "media": {
+    "type": "gif",
+    "src": "media/edb/sVvXT5J.gif",
+    "closest": "exercise ball pike push up"
+   },
+   "mediaSource": "exercisedb:sVvXT5J",
+   "sourceNotes": "authored"
   },
   "quad-focused-leg-press": {
    "name": "Quad-Focused Leg Press",

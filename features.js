@@ -57,7 +57,7 @@ export function slugify(name) {
  * Flat, searchable index of everything the user can pick.
  * Tolerates null/undefined/malformed inputs — returns [] rather than throwing.
  */
-export function buildExerciseIndex({ data, custom, workouts } = {}) {
+export function buildExerciseIndex({ data, custom, workouts, library } = {}) {
   // Usage stats: distinct workouts + total non-warm-up sets per exercise id.
   const usage = new Map();
   if (Array.isArray(workouts)) {
@@ -146,6 +146,40 @@ export function buildExerciseIndex({ data, custom, workouts } = {}) {
       isAlternative: false,
       timesLogged: 0, setsLogged: 0, lastLoggedTs: null,
     });
+  }
+
+  // The guided library (guides.json): every exercise that has instructions, a
+  // key tip and a muscle map ships as a built-in, so a lift someone once added
+  // by hand (or imported from Strong) is in the main list for every user, not
+  // labelled "custom" on one phone. Cardio is skipped — time-based logging
+  // needs a mode/MET, which only CARDIO_EXERCISES and custom records carry.
+  // When the user also has a custom record with the same id, its bodyweight
+  // flag is kept so the set row does not suddenly grow a weight column.
+  const customById = new Map();
+  if (Array.isArray(custom)) for (const c of custom) if (c && c.id) customById.set(c.id, c);
+  // guides.json keys on slugify(name), but 16 of the 21 PDF main lifts use a
+  // shorter id ('pull-up' for "Pull-Ups") and several alternatives repeat a main
+  // lift's name — so a library row whose NAME is already listed is the same
+  // exercise under its guide slug and must not become a second row.
+  const namesSeen = new Set(out.map(x => slugify(x.name)));
+  if (Array.isArray(library)) {
+    for (const g of library) {
+      if (!g || !g.id || !g.name || byId.has(g.id)) continue;
+      if (namesSeen.has(slugify(g.name))) continue;
+      if (g.muscle === 'Cardio') continue;
+      const own = customById.get(g.id);
+      if (own && isCardio(own)) continue;
+      push({
+        id: g.id,
+        name: g.name,
+        muscle: g.muscle != null ? g.muscle : null,
+        video: null,
+        bodyweight: !!g.bodyweight || !!(own && own.bodyweight),
+        custom: false,
+        isAlternative: false,
+        timesLogged: 0, setsLogged: 0, lastLoggedTs: null,
+      });
+    }
   }
 
   if (Array.isArray(custom)) {
