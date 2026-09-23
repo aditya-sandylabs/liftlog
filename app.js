@@ -347,8 +347,6 @@ function showView(v) {
   if (v === 'food') renderFood();
   if (v === 'exercises') renderExerciseBrowser();
   if (v === 'exdetail') renderExerciseDetail();
-  // The two-frame guide animation is an interval; leaving the view stops it.
-  if (v !== 'exdetail') stopGuideAnim();
   if (v === 'stats') { renderStats(); renderBodySections(); }
   if (v === 'quotes') renderQuotes();
   // Object URLs for progress photos belong to the Stats view; leaving it frees them.
@@ -1375,7 +1373,7 @@ async function saveMeasurements() {
   await DB.put('kv', state.measurements, 'measurements');
 }
 
-/* The exercise guides (instructions, tips, two-frame media paths) are 226 kB —
+/* The exercise guides (instructions, tips, animation paths) are 226 kB —
    small next to foods.json but still a screen most launches never open, so the
    same lazy + shared-in-flight-promise contract applies. Mirrored into IDB so a
    later offline launch still has the tips even before the SW precache lands. */
@@ -1960,37 +1958,48 @@ function renderExerciseBrowser() {
 }
 
 /* ================= exercise detail view ================= */
-/* The "animation" is two stills — the start and the end of the movement —
-   alternated on an interval. One interval at a time, cleared on leaving the
-   view, so a dozen visits do not leave a dozen timers running. */
-let guideAnimT = null;
-function stopGuideAnim() {
-  if (guideAnimT != null) { clearInterval(guideAnimT); guideAnimT = null; }
-}
-function startGuideAnim() {
-  stopGuideAnim();
-  const frames = $$('#exd-body .exd-anim img');
-  if (frames.length < 2) return;
-  // Respect the OS setting: no flipping for anyone who asked for less motion.
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  let i = 0;
-  guideAnimT = setInterval(() => {
-    i = (i + 1) % frames.length;
-    frames.forEach((f, k) => f.classList.toggle('on', k === i));
-    const n = $('#exd-body .exd-frame-n');
-    if (n) n.textContent = (i === 0 ? 'start' : 'end');
-  }, 900);
+/* The animation is one looping GIF per exercise (ExerciseDB, 180x180 — see
+   build/vendor/exercisedb/NOTICE.md). A GIF plays itself, so there is no timer
+   to manage. The one thing it cannot do natively is honour "reduce motion": for
+   those users the GIF is replaced by a still of its first frame (drawn to a
+   canvas) and plays only when tapped. */
+const reduceMotion = () =>
+  !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+function startGuideAnim(root) {
+  if (!reduceMotion()) return;
+  (root || document).querySelectorAll('.exd-anim img[data-still]').forEach(img => {
+    const still = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth || 180; c.height = img.naturalHeight || 180;
+      c.className = 'exd-still';
+      try { c.getContext('2d').drawImage(img, 0, 0); } catch { return; }
+      img.hidden = true;
+      img.parentNode.insertBefore(c, img);
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'exd-play'; btn.textContent = '\u25B6 Play';
+      btn.setAttribute('aria-label', 'Play the animation');
+      btn.onclick = () => { c.remove(); btn.remove(); img.hidden = false; };
+      img.parentNode.appendChild(btn);
+    };
+    if (img.complete && img.naturalWidth) still(); else img.addEventListener('load', still, { once: true });
+  });
 }
 
-function guideMediaHTML(g, name) {
-  const imgs = g && g.media && Array.isArray(g.media.images) ? g.media.images : [];
-  if (imgs.length < 1) {
-    return `<div class="exd-noanim" role="img" aria-label="No animation yet for ${esc(name)}">No animation yet</div>`;
+function guideMediaHTML(g, name, compact) {
+  const m = g && g.media;
+  if (!m || m.type !== 'gif' || !m.src) {
+    return compact ? '' :
+      `<div class="exd-noanim" role="img" aria-label="No animation for ${esc(name)}">No animation available for this exercise</div>`;
   }
-  const alt = (i) => `${name} — ${i === 0 ? 'start' : 'end'} position`;
-  return `<div class="exd-anim">` + imgs.slice(0, 2).map((src, i) =>
-    `<img class="${i === 0 ? 'on' : ''}" src="./${esc(src)}" alt="${esc(alt(i))}" loading="lazy" decoding="async">`
-  ).join('') + `<span class="exd-frame-n">start</span></div>`;
+  // "Closest available": ExerciseDB has no animation of exactly this variant,
+  // so the nearest one is shown — and SAYS so, rather than passing off e.g. a
+  // plain lunge as the front-foot-elevated one.
+  const note = m.closest
+    ? `<span class="exd-closest">Closest available: ${esc(m.closest)}</span>` : '';
+  return `<div class="exd-anim${compact ? ' exd-anim-s' : ''}">` +
+    `<img src="./${esc(m.src)}" alt="${esc(name)} \u2014 animated demonstration" data-still decoding="async">` +
+    note + `</div>`;
 }
 
 function openExerciseDetail(exId) {
@@ -2069,7 +2078,7 @@ function renderExerciseDetail() {
     ${steps}
     <h3 class="sec">History</h3>
     ${exerciseHistoryHTML(exId)}`;
-  startGuideAnim();
+  startGuideAnim(box);
 }
 
 /* ================= 💡 tips popup (from a live workout card) ================= */
@@ -2090,17 +2099,18 @@ function openTipsPopup(exId) {
   const ex = resolveExercise(exId, null);
   const paint = () => showModal({
     title: ex.name || String(exId),
-    body: tipsBodyHTML(guideFor(exId)) + musclesHTML(exId),
+    body: guideMediaHTML(guideFor(exId), ex.name || String(exId), true) +
+          tipsBodyHTML(guideFor(exId)) + musclesHTML(exId),
     actions: [
       { label: 'Open full guide', onClick: () => { closeModal(); openExerciseDetail(exId); } },
       { label: 'Close', primary: true }
     ]
   });
-  if (state.guides) { paint(); return; }
+  if (state.guides) { paint(); startGuideAnim($('#modal-wrap')); return; }
   showModal({ title: ex.name || String(exId), body: '<p class="muted">Loading tips\u2026</p>', actions: [{ label: 'Close', primary: true }] });
   // Repaint over the placeholder once the file lands; skip it if the user
   // already dismissed the dialog.
-  loadGuides().then(() => { if (!$('#modal-wrap').hidden) paint(); });
+  loadGuides().then(() => { if (!$('#modal-wrap').hidden) { paint(); startGuideAnim($('#modal-wrap')); } });
 }
 
 /* ================= history & read-only workout view ================= */

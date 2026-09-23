@@ -353,6 +353,10 @@ body.has-mini #restbar{
   background:var(--bg);border:1px solid var(--border);border-radius:16px;
   padding:18px 16px 14px;box-shadow:0 8px 30px rgba(0,0,0,.3);
   animation:fadein .12s ease;
+  /* Never taller than the screen: the tips popup now carries an animation and
+     a muscle map, which pushed its buttons off a phone screen. */
+  max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);
+  overflow-y:auto;overscroll-behavior:contain;
 }
 #modal h2{font-size:1.05rem;margin-bottom:10px;padding-right:8px}
 .modal-body{font-size:.92rem}
@@ -490,33 +494,34 @@ body.has-mini #restbar{
 .exb-n{font-weight:800;font-variant-numeric:tabular-nums;font-size:.8rem;flex:none}
 
 /* ---------- exercise detail ---------- */
-/* Two frames cross-faded in place: the start and end of the movement. The pair
-   is the animation, so the box keeps a fixed aspect ratio and neither frame
-   may reflow the page as it decodes. */
+/* One looping GIF. ExerciseDB art is drawn on white, so the box stays white in
+   dark mode too (a white square floating on a dark card looks broken; a framed
+   white panel reads as a picture). Fixed aspect so nothing reflows on decode. */
 .exd-anim{
-  position:relative;width:100%;aspect-ratio:4/3;
+  position:relative;width:100%;max-width:340px;margin:0 auto 12px;aspect-ratio:1/1;
   border-radius:var(--radius);overflow:hidden;
-  background:var(--surface2);border:1px solid var(--border);margin-bottom:12px;
+  background:#fff;border:1px solid var(--border);
 }
-.exd-anim img{
+.exd-anim img,.exd-anim canvas{
   position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
-  opacity:0;transition:opacity .18s linear;
+  image-rendering:auto;
 }
-.exd-anim img.on{opacity:1}
-@media (prefers-reduced-motion: reduce){
-  /* No flipping: show the first frame and leave it. */
-  .exd-anim img{transition:none}
+.exd-anim-s{max-width:200px}
+.exd-closest{
+  position:absolute;left:6px;right:6px;bottom:6px;
+  font-size:.7rem;font-weight:600;line-height:1.25;color:#333;
+  background:rgba(255,255,255,.92);border:1px solid #ccc;border-radius:6px;padding:2px 6px;
+}
+.exd-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font:inherit;font-weight:700;font-size:.85rem;
+  background:var(--accent);color:#fff;border:0;border-radius:999px;padding:8px 16px;cursor:pointer;
 }
 .exd-noanim{
   display:flex;align-items:center;justify-content:center;
   width:100%;aspect-ratio:4/3;border-radius:var(--radius);
   background:var(--surface2);border:1px dashed var(--border);
   color:var(--muted);font-size:.9rem;margin-bottom:12px;text-align:center;padding:0 16px;
-}
-.exd-frame-n{
-  position:absolute;right:8px;bottom:6px;
-  font-size:.7rem;font-weight:700;color:var(--muted);
-  background:var(--bg);border-radius:6px;padding:1px 6px;
 }
 .keytip{
   display:flex;gap:10px;align-items:flex-start;
