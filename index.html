@@ -11,6 +11,8 @@
 <title>LiftLog</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./learn.css">
+<link rel="stylesheet" href="./learn-widgets.css">
 <link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
@@ -41,6 +43,7 @@
   <symbol id="i-min" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
   <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20.5h19z"/><line x1="12" y1="10" x2="12" y2="14.5"/><line x1="12" y1="17.5" x2="12" y2="17.51"/></symbol>
   <symbol id="i-dumbbell" viewBox="0 0 24 24"><rect x="2.5" y="8.5" width="3.5" height="7" rx="1"/><rect x="18" y="8.5" width="3.5" height="7" rx="1"/><rect x="6" y="10.5" width="2.5" height="3"/><rect x="15.5" y="10.5" width="2.5" height="3"/><line x1="8.5" y1="12" x2="15.5" y2="12"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></symbol>
   <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.5a6 6 0 1 1 6 0v1.5H9z"/><line x1="9.5" y1="21.5" x2="14.5" y2="21.5"/><line x1="10.5" y1="13.5" x2="13.5" y2="13.5"/></symbol>
 </svg>
 
@@ -103,6 +106,12 @@
         <h1 id="exd-title">Exercise</h1>
       </header>
       <div class="pad" id="exd-body"></div>
+    </section>
+
+    <!-- Learn: the educational section. learn.js renders its own header (with a
+         back button) and internal routes (home / section / lesson / glossary). -->
+    <section id="view-learn" class="view" aria-label="Learn">
+      <div id="learn-body"></div>
     </section>
 
     <section id="view-stats" class="view" aria-label="Stats">
@@ -237,6 +246,11 @@
     <button class="rbtn" id="rest-plus">+15s</button>
     <button class="rbtn skip" id="rest-skip">Skip</button>
   </div>
+
+  <!-- Set analysis: the phone camera app records the set (capture), or an existing
+       video is chosen. Read on device only; never uploaded or stored. -->
+  <input type="file" id="cv-rec" accept="video/*" capture="environment" hidden>
+  <input type="file" id="cv-pick" accept="video/*" hidden>
 
   <div id="sheet-wrap" hidden>
     <div class="backdrop" id="sheet-backdrop"></div>

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "title": "Learn",
+  "tagline": "The science of lifting, recovery and food — explained for beginners.",
+  "paths": [
+    {"id": "first-workout", "emoji": "🏁", "title": "Before your first workout", "blurb": "Five short lessons — about 20 minutes — that get you safely through your first session. The rest is there when you're curious.",
+     "lessons": ["start-safety", "start-reading-a-workout", "tech-what-to-think", "tech-choosing-weight", "tech-warm-up"]}
+  ],
+  "sections": [
+    {
+      "id": "start", "emoji": "🚀", "title": "Start here", "file": "learn/start.json",
+      "blurb": "How muscle and strength are built, how to read a workout, and what your first two months look like.",
+      "lessons": [
+        {"id": "start-how-muscle-grows", "title": "How muscles actually grow", "goal": "Training is a signal, recovery is when you adapt; mechanical tension and progressive overload are the core drivers."},
+        {"id": "start-reading-a-workout", "title": "Sets, reps, rest and RIR: reading a workout", "goal": "Decode a program line like '3 x 8-10, 2 RIR, 2 min rest' and know what each part does."},
+        {"id": "start-first-8-weeks", "title": "Your first 8 weeks: what to expect", "goal": "Early strength gains are mostly the nervous system learning; soreness fades; progress is fast then slows; consistency wins."},
+        {"id": "start-myths", "title": "Gym myths beginners believe", "goal": "Bust toning, spot reduction, 'muscle turns to fat', 'women get bulky', 'no pain no gain', 'more sweat = more fat loss'."},
+        {"id": "start-safety", "title": "Training safely and gym basics", "goal": "Effort vs pain, using safety pins/spotters, gym etiquette, when to see a professional; the not-medical-advice framing."}
+      ]
+    },
+    {
+      "id": "body", "emoji": "🫀", "title": "Your body, explained", "file": "learn/body.json",
+      "blurb": "Tap through your muscles, see how a muscle contracts, and learn where your energy comes from.",
+      "lessons": [
+        {"id": "body-atlas", "title": "Meet your muscles", "goal": "Explore the major muscle groups front and back with the tappable atlas: where each is and what it does."},
+        {"id": "body-how-muscle-contracts", "title": "How a muscle contracts", "goal": "Brain to nerve to motor unit to sarcomere; actin and myosin sliding; why lifting heavy recruits more motor units."},
+        {"id": "body-fibre-types", "title": "Fast and slow muscle fibres", "goal": "Type I vs type II fibres, size principle, why both grow with lifting, genetics in plain terms."},
+        {"id": "body-joints-levers", "title": "Joints, tendons and levers", "goal": "Bones, joints, tendons, ligaments; muscles pull on levers; why limb length and range of motion change how a lift feels."},
+        {"id": "body-energy-systems", "title": "Where your energy comes from", "goal": "ATP, phosphocreatine, glycolysis, aerobic system; which dominates a 5 s sprint, a set of 10, a 30 min jog."},
+        {"id": "body-hormones", "title": "Hormones and training, naturally", "goal": "What testosterone, cortisol, growth hormone and insulin do; short post-workout spikes matter little; sleep, food and stress matter more."},
+        {"id": "body-adaptation", "title": "How your body adapts to training", "goal": "Stress, recovery, adaptation; specificity (you get better at what you practise); why progress needs gradually more."}
+      ]
+    },
+    {
+      "id": "parts", "emoji": "💪", "title": "Training by body part", "file": "learn/parts.json",
+      "blurb": "Each muscle group: what it does, the moves that train it, what to think about, and common mistakes.",
+      "lessons": [
+        {"id": "part-chest", "title": "Chest", "goal": "Pec anatomy (upper/mid/lower fibres), what it does, pressing and fly patterns, cues, mistakes."},
+        {"id": "part-back", "title": "Back", "goal": "Lats vs upper back vs lower back; vertical and horizontal pulls; cues; mistakes."},
+        {"id": "part-shoulders", "title": "Shoulders", "goal": "Three delt heads and the rotator cuff; pressing, raises, rear-delt work; shoulder-friendly cues."},
+        {"id": "part-arms", "title": "Arms: biceps, triceps and forearms", "goal": "Heads of biceps and triceps, elbow flexion/extension, stretch-position exercises, grip."},
+        {"id": "part-quads", "title": "Quads", "goal": "Four quad muscles, knee extension, squat/leg press/lunge/leg extension, knees over toes is fine, depth."},
+        {"id": "part-glutes-hamstrings", "title": "Glutes and hamstrings", "goal": "Hip extension, hinge vs squat, RDLs, hip thrusts, leg curls; the posterior chain."},
+        {"id": "part-calves", "title": "Calves", "goal": "Gastrocnemius vs soleus, straight vs bent knee, full stretch and pause at the bottom."},
+        {"id": "part-core", "title": "Core and abs", "goal": "Abs, obliques, deep core, lower back; bracing vs crunching; you can't spot-reduce belly fat."}
+      ]
+    },
+    {
+      "id": "technique", "emoji": "🎯", "title": "Lifting technique", "file": "learn/technique.json",
+      "blurb": "What to think about during every rep: setup, bracing, range of motion, tempo and effort.",
+      "lessons": [
+        {"id": "tech-what-to-think", "title": "What to think about during every rep", "goal": "A before / during / after checklist for any exercise: setup, brace, path, range, tempo, effort, breathing."},
+        {"id": "tech-movement-patterns", "title": "The six movement patterns", "goal": "Squat, hinge, push, pull, lunge, carry: almost every exercise is one of these."},
+        {"id": "tech-breathing-bracing", "title": "Breathing and bracing", "goal": "360-degree brace, when to breathe, why it protects and strengthens; when to exhale on light work."},
+        {"id": "tech-range-of-motion", "title": "Range of motion and the stretch", "goal": "Full range beats half reps for most goals; training at long muscle lengths; control the bottom."},
+        {"id": "tech-tempo-control", "title": "Tempo and control", "goal": "Control the lowering, no need for super-slow reps, what tempo notation means, momentum vs cheating."},
+        {"id": "tech-warm-up", "title": "Warming up", "goal": "A few minutes general warm-up plus 2-4 ramp-up sets; long static stretching before lifting is not needed."},
+        {"id": "tech-choosing-weight", "title": "Choosing the right weight", "goal": "Pick a starting weight, use RIR to judge effort, when to add weight, form breakdown as the stop sign."},
+        {"id": "tech-mind-muscle", "title": "Focus: mind-muscle connection", "goal": "Internal focus can help muscle growth on isolation moves; external focus helps strength and skill."}
+      ]
+    },
+    {
+      "id": "programming", "emoji": "📈", "title": "Planning your training", "file": "learn/programming.json",
+      "blurb": "Progressive overload, how many sets, how often, how hard — and what to do when you stall.",
+      "lessons": [
+        {"id": "prog-progressive-overload", "title": "Progressive overload", "goal": "Doing a bit more over time; double progression (reps then weight); other ways to progress."},
+        {"id": "prog-volume", "title": "How many sets? Training volume", "goal": "Weekly hard sets per muscle; dose-response with diminishing returns; a beginner starting range."},
+        {"id": "prog-frequency-splits", "title": "How often: frequency and splits", "goal": "Training each muscle about twice a week; full body vs upper/lower vs push-pull-legs; pick what you'll stick to."},
+        {"id": "prog-effort-failure", "title": "How hard: effort and failure", "goal": "Sets need to be close to failure to count; you don't need to hit failure every set; safer exercises for going to failure."},
+        {"id": "prog-deloads-plateaus", "title": "Plateaus and deloads", "goal": "Why progress stalls, a troubleshooting checklist (sleep, food, effort, program), what a deload is."},
+        {"id": "prog-cardio-and-lifting", "title": "Cardio and lifting together", "goal": "Cardio's health benefits, the small interference effect, how to schedule both, steps and daily movement."},
+        {"id": "prog-tracking", "title": "Tracking your progress", "goal": "Why logging matters, what to track (weights, reps, body weight trend, photos), using LiftLog to do it."}
+      ]
+    },
+    {
+      "id": "recovery", "emoji": "😴", "title": "Recovery", "file": "learn/recovery.json",
+      "blurb": "You grow between workouts: sleep, rest days, soreness, stretching, massage and managing stress.",
+      "lessons": [
+        {"id": "rec-what-recovery-is", "title": "What recovery actually is", "goal": "Muscle repair and protein synthesis over the next day or two; fatigue vs fitness; recovery is where adaptation happens."},
+        {"id": "rec-sleep", "title": "Sleep: the best recovery tool", "goal": "Sleep need for adults, effects of short sleep on strength, hunger and recovery; practical sleep hygiene."},
+        {"id": "rec-rest-days", "title": "Rest days and active recovery", "goal": "How much rest between sessions for the same muscle, active recovery like walking, you don't need to rest completely."},
+        {"id": "rec-soreness", "title": "Muscle soreness (DOMS)", "goal": "What DOMS is, why it's worst for beginners and new exercises, soreness is not a measure of a good workout."},
+        {"id": "rec-stretching", "title": "Stretching and flexibility", "goal": "Static vs dynamic stretching, when each is useful, lifting through full range also builds flexibility."},
+        {"id": "rec-foam-rolling-massage", "title": "Foam rolling and massage", "goal": "Short-term feel-good and range-of-motion effects, small effect on soreness, it does not 'break up' fascia or flush toxins."},
+        {"id": "rec-stress-overreaching", "title": "Stress, fatigue and overreaching", "goal": "Life stress adds to training stress; warning signs of doing too much; true overtraining is rare in beginners."},
+        {"id": "rec-pain-injury", "title": "Pain vs soreness vs injury", "goal": "Telling normal effort and soreness apart from injury warning signs; modify instead of stopping everything; when to see a professional."}
+      ]
+    },
+    {
+      "id": "nutrition", "emoji": "🥗", "title": "Nutrition", "file": "learn/nutrition.json",
+      "blurb": "Calories, protein, carbs and fats, food groups, vitamins — and how to eat to gain muscle or lose fat.",
+      "lessons": [
+        {"id": "nut-energy-balance", "title": "Calories and energy balance", "goal": "Calories in vs out decides weight change; what burns calories (BMR, NEAT, exercise, digestion); why scale weight fluctuates."},
+        {"id": "nut-macros", "title": "Macros: protein, carbs and fat", "goal": "The three macronutrients, kcal per gram (4/4/9, alcohol 7), what each does for a lifter."},
+        {"id": "nut-protein", "title": "Protein: how much, and from where", "goal": "A science-based daily protein range for lifters, spreading it over meals, best food sources compared."},
+        {"id": "nut-carbs-fats", "title": "Carbs, fibre and fats", "goal": "Carbs as training fuel, fibre, whole vs refined, healthy fats and essential fats; neither carbs nor fat is the enemy."},
+        {"id": "nut-plate", "title": "Food groups: building a plate", "goal": "Vegetables and fruit, whole grains, protein foods, dairy, fats; the plate method including an Indian thali version."},
+        {"id": "nut-micros-water", "title": "Vitamins, minerals and water", "goal": "What micronutrients do, common gaps (vitamin D, B12 for vegetarians, iron, calcium), staying hydrated."},
+        {"id": "nut-vegetarian", "title": "Building muscle as a vegetarian", "goal": "Protein quality, combining sources, Indian vegetarian protein foods compared, reaching the target without meat."},
+        {"id": "nut-goals", "title": "Bulk, cut or recomp?", "goal": "Choosing a goal, a sensible surplus or deficit, how fast to gain or lose, using the estimator, adjusting by trend."},
+        {"id": "nut-timing", "title": "Meal timing and the 'anabolic window'", "goal": "Total daily intake matters most; pre- and post-workout meals; the narrow anabolic window is a myth."},
+        {"id": "nut-labels-habits", "title": "Reading labels and building habits", "goal": "Read a nutrition label, serving sizes, a few simple habits that beat strict diets."}
+      ]
+    },
+    {
+      "id": "supplements", "emoji": "💊", "title": "Supplements", "file": "learn/supplements.json",
+      "blurb": "What actually works, what's a waste of money, and how to buy safely. Food first, always.",
+      "lessons": [
+        {"id": "supp-do-you-need", "title": "Do you need supplements?", "goal": "Food first; supplements are small add-ons; the evidence tier list; quality and third-party testing; natural-only scope."},
+        {"id": "supp-creatine", "title": "Creatine", "goal": "What it is, what it does, monohydrate 3-5 g a day, loading optional, safety and myths (hair, kidneys, water)."},
+        {"id": "supp-protein-powder", "title": "Protein powder", "goal": "It's just food in powder form; whey vs plant; when it helps; it counts toward daily protein."},
+        {"id": "supp-caffeine", "title": "Caffeine", "goal": "Performance effect, typical dose ranges by body weight, timing vs sleep, tolerance and safety limits."},
+        {"id": "supp-vitamins-omega", "title": "Vitamin D, omega-3 and other basics", "goal": "When vitamin D, omega-3, B12, iron or a multivitamin make sense; test before you supplement; avoid megadoses."},
+        {"id": "supp-skip-list", "title": "What to skip", "goal": "BCAAs when protein is adequate, 'testosterone boosters', fat burners, detox teas: why they're not worth it and the risk of contamination."}
+      ]
+    }
+  ]
+}

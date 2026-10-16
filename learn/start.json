@@ -1,0 +1,822 @@
+{
+  "section": "start",
+  "lessons": [
+    {
+      "id": "start-how-muscle-grows",
+      "title": "How muscles actually grow",
+      "summary": "Lifting sends a signal. Food, sleep and time let your body rebuild, then gradual progress keeps the signal useful.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "After this lesson, you can explain why training starts the growth process and recovery supports it. Training sends the order; recovery brings the crew. Repeating that cycle with gradually harder work changes the building."
+        },
+        {
+          "t": "h",
+          "text": "The signal: challenge the muscle"
+        },
+        {
+          "t": "p",
+          "text": "A working muscle produces [[mechanical tension|tension]] when it pulls hard against resistance. That is a major growth signal. The weight can be lighter or heavier. What matters is that the set becomes genuinely challenging while your technique stays controlled. Research finds muscle growth across a broad range of loads when sets are taken close to your limit. Heavier loads remain especially useful for practising heavy strength."
+        },
+        {
+          "t": "video",
+          "id": "lu_BObG6dj8",
+          "title": "How To Build Muscle (Explained In 5 Levels)",
+          "channel": "Jeff Nippard",
+          "why": "Watch: Jeff Nippard explains muscle growth from beginner basics to deeper detail."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Signal",
+              "text": "You perform a challenging set. The muscle experiences tension and receives a reason to adapt."
+            },
+            {
+              "title": "Recover",
+              "text": "After training, food and rest support repair. Your body raises [[muscle protein synthesis|muscle-building activity]] as part of that work."
+            },
+            {
+              "title": "Adapt",
+              "text": "Across repeated sessions, the muscle can add working tissue and become better prepared for similar demands."
+            },
+            {
+              "title": "Repeat with progress",
+              "text": "As the old challenge becomes easier, add a sensible new challenge. That keeps the signal from becoming background noise."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Recovery is part of training"
+        },
+        {
+          "t": "p",
+          "text": "The workout starts the conversation; it does not finish the job. Your body needs enough food, sleep and time between hard sessions. More soreness is not more growth. Smashing the same tired muscle again can simply reduce the quality of your next workout. For the fuller recovery picture, visit [[lesson:rec-what-recovery-is|what recovery actually is]]."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Useful progress",
+            "items": [
+              "Add a clean rep when the same weight feels manageable.",
+              "Add a small amount of weight after reaching the top of your rep target.",
+              "Improve control or range while keeping the exercise challenging."
+            ]
+          },
+          "right": {
+            "title": "Random difficulty",
+            "items": [
+              "Change every exercise before you can learn it.",
+              "Add weight while your technique falls apart.",
+              "Chase soreness instead of recording performance."
+            ]
+          }
+        },
+        {
+          "t": "p",
+          "text": "This gradual increase is [[progressive overload]]. It is not a demand to beat a record every Monday. Progress may mean one more clean rep, slightly more weight, or better control. Some weeks you simply repeat good work. The detailed biology belongs in [[lesson:body-how-muscle-contracts|how a muscle contracts]], while practical progression belongs in [[lesson:prog-progressive-overload|progressive overload]]."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "What to do on Monday",
+          "text": "Choose a repeatable workout. Log the weight and clean reps. Recover, then try to improve one small thing next time. Tiny upgrades are less exciting than wizard spells, but they work better."
+        }
+      ],
+      "takeaways": [
+        "Challenging, controlled sets create tension that signals your muscles to adapt.",
+        "Recovery supplies the time and resources needed for repair and growth.",
+        "Progressive overload means gradually increasing a useful challenge, not forcing a record every session."
+      ],
+      "quiz": [
+        {
+          "q": "Your usual weight now feels easier and every rep stays controlled. What is a sensible next step?",
+          "options": [
+            "Add one clean rep within the planned range",
+            "Replace the exercise with a random new move",
+            "Repeat the set until your technique breaks down"
+          ],
+          "answer": 0,
+          "why": "A small, measurable increase keeps the challenge moving while protecting the quality of the exercise."
+        },
+        {
+          "q": "Which description best matches muscle growth?",
+          "options": [
+            "The muscle grows only while the weight is moving during each set",
+            "Training signals change, then recovery supports adaptation",
+            "Soreness directly measures how much muscle was added"
+          ],
+          "answer": 1,
+          "why": "Training provides the signal. Adaptation unfolds during recovery across many repeated sessions."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Schoenfeld BJ (2010) J Strength Cond Res — mechanisms of muscle hypertrophy",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20847704/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Schoenfeld BJ et al. (2017) J Strength Cond Res — low- versus high-load training meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28834797/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "American College of Sports Medicine (2009) — progression models in resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19204579/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "start-reading-a-workout",
+      "title": "Sets, reps, rest and RIR: reading a workout",
+      "summary": "Learn to translate one compact workout line into exactly what you do, how hard you work and when you rest.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "After this lesson, you can decode **3 x 8–10 @ 2 RIR, 2 min rest** and know what to do next. It is a short set of instructions, not a maths exam."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Choose the exercise and weight",
+              "text": "Use a weight you expect to lift for the target range with clean technique. Your first attempt is allowed to be an estimate."
+            },
+            {
+              "title": "Do 8 to 10 reps",
+              "text": "A [[rep|repetition]] is one complete movement. Stop inside the range when you estimate that two clean reps remain."
+            },
+            {
+              "title": "Finish one set",
+              "text": "That group of reps is one [[set]]. Record what you actually did, not what your ego hoped happened."
+            },
+            {
+              "title": "Rest for 2 minutes",
+              "text": "The [[rest period]] gives you time to recover before the next set. Start the timer after the set ends."
+            },
+            {
+              "title": "Repeat until you have 3 sets",
+              "text": "Keep the same goal for each set. Reps may fall slightly as fatigue builds, which is normal."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "What does 2 RIR mean?"
+        },
+        {
+          "t": "p",
+          "text": "[[reps in reserve|RIR]] means the number of clean reps you think were left in the tank. **2 RIR** means you stopped while believing you could complete about two more. **0 RIR** means no further clean rep was available. This is an estimate, not a laboratory reading. Beginners often improve at judging it through practice."
+        },
+        {
+          "t": "video",
+          "id": "C8rcH2DJxp0",
+          "title": "How To Gauge Reps in Reserve",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: Renaissance Periodization demonstrates how to judge reps left in the tank."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "How many clean reps were left?",
+            "stops": [
+              {
+                "value": 0,
+                "title": "0 RIR",
+                "text": "No clean reps remained. You reached [[failure|your rep limit]].",
+                "tag": "At the limit"
+              },
+              {
+                "value": 1,
+                "title": "1 RIR",
+                "text": "You could probably complete one more clean rep.",
+                "tag": "Very hard"
+              },
+              {
+                "value": 2,
+                "title": "2 RIR",
+                "text": "You could probably complete two more clean reps.",
+                "tag": "Hard"
+              },
+              {
+                "value": 3,
+                "title": "3 RIR",
+                "text": "You could probably complete three more clean reps.",
+                "tag": "Challenging"
+              },
+              {
+                "value": 4,
+                "title": "4 RIR",
+                "text": "You had several clean reps available and the set felt comfortable.",
+                "tag": "Comfortable"
+              }
+            ],
+            "initial": 2
+          },
+          "caption": "Slide from 0 to 4 RIR and notice how effort changes."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "If the set was too easy",
+            "items": [
+              "You reached 10 reps with about 4 RIR.",
+              "Next set, consider a small weight increase.",
+              "Keep the movement controlled after changing weight."
+            ]
+          },
+          "right": {
+            "title": "If the set was too hard",
+            "items": [
+              "You missed 8 reps or lost clean technique.",
+              "Next set, reduce the weight a little.",
+              "Treat the adjustment as useful information, not failure."
+            ]
+          }
+        },
+        {
+          "t": "p",
+          "text": "Rest is not cheating. It helps the next set look like training rather than a dramatic furniture move. Use the written rest target, then notice your performance. If your reps collapse, you may need more recovery or a lighter load. For choosing and progressing weights, continue to [[lesson:tech-choosing-weight|choosing the right weight]]."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Read it aloud",
+          "text": "Say: “Three sets of eight to ten reps. Stop with about two clean reps left. Rest two minutes between sets.” You have now decoded the whole line."
+        }
+      ],
+      "takeaways": [
+        "A rep is one movement, while a set is a group of reps.",
+        "RIR estimates how many clean reps remained when you stopped the set.",
+        "Rest supports the quality of your next set and is part of the plan."
+      ],
+      "quiz": [
+        {
+          "q": "Your first set reaches 10 reps and feels like 4 RIR. What should you consider next?",
+          "options": [
+            "Cut the rest short and rush directly into another set",
+            "Use a slightly heavier weight with clean form",
+            "Keep lifting until every rep becomes uneven"
+          ],
+          "answer": 1,
+          "why": "You stopped farther from your limit than the planned 2 RIR. A small load increase may bring the next set closer to the target."
+        },
+        {
+          "q": "What does 2 RIR mean after a set?",
+          "options": [
+            "You completed exactly two reps in total",
+            "You must rest for exactly two minutes",
+            "You likely had two clean reps remaining"
+          ],
+          "answer": 2,
+          "why": "RIR describes estimated reps left in the tank, not reps completed or minutes of rest."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Helms EC et al. (2016) Strength Cond J — repetitions-in-reserve scale for resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27531969/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "American College of Sports Medicine (2009) — progression models in resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19204579/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "start-first-8-weeks",
+      "title": "Your first 8 weeks: what to expect",
+      "summary": "Early progress is part skill, part strength and eventually visible growth. Soreness usually settles, while steady attendance keeps paying.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "After this lesson, you can recognise normal early progress: smoother movement, quick strength gains and less soreness. The mirror may change more slowly, and that does not erase real improvement."
+        },
+        {
+          "t": "h",
+          "text": "First, your nervous system learns"
+        },
+        {
+          "t": "p",
+          "text": "Early strength gains lean heavily on [[neural adaptation]]. Your brain gets better at recruiting muscle and coordinating the setup, balance and path. Think of it as upgrading the driver before rebuilding the engine."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Why strength can rise before size",
+          "text": "An early study found neural factors explained more of the initial strength gain, while muscle growth contributed more later. That describes a group pattern, not a personal timetable."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "line",
+            "title": "A beginner's possible first eight weeks",
+            "xLabel": "Training week",
+            "yLabel": "Illustrative progress",
+            "x": ["1", "2", "4", "6", "8"],
+            "series": [
+              {
+                "name": "Movement skill",
+                "values": [10, 28, 48, 59, 65],
+                "style": "solid"
+              },
+              {
+                "name": "Visible muscle change",
+                "values": [4, 7, 15, 28, 42],
+                "style": "dashed"
+              }
+            ],
+            "note": "The shapes show a common idea, not a forecast. Real progress is uneven and individual.",
+            "hypothetical": true
+          },
+          "caption": "Illustration only: skill can improve before visible muscle change becomes obvious."
+        },
+        {
+          "t": "h",
+          "text": "Soreness and swelling can fool you"
+        },
+        {
+          "t": "p",
+          "text": "New exercises can cause [[delayed-onset muscle soreness|soreness]] after the session. Repeating a familiar challenge often reduces that response. Less soreness does not mean the workout stopped working. Early increases in measured muscle size can also include temporary [[edema|swelling]] from unfamiliar training. That is why one pumped arm, one sore morning or one tape measurement cannot tell the whole story."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Week two: “I added weight already. Is it all new muscle?”",
+              "back": "Probably not. Better coordination and confidence can raise performance quickly, while early size changes may include swelling."
+            },
+            {
+              "front": "Week four: “I am less sore. Did I stop improving?”",
+              "back": "No. Your body often becomes less sore after repeated exposure to a familiar exercise."
+            },
+            {
+              "front": "Week six: “This week was messy. Have I failed?”",
+              "back": "No. Sleep, stress and normal variation can move performance around. Judge the trend across sessions."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Newbie gains are a chapter, not a deadline"
+        },
+        {
+          "t": "p",
+          "text": "Beginners often improve quickly because nearly everything is new. Later, the easy wins become smaller and progress slows. That is normal [[adaptation]], not a broken program. Avoid comparing your week eight with someone else's year eight. Bodies, schedules and starting points differ."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Your real target",
+          "text": "Build the habit of showing up, logging the session and practising a few repeatable exercises. Consistency gives your body enough useful exposures to learn and adapt. Perfection mostly gives you reasons to skip Tuesday."
+        },
+        {
+          "t": "p",
+          "text": "Track weights, reps and technique notes. Photos or measurements can change slowly, so use them sparingly and under similar conditions. For soreness details, see [[lesson:rec-soreness|muscle soreness]]. For the bigger picture, see [[lesson:prog-tracking|tracking your progress]]."
+        }
+      ],
+      "takeaways": [
+        "Early strength gains come partly from learning to coordinate and recruit muscle better.",
+        "Soreness often falls as an exercise becomes familiar, and that does not mean progress stopped.",
+        "Fast beginner progress slows eventually, so judge trends and keep training consistently."
+      ],
+      "quiz": [
+        {
+          "q": "You are stronger after two weeks but look similar. What is the best explanation?",
+          "options": [
+            "Your nervous system and movement skill improved early",
+            "The program failed because appearance did not change",
+            "Every strength increase must be temporary swelling"
+          ],
+          "answer": 0,
+          "why": "Early performance can improve through coordination and neural changes before visible growth is clear."
+        },
+        {
+          "q": "A familiar workout causes less soreness than before. What should you conclude?",
+          "options": [
+            "The workout is useless unless soreness returns",
+            "Your body may have adapted to the repeated challenge",
+            "You should replace every exercise immediately"
+          ],
+          "answer": 1,
+          "why": "A repeated exercise often causes less soreness. Use performance and consistency, not soreness alone, to judge training."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Moritani T, deVries HA (1979) — neural factors versus hypertrophy during early strength gain",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/453338/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Damas F et al. (2016) Eur J Appl Physiol — early size increases and edema-related swelling",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26280652/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Hyldahl RD et al. (2017) Exerc Sport Sci Rev — mechanisms and mediators of the repeated-bout effect",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27782911/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "start-myths",
+      "title": "Gym myths beginners believe",
+      "summary": "Seven popular gym claims meet the evidence. Tap each card, keep the useful bit and bin the nonsense.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "After this lesson, you can spot six common gym myths before they shape your training. Tap each claim, predict the answer, then check the explanation. Most myths contain one small truth stretched far too wide."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Myth: Light weights “tone,” while heavy weights make you bulky.",
+              "back": "“Toned” usually means having some muscle with less fat covering it. Many loads can build muscle when sets are challenging. The look changes gradually, not by selecting a magic rep range."
+            },
+            {
+              "front": "Myth: Hundreds of crunches burn belly fat.",
+              "back": "Crunches can train abdominal endurance. They do not let you choose where body fat leaves. Studies of local abdominal and leg training did not find preferential fat loss from the trained area."
+            },
+            {
+              "front": "Myth: Muscle turns into fat when you stop training.",
+              "back": "Muscle and fat are different tissues. With less training, muscle can shrink. If activity falls while food intake stays high, fat can rise at the same time. One did not transform into the other."
+            },
+            {
+              "front": "Myth: Lifting automatically makes every woman bulky.",
+              "back": "Muscle gain is gradual and varies by person. Research finds women respond well to resistance training. A specific muscular look requires sustained training, not accidental contact with a dumbbell."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Pain, sweat and growth"
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Myth: No pain, no gain.",
+              "back": "Hard effort can burn and unfamiliar training can cause later soreness. Sharp or worsening pain is not a growth target. Muscle damage is not required to build muscle."
+            },
+            {
+              "front": "Myth: More sweat means more fat loss.",
+              "back": "Sweat mainly cools you. A lower scale reading after a sweaty session mostly reflects lost fluid, which returns when you drink. Fat change depends on longer-term energy balance."
+            },
+            {
+              "front": "Myth: Lifting stunts a teenager's growth.",
+              "back": "Properly designed and supervised resistance training is supported for young people. Good coaching, suitable loads and age-appropriate instruction matter more than the myth."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Why the myths feel convincing"
+        },
+        {
+          "t": "p",
+          "text": "You can feel your abs during crunches, so local fat loss sounds logical. You can lose water while sweating, so the scale may fall. You can feel sore after a new workout, so soreness feels like proof. Each observation is real. The conclusion attached to it is the problem."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Better evidence",
+            "items": [
+              "Your logged reps or weight improve over time.",
+              "Your technique becomes more stable and repeatable.",
+              "Measurements are compared across similar conditions.",
+              "Advice explains limits and uncertainty."
+            ]
+          },
+          "right": {
+            "title": "Weak evidence",
+            "items": [
+              "One workout made you very sore.",
+              "One sweaty session changed the scale.",
+              "A confident stranger said “always” or “never.”",
+              "A dramatic result appeared without context."
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "myth",
+          "title": "The myth detector",
+          "text": "Ask three questions: What exactly is being claimed? What else could explain the result? Does good evidence support the conclusion? Your eyebrows may rise. That is a feature."
+        },
+        {
+          "t": "p",
+          "text": "Training can change your body, but it does not let you pick where fat leaves first. It also does not require misery. Use a balanced program, progress it gradually and judge trends over time. For effort, visit [[lesson:prog-effort-failure|effort and failure]]. For pain, use [[lesson:rec-pain-injury|pain versus soreness versus injury]]."
+        }
+      ],
+      "takeaways": [
+        "You can train a muscle locally, but you cannot reliably choose where body fat leaves.",
+        "Sweat reflects cooling and fluid loss, not a direct measurement of fat loss.",
+        "Useful training is challenging, but pain and soreness are not scoreboards.",
+        "Young people can resistance train safely with suitable instruction and supervision."
+      ],
+      "quiz": [
+        {
+          "q": "Your weight is lower immediately after a very sweaty workout. What most likely changed first?",
+          "options": [
+            "You lost fluid through sweating",
+            "Only belly fat was burned away",
+            "Muscle tissue changed into energy"
+          ],
+          "answer": 0,
+          "why": "A fast post-workout scale change mainly reflects fluid loss. Drinking replaces much of it."
+        },
+        {
+          "q": "You do many crunches and your abdominal endurance improves. What does that prove?",
+          "options": [
+            "Crunches remove fat only from the waist",
+            "The trained muscles became better at repeated work",
+            "Soreness guarantees visible abdominal definition"
+          ],
+          "answer": 1,
+          "why": "Local exercise can improve the trained muscle's endurance. It does not prove local fat loss."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Vispute SS et al. (2011) J Strength Cond Res — abdominal exercise and abdominal fat",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21804427/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Ramírez-Campillo R et al. (2013) J Strength Cond Res — localized training and regional fat change",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23222084/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Roberts BM et al. (2020) J Strength Cond Res — sex differences in resistance-training adaptation",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32218059/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Damas F et al. (2018) Eur J Appl Physiol — muscle damage is not required for hypertrophy",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29282529/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Faigenbaum AD et al. (2009) NSCA position statement — youth resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19620931/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "National Academies Press via NCBI Bookshelf — sweating, water balance and exercise",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK231132/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "start-safety",
+      "title": "Training safely and gym basics",
+      "summary": "Learn the difference between effort and warning pain, set up equipment safely, share the gym well and know when to seek help.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "After this lesson, you can prepare a safer set, recognise warning symptoms and share the gym well. Control the load, check the equipment, pay attention to pain and leave the space ready for the next person."
+        },
+        {
+          "t": "h",
+          "text": "Effort is not the same as pain"
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Common training effort",
+            "items": [
+              "Muscles feel tired, shaky or warm during a hard set.",
+              "Breathing becomes heavier and settles after you stop.",
+              "Both sides feel broadly similar during the movement.",
+              "Normal [[delayed-onset muscle soreness|soreness]] may appear later."
+            ]
+          },
+          "right": {
+            "title": "Stop and reassess",
+            "items": [
+              "Pain feels sharp, sudden, electric or rapidly worsening.",
+              "A joint feels unstable, catches or changes your movement.",
+              "You feel faint, confused, unusually breathless or unwell.",
+              "Symptoms continue, return or interfere with normal activity."
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Pain is information, not a test of character",
+          "text": "Stop the set if something feels wrong. Do not force another rep to prove toughness. Reduce the load, change the movement or end the exercise. Persistent, severe or worrying symptoms deserve assessment by a qualified health professional."
+        },
+        {
+          "t": "h",
+          "text": "Set up before the set"
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Check the area",
+              "text": "Clear loose plates, bags and bottles from your path. Make sure the bench, seat and attachments are secure."
+            },
+            {
+              "title": "Set the escape route",
+              "text": "Ask gym staff to show you the safety setup for this lift. With an empty bar, check that the supports clear your normal movement and catch the bar before it can trap you. For bench presses, confirm protection of your chest and neck. If the setup cannot do this, use a different setup."
+            },
+            {
+              "title": "Ask for a spotter when needed",
+              "text": "A [[spotter]] can help on a difficult free-weight set. Agree on the plan before you lift, including when they should touch the weight."
+            },
+            {
+              "title": "Use a manageable load",
+              "text": "Choose a weight you can control through the planned movement. Save experiments for a properly prepared setup."
+            },
+            {
+              "title": "End the set deliberately",
+              "text": "Return the weight securely before relaxing. A rep is not finished while the equipment is still moving."
+            }
+          ]
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Beginner gym safety check",
+            "groups": [
+              {
+                "title": "Before the set",
+                "items": [
+                  "Clear the space around you",
+                  "Check the seat, rack and attachments",
+                  "Ask staff to show the safety setup, then test it empty",
+                  "Choose a controllable starting weight"
+                ]
+              },
+              {
+                "title": "During the set",
+                "items": [
+                  "Use a stable setup and controlled movement",
+                  "Stop for sharp or worsening pain",
+                  "Keep other people outside the weight's path"
+                ]
+              },
+              {
+                "title": "After the set",
+                "items": [
+                  "Secure the weight before stepping away",
+                  "Return plates and dumbbells",
+                  "Wipe equipment if you left sweat"
+                ]
+              }
+            ],
+            "persistKey": "start-safety-basics"
+          },
+          "caption": "Tap each item until the routine becomes automatic."
+        },
+        {
+          "t": "h",
+          "text": "Share the room"
+        },
+        {
+          "t": "list",
+          "items": [
+            "Rerack plates and dumbbells where they belong.",
+            "Do not stand close to someone who is actively lifting.",
+            "Ask before taking equipment that appears to be in use.",
+            "Keep phone calls and filming from blocking shared space.",
+            "If you ask to work in, match the setup or wait politely.",
+            "Offer advice only when asked, unless there is immediate danger."
+          ]
+        },
+        {
+          "t": "h",
+          "text": "When to get professional help"
+        },
+        {
+          "t": "p",
+          "text": "Seek urgent help for a serious injury or severe symptoms. Arrange professional assessment when pain is persistent, worsening, repeatedly returns or limits normal movement. A clinician can assess health concerns. A qualified coach can help with exercise setup and technique. This lesson is general education, not medical advice. It cannot diagnose an injury."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Your next stop",
+          "text": "Learn a simple setup, brace and movement path in [[lesson:tech-what-to-think|what to think about during every rep]]. For a fuller symptom guide, read [[lesson:rec-pain-injury|pain versus soreness versus injury]]."
+        }
+      ],
+      "takeaways": [
+        "Hard muscular effort can be normal, while sharp or worsening pain is a reason to stop.",
+        "Have staff show the safety setup, test it with an empty bar and plan how each loaded set ends.",
+        "Rerack equipment, respect other lifters' space and leave shared equipment usable.",
+        "Persistent, severe or worrying symptoms should be assessed by a qualified professional."
+      ],
+      "quiz": [
+        {
+          "q": "A rep causes sudden sharp pain in your shoulder. What should you do first?",
+          "options": [
+            "Stop the set and reassess the movement",
+            "Finish every planned rep before checking it",
+            "Add weight so the joint feels more stable"
+          ],
+          "answer": 0,
+          "why": "Sudden sharp pain is a warning to stop. You can then reduce, modify or end the exercise and seek help when needed."
+        },
+        {
+          "q": "Before a hard barbell set in a rack, what is the safest preparation?",
+          "options": [
+            "Leave the pins low so they never touch the bar",
+            "Set the pins and plan how to end the set",
+            "Ask for a spotter but never agree when they should help"
+          ],
+          "answer": 1,
+          "why": "A prepared rack and clear plan give you a controlled place to put the bar if the rep does not finish."
+        }
+      ],
+      "sources": [
+        {
+          "label": "American College of Sports Medicine (2009) — progression models in resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19204579/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Faigenbaum AD et al. (2009) NSCA position statement — supervised youth resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19620931/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIAMS — sports injuries: diagnosis, treatment and steps to take",
+          "url": "https://www.niams.nih.gov/health-topics/sports-injuries/diagnosis-treatment-and-steps-to-take",
+          "checked": "2026-10-10"
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "mechanical tension",
+      "def": "The pulling force a working muscle experiences when it contracts against resistance."
+    },
+    {
+      "term": "muscle protein synthesis",
+      "def": "The process your body uses to build new muscle proteins."
+    },
+    {
+      "term": "progressive overload",
+      "def": "Gradually increasing a training challenge as your body adapts."
+    },
+    {
+      "term": "rep",
+      "def": "One complete repetition of an exercise movement."
+    },
+    {
+      "term": "set",
+      "def": "A group of repetitions performed before you stop and rest."
+    },
+    {
+      "term": "rest period",
+      "def": "The planned recovery time between sets or exercises."
+    },
+    {
+      "term": "reps in reserve",
+      "def": "Your estimate of how many more clean repetitions you could have completed."
+    },
+    {
+      "term": "failure",
+      "def": "The point where you cannot complete another clean repetition."
+    },
+    {
+      "term": "neural adaptation",
+      "def": "Your nervous system becoming better at recruiting muscles and coordinating a movement."
+    },
+    {
+      "term": "delayed-onset muscle soreness",
+      "def": "Tenderness or stiffness that appears after unfamiliar or demanding exercise."
+    },
+    {
+      "term": "edema",
+      "def": "Temporary swelling caused by extra fluid in body tissue."
+    },
+    {
+      "term": "adaptation",
+      "def": "A lasting change that makes your body better prepared for a repeated demand."
+    },
+    {
+      "term": "safety pins",
+      "def": "Strong rack supports positioned to catch a bar if you cannot complete a lift."
+    },
+    {
+      "term": "spotter",
+      "def": "A person ready to assist if you cannot safely finish a lift."
+    }
+  ]
+}

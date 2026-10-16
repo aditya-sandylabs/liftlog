@@ -944,3 +944,108 @@ export function dropsToField(set, fmt) {
   }
   return out.join(';');
 }
+
+
+/* ================= set analysis (computer vision) =================
+ *
+ * The ONE place that decides which exercises offer "Analyse set". Keys are
+ * LiftLog exerciseIds; values are keys of EXERCISES in formcheck/reps.js. To add
+ * an exercise: give it a config in reps.js EXERCISES (with tests in
+ * formcheck/test_reps.mjs), then add its LiftLog id here.
+ */
+export const CV_EXERCISES = {
+  'triceps-pushdown-cable-straight-bar': 'pushdown',
+  'chest-press-machine': 'chest_press',
+  'bicep-curl-barbell': 'curl',
+  'seated-row-machine': 'row',
+  'lateral-raise-cable': 'lateral_raise'
+};
+
+/* Ship switch. true here (local dev + tests); deploy.sh rewrites it to false in
+ * the published copy and leaves formcheck/ out, unless LIFTLOG_SHIP_CV=1.
+ * Every camera entry point goes through cvKeyFor, so false hides them all. */
+export const CV_ENABLED = false;
+
+/** reps.js exercise key for a LiftLog exercise id, or null when unsupported. */
+export function cvKeyFor(exerciseId) {
+  if (!CV_ENABLED) return null;
+  return Object.prototype.hasOwnProperty.call(CV_EXERCISES, exerciseId) ? CV_EXERCISES[exerciseId] : null;
+}
+
+const CV_NUM_FIELDS = ['reps', 'avgRange', 'romDropPct', 'eccFirst', 'eccLast', 'concFirst', 'concLast', 'gatedPct', 'at'];
+
+/**
+ * The compact per-set analysis summary, cleaned for storage:
+ *   { v:1, reps, avgRange, romDropPct, eccFirst, eccLast, concFirst, concLast,
+ *     faults:{id:count}, gatedPct, at }
+ * Numbers only (null where unknown), fault ids limited to [a-z_], counts to
+ * non-negative integers. Returns null for anything that is not a v1 summary, so
+ * a malformed value can never ride into history.
+ */
+export function sanitizeCv(cv) {
+  if (!cv || typeof cv !== 'object' || cv.v !== 1) return null;
+  const out = { v: 1 };
+  for (const k of CV_NUM_FIELDS) {
+    const n = cv[k];
+    out[k] = (typeof n === 'number' && isFinite(n)) ? n : null;
+  }
+  if (out.reps == null) return null;
+  out.faults = {};
+  if (cv.faults && typeof cv.faults === 'object') {
+    for (const [id, c] of Object.entries(cv.faults)) {
+      if (/^[a-z_]{1,40}$/.test(id) && typeof c === 'number' && isFinite(c) && c >= 0) out.faults[id] = Math.round(c);
+    }
+  }
+  return {
+    v: 1, reps: out.reps, avgRange: out.avgRange, romDropPct: out.romDropPct,
+    eccFirst: out.eccFirst, eccLast: out.eccLast, concFirst: out.concFirst, concLast: out.concLast,
+    faults: out.faults, gatedPct: out.gatedPct, at: out.at
+  };
+}
+
+/** One short plain line for history lists, e.g. "Camera: 8 reps · range −22% · lowering 1.4→0.6 s". */
+export function fmtCvLine(cv) {
+  const c = sanitizeCv(cv);
+  if (!c) return '';
+  const parts = [c.reps + ' rep' + (c.reps === 1 ? '' : 's') + ' counted'];
+  if (c.romDropPct != null) parts.push(c.romDropPct > 0 ? 'range \u2212' + c.romDropPct + '%' : 'range held');
+  if (c.eccFirst != null && c.eccLast != null) parts.push('lowering ' + c.eccFirst.toFixed(1) + '\u2192' + c.eccLast.toFixed(1) + ' s');
+  const nf = Object.values(c.faults).reduce((t, n) => t + n, 0);
+  if (nf) parts.push(nf + ' form flag' + (nf === 1 ? '' : 's'));
+  return 'Camera: ' + parts.join(' \u00b7 ');
+}
+
+/**
+ * The history row saveWorkout writes for one completed set. Optional fields
+ * (superset, drops, cardio, cv) are added ONLY when present, so an ordinary set
+ * stays byte-identical to what every earlier version wrote and old records,
+ * exports and merges are untouched.
+ */
+export function buildSetRow(ex, s) {
+  const row = {
+    exerciseId: ex.exerciseId, exerciseName: ex.name, setNumber: s.n,
+    weightKg: s.weightKg == null ? 0 : s.weightKg, reps: s.reps == null ? 0 : s.reps,
+    isWarmup: !!s.isWarmup, note: s.note || '', pr: !!s.pr
+  };
+  if (ex.superset) row.superset = ex.superset;
+  /* Only completed drops are saved: an abandoned half-entered drop must not
+     become a phantom 0-rep segment in history. */
+  const drops = dropsOf(s).filter(d => d && d.done);
+  if (drops.length) {
+    row.drops = drops.map(d => ({
+      weightKg: d.weightKg == null ? 0 : d.weightKg,
+      reps: d.reps == null ? 0 : d.reps
+    }));
+  }
+  if (s.cardio) {
+    row.cardio = true;
+    row.durationSec = s.durationSec == null ? 0 : s.durationSec;
+    if (s.speedKmh != null) row.speedKmh = s.speedKmh;
+    if (s.inclinePct != null) row.inclinePct = s.inclinePct;
+    if (s.kcal != null) row.kcal = s.kcal;
+    row.kcalEstimated = !s.kcalManual;
+  }
+  const cv = sanitizeCv(s.cv);
+  if (cv) row.cv = cv;
+  return row;
+}

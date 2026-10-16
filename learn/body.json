@@ -1,0 +1,266 @@
+{
+  "section": "body",
+  "lessons": [
+    {
+      "id": "body-atlas",
+      "title": "Meet your muscles",
+      "summary": "Explore your muscles by location and job. The map is a useful guide, not a list of separate parts to train alone.",
+      "blocks": [
+        {"t":"p","text":"After this lesson, you can find the major muscle regions and connect each one to a simple job. Choose a tour, tap a region and open an exercise only after you can explain what that region helps do."},
+        {"t":"p","text":"Your [[skeletal muscle|skeletal muscles]] move bones and hold you steady as a team. A [[ex:flat-dumbbell-press|dumbbell press]], for example, uses chest, front shoulders and triceps. The atlas simplifies anatomy; it does not show every deep muscle or promise that one exercise isolates a highlighted patch."},
+        {"t":"h","text":"Take one guided tour"},
+        {"t":"widget","w":"body-atlas","params":{"view":"front","tours":[{"name":"Front: push & reach","focus":["chest-upper","chest-mid","chest-lower","delt-front","delt-side","biceps","triceps","forearms","serratus"]},{"name":"Back: pull","focus":["delt-rear","traps-upper","upper-back","lats","lower-back"]},{"name":"Legs & hips","focus":["glutes","glute-med","quads","adductors","hamstrings","calves","soleus"]},{"name":"Core","focus":["abs","obliques","lower-back"]}],"prompt":"Choose a tour, then tap each highlighted region to see its job and exercise examples."},"caption":"Front tours show pushing and reaching muscles; back, legs and core tours show pulling, lower-body movement and trunk control."},
+        {"t":"p","text":"On the front, chest helps bring the upper arm across you, shoulders move the arm, biceps bend the elbow and triceps straighten it. Forearms manage the wrist and grip. Upper, middle and lower chest are map regions within one broad chest muscle, not separate on switches."},
+        {"t":"p","text":"On the back, lats and upper-back muscles help pull and guide the shoulder blades. Quads straighten the knee; hamstrings bend it; hips help you stand, step and hinge. Your [[core]] can move the trunk or keep it steady while your limbs work."},
+        {"t":"flip","cards":[{"front":"Does each map patch need its own exercise?","back":"No. Many movements train several regions together. Some exercise chips show supporting roles, not a muscle working alone."},{"front":"Do abs only work when you crunch?","back":"No. Your [[core]] also helps keep your trunk steady while your limbs move."}]},
+        {"t":"callout","kind":"try","title":"Use the map on your next workout","text":"Pick one exercise from a region you recognise. Ask what joint moves and what stays steady. Then visit [[lesson:part-back|training your back]] or [[lesson:part-quads|training your quads]] for coaching. Use the atlas to understand a workout, not to collect an exercise for every patch."}
+      ],
+      "takeaways":["Muscles work together to move your body and keep it steady.","Atlas regions simplify anatomy; a highlighted region is not a separate muscle or an isolation guarantee.","Use a muscle's job to understand why an exercise trains it."],
+      "quiz":[
+        {"q":"A press highlights chest, shoulders and triceps. What does that tell you?","options":["The map cannot identify the real working muscle.","Several muscles contribute to the same movement.","Every highlighted patch needs a separate exercise."],"answer":1,"why":"A movement can have main movers and helpers. Highlighting several regions is expected."},
+        {"q":"You want to understand why quads train during a leg exercise. What should you look for?","options":["Whether the exercise bends your elbow repeatedly.","Whether the map divides your calf into regions.","Whether your knee straightens against resistance."],"answer":2,"why":"The quads extend, or straighten, the knee. Following the joint action is more useful than memorising names."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology 2e — upper limb and shoulder muscles","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — pelvic girdle and lower limb muscles","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — abdominal wall and thorax","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/11-4-axial-muscles-of-the-abdominal-wall-and-thorax","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — axial muscles, including the back","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/11-3-axial-muscles-of-the-head-neck-and-back","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id":"body-how-muscle-contracts",
+      "title":"How a muscle contracts",
+      "summary":"Your nervous system sends the instruction. Tiny protein filaments produce force, while larger efforts bring more muscle fibres into the job.",
+      "blocks":[
+        {"t":"p","text":"After this lesson, you can trace a lifting command from your brain to the sliding proteins inside a muscle. Your [[nervous system]] calls the crew; muscle fibres turn chemical energy into force."},
+        {"t":"video","id":"Ktv-CaOt6UQ","title":"Muscles, Part 1 - Muscle Cells: Crash Course Anatomy & Physiology #21","channel":"CrashCourse","why":"Watch: CrashCourse animates muscle cells and the machinery behind contraction."},
+        {"t":"steps","items":[
+          {"title":"Your brain starts the message","text":"For a deliberate movement, signals travel from your brain through pathways in your spinal cord. They reach a [[motor neuron]], a nerve cell that sends instructions to muscle fibres."},
+          {"title":"The nerve calls its crew","text":"A [[motor unit]] is that nerve cell and the muscle fibres it controls. At each nerve-to-muscle connection, a chemical messenger starts an electrical signal in the fibre."},
+          {"title":"Calcium opens the gate","text":"The signal causes stored calcium to be released inside the muscle cell. Calcium helps expose attachment sites on [[actin]], one of the proteins in the pulling machinery."},
+          {"title":"Tiny pulling units produce force","text":"Each [[sarcomere]] contains actin and [[myosin]]. Myosin heads attach to actin, pull, release and reset. These temporary attachments are called [[cross-bridges]]. [[ATP]] supplies energy for the cycle."}
+        ]},
+        {"t":"widget","w":"sarcomere","params":{},"caption":"Move from relaxed to contracted. Watch the boundaries move closer as the filaments slide past each other."},
+        {"t":"p","text":"The filaments do not shrink like wet clothes. They slide, increasing their overlap and shortening the sarcomere. Its boundary is called a [[Z-line]]. When signalling stops, calcium is pumped back into storage and the attachment sites become covered again. Relaxation also uses energy. The diagram shows a simplified shortening contraction, not every kind of muscle action."},
+        {"t":"p","text":"Your nervous system adjusts force by recruiting more motor units and changing how quickly they send signals. [[Recruitment]] means bringing units into the job. A heavy load usually requires more units than an easy load from the start. You do not consciously select each fibre. Your nervous system handles that busy spreadsheet for you."},
+        {"t":"flip","cards":[{"front":"Does contraction always mean your muscle gets shorter?","back":"No. Muscle can produce force while shortening, holding a position or lengthening under a load. Controlled lowering is still muscle work."}]},
+        {"t":"callout","kind":"tip","title":"What to do with this knowledge","text":"Practise smooth, controlled repetitions rather than trying to switch on every fibre by squeezing harder. Learn how effort changes recruitment in [[lesson:body-fibre-types|fast and slow muscle fibres]]. For selecting a load, use [[lesson:tech-choosing-weight|choosing the right weight]]."}
+      ],
+      "takeaways":["A motor unit is a nerve cell and the muscle fibres it controls.","Actin and myosin slide past each other; the filaments do not shrink.","Your nervous system increases force through recruitment and faster signalling.","Muscles can produce force while shortening, holding still or lengthening."],
+      "quiz":[
+        {"q":"You lower a dumbbell slowly. Is your muscle still working?","options":["Yes; it produces force while lengthening.","No; contraction only happens during lifting.","No; the nerve stops signalling during lowering."],"answer":0,"why":"Controlled lowering is an active muscle action. Producing force does not always mean shortening."},
+        {"q":"The sarcomere becomes shorter in the diagram. What changed?","options":["The protein filaments shrank into smaller proteins.","The same filaments slid into greater overlap.","The nerve cell moved inside the muscle fibre."],"answer":1,"why":"Myosin pulls actin inward. The filaments keep their lengths while their overlap changes."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology 2e — muscle contraction and relaxation","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/10-3-muscle-fiber-contraction-and-relaxation","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — motor units and control of muscle tension","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/10-4-nervous-system-control-of-muscle-tension","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id":"body-fibre-types",
+      "title":"Fast and slow muscle fibres",
+      "summary":"Your muscles contain a mix of fibre types. Effort recruits the team, and both slow and fast fibres can grow through lifting.",
+      "blocks":[
+        {"t":"p","text":"After this lesson, you can explain slow- and fast-fibre tendencies without turning them into a personality test for your legs. Most muscles contain a mix: steady workers and powerful workers that tire sooner."},
+        {"t":"p","text":"[[Type I]] fibres are relatively slow and resist fatigue well. They suit sustained activity and posture. [[Type II]] fibres contract faster and suit more forceful efforts. The fast group includes fibres with different fatigue resistance. Slow does not mean useless, and fast does not mean better. Different jobs benefit from different members of the team."},
+        {"t":"video","id":"Y2HMgLEijS8","title":"How Your Muscle Fibers Change With Exercise","channel":"Institute of Human Anatomy","why":"Watch: Institute of Human Anatomy explains muscle-fibre types and training changes."},
+        {"t":"compare","left":{"title":"Type I: steady work","items":["Generally slower contractions and good fatigue resistance.","Well equipped to make energy using oxygen.","Contributes during repeated and sustained activity."]},"right":{"title":"Type II: faster work","items":["Generally faster contractions and more powerful efforts.","Includes more fatigue-resistant and less fatigue-resistant types.","Contributes as the demand for force rises."]}},
+        {"t":"p","text":"The [[size principle]] describes the usual [[recruitment]] order: smaller, easier-to-activate [[motor unit|motor units]] join before larger, harder-to-activate units. These groups tend to contain slower and faster fibres respectively. A demanding load recruits more of the team early. With a lighter load, fatigue can increase recruitment as the set continues. Recruitment is not the same as a guaranteed growth result."},
+        {"t":"flip","cards":[
+          {"front":"Do light weights only use slow fibres?","back":"Not necessarily. A demanding lighter set can recruit larger motor units as fatigue builds. That does not make every easy set equally useful."},
+          {"front":"Can both fibre types grow?","back":"Yes. Both types can grow with resistance training. Research is mixed on whether particular loading styles reliably favour one type."}
+        ]},
+        {"t":"p","text":"Inherited differences help shape your starting fibre mix. Training and your environment also matter. You cannot reliably read your fibre mix from your appearance or a single tiring workout. You do not need a fibre test to start lifting. Use a sensible program, practise it and watch your own progress instead of borrowing someone else's biological label."},
+        {"t":"callout","kind":"tip","title":"Train the person, not the label","text":"Keep your focus on controlled repetitions and appropriate effort. There is no need to invent a special slow-fibre day. Use [[lesson:prog-effort-failure|effort and failure]] for the practical guidance. The recruitment order explains why effort matters; it does not mean every set must end with a failed repetition."}
+      ],
+      "takeaways":["Most muscles contain a mixture of slow and fast fibres.","Recruitment generally moves from smaller motor units towards larger ones as demand rises.","Both slow and fast fibres can grow through resistance training.","Your starting biology varies, but you do not need a fibre test to begin."],
+      "quiz":[
+        {"q":"A light set becomes demanding as fatigue builds. What can happen?","options":["Only the original slow fibres remain available.","Every fast fibre permanently becomes a slow fibre.","Additional larger motor units can join the effort."],"answer":2,"why":"Fatigue can increase the recruitment demand. A light weight does not automatically exclude larger motor units."},
+        {"q":"Your friend says slow fibres cannot grow. What is the best response?","options":["Both fibre types can grow with resistance training.","Slow fibres only grow after a specialised fibre test.","Only fast fibres respond to controlled repetitions."],"answer":0,"why":"Resistance training can increase the size of both fibre types. Exact advantages of different loading styles remain uncertain."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology 2e — types of muscle fibres","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/10-5-types-of-muscle-fibers","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — recruitment and motor units","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/10-4-nervous-system-control-of-muscle-tension","checked":"2026-10-10"},
+        {"label":"Grgic (2020) — low-load versus high-load training and fibre growth meta-analysis","url":"https://pubmed.ncbi.nlm.nih.gov/33312275/","checked":"2026-10-10"},
+        {"label":"Simoneau and Bouchard (1995) — inherited and environmental influences on fibre proportions","url":"https://pubmed.ncbi.nlm.nih.gov/7649409/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id":"body-joints-levers",
+      "title":"Joints, tendons and levers",
+      "summary":"Bones provide levers, joints provide pivots and tendons transfer muscle force. Your proportions and exercise position change how a load feels.",
+      "blocks":[
+        {"t":"p","text":"After this lesson, you can explain why the same bag feels harder when held farther away. Its mass is unchanged, but its position increases the turning demand on your joints. Your body uses [[lever|levers]], like a door around its hinge."},
+        {"t":"video","id":"DLxYDoN634c","title":"Joints: Crash Course Anatomy & Physiology #20","channel":"CrashCourse","why":"Watch: CrashCourse explains joint structure and how different joints move."},
+        {"t":"steps","items":[
+          {"title":"Bones provide the structure","text":"Your bones support you and act as levers during movement. A [[joint]] is where bones meet. Different joints allow different kinds and amounts of movement."},
+          {"title":"Muscles provide the pull","text":"A [[tendon]] typically connects muscle to bone and transfers pulling force. Muscles do not push bones apart. Other muscles and external forces help create movement in the opposite direction."},
+          {"title":"Ligaments help support joints","text":"A [[ligament]] usually connects bone to bone. It helps support a joint and limit certain movements. A tendon and a ligament are not interchangeable names for the same structure."}
+        ]},
+        {"t":"p","text":"[[Torque]] means the turning effect of a force around a pivot. For the same load, a larger perpendicular distance from its line of force to a joint creates more torque. That is why arm position can change how hard holding a weight feels. You do not need to calculate it before lifting; recognising the pattern is useful."},
+        {"t":"widget","w":"slider-explainer","params":{"label":"Explore arm position with the same imagined bag","initial":0,"stops":[{"value":0,"title":"Arm hanging near your side","text":"The bag's downward pull passes relatively close to your shoulder. Its turning effect at the shoulder is smaller."},{"value":1,"title":"Arm held forward","text":"The bag's downward pull passes farther from your shoulder. Your shoulder muscles face a greater turning demand."},{"value":2,"title":"Bag brought close again","text":"Bringing the bag back towards your side reduces that distance. This is a position example, not a strength test."}]},"caption":"Compare position, not weight. The same object can place different turning demands on your shoulder."},
+        {"t":"p","text":"Your limb lengths and muscle attachments affect these relationships. People with different proportions can experience the same lift differently. A [[range of motion]] is the distance a joint travels through an action. As the angle changes, leverage changes too. That can help explain a sticking point, without making your body the wrong shape for training."},
+        {"t":"callout","kind":"try","title":"Use your own setup","text":"On Monday, adjust the machine seat so its instructions and joint position fit you. Use [[lesson:tech-range-of-motion|range of motion]] for practical guidance. Compare your controlled repetitions with your own previous sessions, not with a taller or shorter friend's numbers."},
+        {"t":"callout","kind":"safety","title":"Different does not mean painful","text":"A lift feeling different because of your proportions is not permission to force a painful position. Stop a movement that causes sharp pain and seek qualified guidance when needed. See [[lesson:rec-pain-injury|pain versus soreness]]; this lesson does not diagnose joint problems."}
+      ],
+      "takeaways":["Tendons transfer muscle force to bones; ligaments usually help connect and support bones at joints.","The same load can create different turning demands when its position changes.","Limb lengths and joint angles affect leverage, so useful setups can differ between people.","Use a controlled, appropriate range rather than forcing a painful position."],
+      "quiz":[
+        {"q":"The same bag feels too hard with your arm extended. What change reduces the shoulder's turning demand?","options":["Bring the bag closer to your body","Keep the arm out and change hands","Hold it out for longer"],"answer":0,"why":"Bringing the load closer shortens its lever arm. You changed the demand without changing the bag's mass."},
+        {"q":"Your friend's longer limbs make a lift look different. What is sensible?","options":["Copy their joint positions exactly regardless of comfort.","Assume their different proportions prevent safe training.","Find a controlled setup suited to your own proportions."],"answer":2,"why":"Proportions influence leverage. Useful technique shares principles without requiring identical-looking positions."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology 2e — muscle interactions and lever systems","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/11-1-interactions-of-skeletal-muscles-their-fascicle-arrangement-and-their-lever-systems","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — synovial joints, tendons and ligaments","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/9-4-synovial-joints","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id":"body-energy-systems",
+      "title":"Where your energy comes from",
+      "summary":"Every effort uses ATP. Several systems rebuild it together; the mix changes with how hard and how long you work.",
+      "blocks":[
+        {"t":"p","text":"After this lesson, you can explain how your energy systems overlap during a sprint, lifting set or jog. [[ATP]] is your muscles' immediately usable energy; the systems keep topping up that small wallet while you move."},
+        {"t":"video","id":"mePsQdTJRK0","title":"Energy Systems - How The Body Uses Fat, Carbs, & Protein For Fuel: 5 Min Phys","channel":"Andy Galpin","why":"Watch: Andy Galpin gives a short overview of the body's energy systems."},
+        {"t":"steps","items":[
+          {"title":"Fast access: phosphocreatine","text":"[[Phosphocreatine]] helps rebuild ATP very quickly. It is especially important at the start of a brief, intense effort. Its readily available reserve is limited."},
+          {"title":"Rapid carbohydrate breakdown","text":"[[Glycolysis]] breaks down glucose to help make ATP. The glucose can come from your blood or [[glycogen]] stored in muscle. This process does not directly require oxygen."},
+          {"title":"Sustained supply using oxygen","text":"The [[aerobic system]] uses oxygen to help make ATP from carbohydrate and fat. It supports sustained activity and contributes during shorter efforts too."}
+        ]},
+        {"t":"p","text":"These are teammates, not relay runners waiting for a handover. All contribute during exercise. Their relative contributions depend on intensity, duration and your starting state. You do not suddenly switch from one system to another at a magic second. A longer all-out effort also differs from a comfortable effort of the same duration."},
+        {"t":"widget","w":"slider-explainer","params":{"label":"Compare example efforts, not strict time zones","initial":1,"stops":[{"value":0,"title":"A sprint lasting about 5 seconds","text":"Stored ATP and phosphocreatine provide much of the immediate supply. Glycolysis and the aerobic system also contribute.","tag":"Brief and intense"},{"value":1,"title":"A demanding set of 10 repetitions","text":"Phosphocreatine helps early. Glycolysis becomes important as the effort continues. The balance depends on tempo, load and prior fatigue, not the repetition count alone.","tag":"Repeated intense effort"},{"value":2,"title":"A steady 30-minute jog","text":"The aerobic system supplies most energy during a sustained comfortable effort. Faster surges change the mix.","tag":"Longer and steady"}]},"caption":"The durations are examples, not biological cutoffs. No single system works alone."},
+        {"t":"p","text":"A lifting set and its rest break are different demands. During rest, your body restores fuel availability, including phosphocreatine. Rest is not wasted time: it helps prepare the next effort. For actual rest periods and workout notation, open [[lesson:start-reading-a-workout|reading a workout]]. Do not turn this biology lesson into a stopwatch rule."},
+        {"t":"flip","cards":[{"front":"Does using fat as fuel mean this workout guarantees fat loss?","back":"No. The fuel used during one activity does not decide your longer-term weight change. Visit [[lesson:nut-energy-balance|energy balance]] for that separate question."},{"front":"Should you sprint to test these systems?","back":"No. The slider is an explanation, not a challenge. Follow an appropriate training plan rather than proving you can empty the wallet."}]},
+        {"t":"callout","kind":"tip","title":"Your Monday connection","text":"Eat normally, arrive ready to train and take the rest your program calls for. See [[lesson:nut-carbs-fats|carbohydrate and fat]] for food choices. Understanding energy supply explains fatigue; it does not require special foods for each system."}
+      ],
+      "takeaways":["ATP supplies immediately usable energy, and your body continually rebuilds it.","Phosphocreatine, glycolysis and aerobic processes contribute together rather than switching on in strict sequence.","Intensity and duration change the mix; repetition count alone does not identify a dominant system.","Rest helps restore fuel availability for the next effort."],
+      "quiz":[
+        {"q":"A friend says the aerobic system stays off during a short sprint. What is correct?","options":["It begins only after all other energy is exhausted.","It contributes too, although the mix favours rapid supply.","It is the only active system during every brief sprint."],"answer":1,"why":"The systems overlap. Brief intense work relies heavily on rapid supply, but aerobic contribution is not zero."},
+        {"q":"Two people both do 10 repetitions. Must their energy-system mix be identical?","options":["No; tempo, load and starting fatigue change the demand.","Yes; the repetition count fixes the same fuel mixture.","Yes; every lifting set uses only stored phosphocreatine."],"answer":0,"why":"A repetition count is not a duration or intensity measurement. The energy-system balance depends on the actual effort."}
+      ],
+      "sources":[
+        {"label":"Gastin (2001) — energy-system interaction during maximal exercise review","url":"https://pubmed.ncbi.nlm.nih.gov/11547894/","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — ATP supply and muscle metabolism","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/10-3-muscle-fiber-contraction-and-relaxation","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id":"body-hormones",
+      "title":"Hormones and training, naturally",
+      "summary":"Natural hormones help coordinate your body. Chasing a brief post-workout spike is less useful than consistent training, food, sleep and manageable stress.",
+      "blocks":[
+        {"t":"p","text":"After this lesson, you can separate normal hormone biology from workout hype. A [[hormone]] is a chemical message, but a brief post-workout rise is not a score for future muscle growth."},
+        {"t":"flip","cards":[
+          {"front":"Testosterone: what is its everyday role?","back":"[[Testosterone]] helps maintain tissues, including muscle, and supports reproductive functions. It naturally occurs in everyone, though typical levels differ."},
+          {"front":"Cortisol: enemy or useful messenger?","back":"[[Cortisol]] helps make fuel available and coordinates parts of your stress response. A normal rise during exercise is not proof that muscle is disappearing."},
+          {"front":"Growth hormone: what does it do?","back":"[[Growth hormone]] helps regulate growth, tissue maintenance and fuel use. Its name does not mean a larger workout spike guarantees larger muscles."},
+          {"front":"Insulin: only about body fat?","back":"[[Insulin]] helps regulate blood sugar, nutrient use and storage. For example, it helps muscle cells take up glucose. It is not simply a fat-storage switch."}
+        ]},
+        {"t":"callout","kind":"science","title":"What the training study found","text":"A controlled study in young men found that larger natural post-workout hormone rises did not produce greater arm muscle growth or strength. It does not answer every question about every person's hormonal health."},
+        {"t":"p","text":"Other research has found weak associations for some responses and outcomes, rather than a clean bigger-spike-means-bigger-muscles rule. Blood measurements also do not describe every signal inside a muscle. The practical conclusion is modest: do not choose a routine mainly because it promises a larger brief hormone spike. Judge repeatable training and longer-term progress instead."},
+        {"t":"compare","left":{"title":"Useful priorities","items":["Practise a suitable workout consistently.","Eat enough for your goal and include protein.","Protect sleep and make room for manageable recovery."]},"right":{"title":"Unhelpful scorecards","items":["Ranking workouts by a promised hormone surge.","Treating every normal cortisol rise as damage.","Assuming a single tired day diagnoses a hormone problem."]}},
+        {"t":"callout","kind":"try","title":"The Monday plan","text":"Choose one controllable habit: a regular bedtime, a planned meal or a workout you can repeat. Read [[lesson:rec-sleep|sleep]], [[lesson:nut-protein|protein]] and [[lesson:rec-stress-overreaching|stress and fatigue]] for the practical steps. These support your training without needing you to micromanage chemical messages."},
+        {"t":"callout","kind":"safety","title":"Health is a separate question","text":"Persistent symptoms or concerns about hormonal health deserve a qualified clinician, not a diagnosis from a fitness chart. This lesson explains normal training biology. It does not interpret tests or prescribe treatment."}
+      ],
+      "takeaways":["Natural hormones coordinate fuel use, growth and other essential body functions.","A brief post-workout hormone spike does not reliably predict greater muscle growth.","Prioritise repeatable training, suitable food, sleep and manageable stress over chasing spikes.","Persistent health concerns belong with a qualified clinician."],
+      "quiz":[
+        {"q":"A routine advertises a bigger temporary hormone spike. What is a better reason to choose it?","options":["It produces the most exhausting feeling immediately.","It promises a hormone surge without requiring a log.","It fits your goals and lets you progress consistently."],"answer":2,"why":"Temporary hormone spikes are not a reliable growth scorecard. A suitable, repeatable routine is a more useful priority."},
+        {"q":"Cortisol rises during a normal workout. What can you conclude from that alone?","options":["Muscle growth is impossible after that training session.","It can be part of a normal response to physical effort.","Your hormonal health needs a diagnosis from the gym."],"answer":1,"why":"Cortisol has useful normal roles. A workout rise alone does not diagnose a problem or prove muscle loss."}
+      ],
+      "sources":[
+        {"label":"West et al. (2010) — larger natural acute hormone responses did not improve arm growth or strength","url":"https://pubmed.ncbi.nlm.nih.gov/19910330/","checked":"2026-10-10"},
+        {"label":"West and Phillips (2012) — acute hormone responses and training adaptation associations","url":"https://pubmed.ncbi.nlm.nih.gov/22105707/","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — gonadal hormones, including testosterone","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/17-8-gonadal-and-placental-hormones","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — adrenal glands and cortisol","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/17-6-the-adrenal-glands","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — pituitary gland and growth hormone","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/17-3-the-pituitary-gland-and-hypothalamus","checked":"2026-10-10"},
+        {"label":"OpenStax Anatomy and Physiology 2e — insulin and the endocrine pancreas","url":"https://openstax.org/books/anatomy-and-physiology-2e/pages/17-9-the-endocrine-pancreas","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id":"body-adaptation",
+      "title":"How your body adapts to training",
+      "summary":"Training creates a demand, recovery supports the response and repeated practice builds specific abilities. Progress means gradually updating the challenge.",
+      "blocks":[
+        {"t":"p","text":"After this lesson, you can explain how repeated training changes what your body can do. [[Adaptation]] is a lasting change in capacity: practise a useful challenge, recover, then become better prepared for it."},
+        {"t":"video","id":"k0J8URJfUTg","title":"Everyone Is Confused About Progressive Overload","channel":"Jeff Nippard","why":"Watch: Jeff Nippard explains how training demands progress as your body adapts."},
+        {"t":"steps","items":[
+          {"title":"Stress: provide a useful demand","text":"A training session asks your muscles and nervous system to do work. The demand should match your current ability and your goal, rather than simply making you exhausted."},
+          {"title":"Recovery: make room for the response","text":"Training can leave temporary fatigue. Between sessions, fuel availability and readiness recover. [[Muscle protein synthesis]] helps build muscle proteins for repair and growth; food and training influence this process."},
+          {"title":"Adaptation: repeat over time","text":"Repeated appropriate sessions can improve strength, movement skill and muscle size. These changes do not happen at identical speeds. A single session is a signal, not a finished transformation."}
+        ]},
+        {"t":"widget","w":"chart","params":{"kind":"line","title":"Why a tired day can hide progress","xLabel":"Illustrated stages, not a timetable","yLabel":"Readiness: arbitrary illustration units","x":["Before training","After the session","After recovery"],"series":[{"name":"Possible readiness","values":[6,3,7],"style":"solid"}],"hypothetical":true,"note":"One possible response, not measured data, a recovery schedule or a guarantee of improvement."},"caption":"Fatigue can temporarily reduce what you can show. One lower-performance day does not measure your whole training response."},
+        {"t":"p","text":"[[Specificity]] means you improve especially at the demands you practise. Lifting, jogging and learning a movement overlap in some benefits, but they are not interchangeable skills. To improve a particular lift, practise it or closely related movements. To improve sustained running, include sustained running. A workout can be difficult without being the right practice for your goal."},
+        {"t":"p","text":"As your capacity grows, an unchanged challenge may become easier. [[Progressive overload]] means gradually updating the demand to match that improvement. It does not mean adding weight every session regardless of technique. Better control, more repetitions or a suitable load increase can reflect progress. Open [[lesson:prog-progressive-overload|progressive overload]] for the practical method."},
+        {"t":"flip","cards":[{"front":"Does maximum soreness prove maximum adaptation?","back":"No. Being sore is not a score for growth or skill. Use [[lesson:rec-soreness|understanding soreness]] rather than chasing a painful training trophy."},{"front":"If today's performance dips, did you lose all your progress?","back":"Not necessarily. Temporary fatigue can hide your current ability. Look at repeated comparable sessions, not a single result."}]},
+        {"t":"callout","kind":"try","title":"Repeat, recover, review","text":"On Monday, follow your plan and log what you actually did. Check the trend across comparable sessions before changing everything. Link the training signal to [[lesson:rec-what-recovery-is|recovery]] and [[lesson:prog-tracking|tracking progress]]. Consistency makes the feedback easier to understand."}
+      ],
+      "takeaways":["Training provides a demand; recovery and repeated practice support adaptation.","You improve especially at the tasks and demands you practise.","Increase the challenge gradually as ability grows, rather than forcing progress every session.","Judge comparable sessions over time instead of using soreness or one tired day as your scorecard."],
+      "quiz":[
+        {"q":"You want to improve a particular lift. Which approach follows specificity?","options":["Practise that lift or closely related movements.","Choose only unrelated exercises that feel exhausting.","Change every exercise before learning any movement."],"answer":0,"why":"Adaptations depend on the practiced demands. Unrelated difficulty is not a substitute for useful practice."},
+        {"q":"One session feels harder after poor recovery. What is the best interpretation?","options":["All previous adaptation vanished during the rest period.","You must increase the load to restore yesterday's ability.","Temporary fatigue may be hiding your current capacity."],"answer":2,"why":"Readiness and long-term capacity are not the same thing. Review the trend and recovery context before drawing a conclusion."}
+      ],
+      "sources":[
+        {"label":"ACSM (2009) — progression models in resistance training for healthy adults","url":"https://pubmed.ncbi.nlm.nih.gov/19204579/","checked":"2026-10-10"},
+        {"label":"Phillips, Hill and Atherton (2012) — regulation of muscle protein synthesis in humans","url":"https://pubmed.ncbi.nlm.nih.gov/22037010/","checked":"2026-10-10"}
+      ]
+    }
+  ],
+  "glossary":[
+    {"term":"skeletal muscle","def":"Muscle tissue that moves your skeleton or helps hold your body steady."},
+    {"term":"core","def":"The muscles around your trunk that help move it and keep it steady."},
+    {"term":"nervous system","def":"Your brain, spinal cord and nerves, which carry messages that help control your body."},
+    {"term":"motor neuron","def":"A nerve cell that sends instructions to muscle fibres."},
+    {"term":"motor unit","def":"A motor neuron and all the muscle fibres it controls."},
+    {"term":"sarcomere","def":"A tiny force-producing unit inside a muscle fibre, containing overlapping protein filaments."},
+    {"term":"actin","def":"The protein forming thin filaments that myosin pulls during muscle contraction."},
+    {"term":"myosin","def":"The protein forming thick filaments whose heads attach to and pull actin."},
+    {"term":"cross-bridges","def":"Temporary attachments between myosin heads and actin that help a muscle produce force."},
+    {"term":"Z-line","def":"A boundary of a sarcomere that anchors its thin filaments."},
+    {"term":"ATP","def":"A molecule that supplies immediately usable energy for muscle work and many other cell activities."},
+    {"term":"recruitment","def":"Bringing more motor units into the effort so a muscle can produce more force."},
+    {"term":"type I","def":"Relatively slow muscle fibres that resist fatigue well."},
+    {"term":"type II","def":"Faster-contracting muscle fibres, including types with different fatigue resistance."},
+    {"term":"size principle","def":"The usual order of recruitment: smaller motor units before larger ones as force demand rises."},
+    {"term":"joint","def":"A place where bones meet; many joints allow movement."},
+    {"term":"tendon","def":"Strong connective tissue that typically links a muscle to a bone and transfers its pulling force."},
+    {"term":"ligament","def":"Strong connective tissue that usually links bones and helps support a joint."},
+    {"term":"lever","def":"A rigid structure that turns around a pivot when forces act on it."},
+    {"term":"torque","def":"The turning effect of a force around a joint or other pivot."},
+    {"term":"range of motion","def":"How far a joint moves during an action."},
+    {"term":"phosphocreatine","def":"A stored compound that helps quickly rebuild ATP during muscular effort."},
+    {"term":"glycolysis","def":"A process that breaks down glucose to help supply energy, without directly needing oxygen."},
+    {"term":"aerobic system","def":"Energy-making processes that use oxygen and help sustain longer efforts."},
+    {"term":"glycogen","def":"Stored carbohydrate in your muscles and liver that can supply fuel."},
+    {"term":"hormone","def":"A chemical message made in your body that changes how particular cells work."},
+    {"term":"testosterone","def":"A natural hormone involved in reproduction and maintaining tissues, including muscle."},
+    {"term":"cortisol","def":"A natural hormone that helps regulate fuel availability, stress responses and other body functions."},
+    {"term":"growth hormone","def":"A natural hormone involved in growth, tissue maintenance and how your body uses fuel."},
+    {"term":"insulin","def":"A natural hormone that helps regulate blood sugar and the use and storage of nutrients."},
+    {"term":"adaptation","def":"A lasting change in your body's capacity in response to repeated demands."},
+    {"term":"specificity","def":"The principle that training improvements depend on the tasks and demands you practise."},
+    {"term":"progressive overload","def":"Gradually increasing training demands as your ability improves."},
+    {"term":"muscle protein synthesis","def":"The process of making muscle proteins for maintenance, repair and growth."}
+  ],
+  "regions":{
+    "chest-upper":{"name":"Upper chest","plain":"The chest fibres just below your collarbone.","does":"Helps bring your arm forward and across your body.","train":["low-incline-dumbbell-press","low-to-high-chest-fly"],"fact":"This is the collarbone portion of the pectoralis major, not a separate chest muscle."},
+    "chest-mid":{"name":"Middle chest","plain":"The broad chest area beside your breastbone.","does":"Helps bring your upper arm across your chest.","train":["flat-dumbbell-press","pec-deck-machine"],"fact":"Pectoralis major is fan-shaped, with fibres running from your chest towards your upper arm."},
+    "chest-lower":{"name":"Lower chest","plain":"The lower part of the large chest muscle.","does":"Helps draw your upper arm across your body and down from a raised position.","train":["chest-dip-assisted","flat-dumbbell-press"],"fact":"The lower and middle map regions belong to the breastbone-and-rib portion of pectoralis major."},
+    "delt-front":{"name":"Front shoulder","plain":"The front portion of your shoulder cap.","does":"Helps lift your upper arm forward.","train":["shoulder-press-machine","front-raise-dumbbell"],"fact":"Your front deltoid is part of the same shoulder muscle as the side and rear portions."},
+    "delt-side":{"name":"Side shoulder","plain":"The outer portion of your shoulder cap.","does":"Helps raise your arm out to the side.","train":["lateral-raise-dumbbell","lateral-raise-cable"],"fact":"The deltoid forms much of the rounded outline of your shoulder."},
+    "delt-rear":{"name":"Rear shoulder","plain":"The back portion of your shoulder cap.","does":"Helps move your upper arm backwards and outwards.","train":["reverse-fly-machine","reverse-fly-cable"],"fact":"Moving your arm backwards can involve both your rear deltoid and muscles that move your shoulder blade."},
+    "biceps":{"name":"Biceps","plain":"The familiar muscle on the front of your upper arm.","does":"Helps bend your elbow and turn your palm upwards.","train":["bicep-curl-dumbbell","preacher-curl-machine"],"fact":"The biceps crosses both the shoulder and elbow joints."},
+    "triceps":{"name":"Triceps","plain":"The large muscle on the back of your upper arm.","does":"Straightens your elbow.","train":["triceps-pushdown-cable-straight-bar","overhead-rope-extensions"],"fact":"The triceps performs the opposite elbow action to the biceps."},
+    "forearms":{"name":"Forearms","plain":"The many muscles between your elbow and wrist.","does":"Moves your wrist and fingers and helps control your grip.","train":["wrist-curl","wrist-extension"],"fact":"Many muscles that move your fingers start in your forearm, not inside your hand."},
+    "traps-upper":{"name":"Upper traps","plain":"The sloping muscle area between your neck and shoulders.","does":"Helps lift and rotate your shoulder blades.","train":["shrug-dumbbell","shoulder-press-machine"],"fact":"The trapezius also extends down your upper back; this patch shows only its upper region."},
+    "upper-back":{"name":"Upper back","plain":"The muscle team around and between your shoulder blades.","does":"Helps position your shoulder blades and pull them together.","train":["chest-supported-machine-row","seated-cable-row-mid-upper-back"],"fact":"This map region includes several muscles, including the rhomboids and parts of the trapezius."},
+    "lats":{"name":"Lats","plain":"The broad muscles along the sides of your back.","does":"Helps pull your upper arms down towards your sides and backwards.","train":["lat-pulldown","pull-up-assisted"],"fact":"Although your lats lie on your back, they attach to your upper arm bone."},
+    "lower-back":{"name":"Lower back","plain":"The supporting muscle area beside your lower spine.","does":"Helps straighten your trunk and resist unwanted forward bending.","train":["back-extension","barbell-romanian-deadlift"],"fact":"The muscles that help extend your spine continue above the lower-back patch on this map."},
+    "abs":{"name":"Abs","plain":"The muscle area along the front of your abdomen.","does":"Helps bend your trunk forwards and support your abdominal contents.","train":["crunch","crunch-machine"],"fact":"Rectus abdominis runs vertically along the front of your abdomen."},
+    "obliques":{"name":"Obliques","plain":"The muscle layers along the sides of your waist.","does":"Helps turn and side-bend your trunk, or resist those movements.","train":["bent-over-one-arm-row-dumbbell","lat-pulldown-single-arm"],"fact":"Your internal and external obliques are different layers; these exercise examples involve trunk stabilising roles."},
+    "serratus":{"name":"Serratus anterior","plain":"The muscle along your side ribs, beneath your shoulder blade.","does":"Helps move your shoulder blade forwards and rotate it as you reach overhead.","train":["banded-push-ups","shoulder-press-machine"],"fact":"Serratus anterior connects your ribs to the inner surface of your shoulder blade."},
+    "glutes":{"name":"Glutes","plain":"The large muscle area at the back of your hips.","does":"Helps move your thigh backwards and straighten your hip.","train":["barbell-hip-thrust","bulgarian-split-squat-glute-focus"],"fact":"Gluteus maximus sits more superficially than the smaller gluteal muscles beneath it."},
+    "glute-med":{"name":"Side glutes","plain":"The outer hip area, including gluteus medius.","does":"Helps move your leg sideways and keep your pelvis steady when standing on one leg.","train":["hip-abductor-machine","weighted-step-ups"],"fact":"Gluteus medius lies partly underneath gluteus maximus."},
+    "quads":{"name":"Quads","plain":"The large muscle group on the front of your thigh.","does":"Straightens your knee; one member also helps bend your hip.","train":["leg-extension-machine","quad-focused-leg-press"],"fact":"Rectus femoris, unlike the other quadriceps muscles, crosses both your hip and knee."},
+    "adductors":{"name":"Inner thighs","plain":"The muscle group along the inside of your thighs.","does":"Helps bring your thigh towards your body's middle; some members also assist hip extension.","train":["adductor-machine","sumo-deadlift"],"fact":"The adductor group contains several muscles with different attachments and supporting actions."},
+    "hamstrings":{"name":"Hamstrings","plain":"The muscle group on the back of your thighs.","does":"Bends your knee; most members also help move your thigh backwards.","train":["seated-leg-curl-machine","barbell-romanian-deadlift"],"fact":"Hamstrings can contribute to both knee movement and hip movement."},
+    "calves":{"name":"Outer calf: gastrocnemius","plain":"The prominent calf muscle behind your lower leg.","does":"Helps point your foot down and also assists knee bending.","train":["standing-weighted-calf-raises-barbell-or-dumbbell","leg-press-calf-raise"],"fact":"Gastrocnemius and soleus both transmit force through the Achilles tendon."},
+    "soleus":{"name":"Deep calf: soleus","plain":"The broad calf muscle beneath gastrocnemius.","does":"Helps point your foot down and supports upright standing.","train":["seated-calf-raise-machine","standing-weighted-calf-raises-barbell-or-dumbbell"],"fact":"Soleus lies underneath gastrocnemius, so the surface map cannot show its full shape."}
+  }
+}

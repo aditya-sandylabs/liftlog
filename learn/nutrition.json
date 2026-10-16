@@ -1,0 +1,1905 @@
+{
+  "section": "nutrition",
+  "lessons": [
+    {
+      "id": "nut-energy-balance",
+      "title": "Calories and energy balance",
+      "summary": "Body weight responds to energy coming in and going out, but daily scale changes also reflect water, food and stored carbohydrate.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can explain why weight trends change without reacting to one noisy weigh-in. [[energy balance]] is the long-term difference between energy eaten and used. Daily water, salt, stored carbohydrate and digestion can move the scale without changing the long-term energy direction."
+        },
+        {
+          "t": "widget",
+          "w": "energy-balance",
+          "params": {
+            "intake": [
+              1400,
+              3600,
+              2300
+            ],
+            "burn": [
+              1400,
+              3600,
+              2300
+            ],
+            "step": 50,
+            "labels": {
+              "gain": "Intake is above expenditure",
+              "maintain": "Intake and expenditure are close",
+              "lose": "Intake is below expenditure"
+            },
+            "note": "This see-saw shows direction, not a promised rate of weight change.",
+            "hypothetical": true
+          },
+          "caption": "Illustration only: slider bounds and starting values are not intake recommendations."
+        },
+        {
+          "t": "h",
+          "text": "Where does your daily burn go?"
+        },
+        {
+          "t": "p",
+          "text": "[[basal metabolic rate|BMR]] is the energy needed for basic functions at rest. [[NEAT]] covers ordinary movement, such as walking, chores, standing and fidgeting. Planned exercise adds another piece. The [[thermic effect of food]] is the energy used to digest, absorb and store nutrients. These parts can change between people and across weeks."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "bar",
+            "title": "One fictional day of energy use",
+            "xLabel": "Energy-use component",
+            "yLabel": "Less → more (illustration)",
+            "x": [
+              "BMR",
+              "NEAT",
+              "Exercise",
+              "Digestion"
+            ],
+            "series": [
+              {
+                "name": "Energy used",
+                "values": [
+                  1400,
+                  400,
+                  300,
+                  200
+                ],
+                "style": "solid"
+              }
+            ],
+            "note": "The shape is invented to show the four components. Your numbers will differ.",
+            "hypothetical": true
+          },
+          "caption": "BMR is usually the largest part, while daily movement can vary greatly."
+        },
+        {
+          "t": "h",
+          "text": "Why the scale jumps around"
+        },
+        {
+          "t": "p",
+          "text": "A scale measures everything, not just body fat. Water, salt, bowel contents and [[glycogen]] can shift body weight quickly. Glycogen stores carbohydrate with water, so a harder session or a higher-carbohydrate meal can change the reading. Compare several similar morning weigh-ins instead of judging one number."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Use similar conditions",
+              "text": "Weigh after waking and using the bathroom, before breakfast, when practical."
+            },
+            {
+              "title": "Build a weekly trend",
+              "text": "Average several readings. Look for the direction across weeks, not a dramatic Tuesday."
+            },
+            {
+              "title": "Adjust slowly",
+              "text": "If the trend misses your goal for a few weeks, change food or activity modestly."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "myth",
+          "title": "The fixed calorie rule",
+          "text": "A fixed calorie gap does not produce a perfectly fixed weight change. Body composition, water and energy expenditure adapt. Treat predictions as starting estimates."
+        }
+      ],
+      "takeaways": [
+        "Long-term energy balance drives the direction of body-weight change.",
+        "BMR, NEAT, exercise and digestion all contribute to daily expenditure.",
+        "Use weekly weight trends because single weigh-ins are noisy."
+      ],
+      "quiz": [
+        {
+          "q": "Your weight rises after a salty restaurant meal. What is the best first response?",
+          "options": [
+            "Cut food sharply the following day",
+            "Watch several similar weigh-ins",
+            "Add an extra difficult workout"
+          ],
+          "answer": 1,
+          "why": "One reading can reflect water and food mass. A trend gives a better signal."
+        },
+        {
+          "q": "Which activity belongs mainly to NEAT?",
+          "options": [
+            "Walking around the office",
+            "Completing planned intervals",
+            "Digesting your evening meal"
+          ],
+          "answer": 0,
+          "why": "NEAT includes ordinary movement outside planned exercise, sleeping and eating."
+        }
+      ],
+      "sources": [
+        {
+          "label": "NASEM (2023) Dietary Reference Intakes for Energy — components of expenditure",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK591031/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Levine JA (2002) Non-exercise activity thermogenesis review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12468415/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Hall KD (2013) Why the 3500 kcal per pound rule is wrong",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23774459/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-macros",
+      "title": "Macros: protein, carbs and fat",
+      "summary": "Protein, carbohydrate and fat provide energy and different raw materials. Your diet works as a team, not a contest between nutrients.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can read the protein, carbohydrate and fat lines on a food label. These [[macronutrient|macronutrients]] provide energy or building material, but they do different jobs."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "bar",
+            "title": "Energy supplied by one gram",
+            "xLabel": "Nutrient",
+            "yLabel": "kcal per gram",
+            "x": [
+              "Protein",
+              "Carbohydrate",
+              "Fat",
+              "Alcohol"
+            ],
+            "series": [
+              {
+                "name": "Energy",
+                "values": [
+                  4,
+                  4,
+                  9,
+                  7
+                ],
+                "style": "solid"
+              }
+            ],
+            "note": "Standard Atwater energy factors. Alcohol supplies energy but is not a required nutrient."
+          },
+          "caption": "Protein and carbohydrate provide about 4 kcal per gram, fat 9, and alcohol 7."
+        },
+        {
+          "t": "h",
+          "text": "Three teammates, three jobs"
+        },
+        {
+          "t": "p",
+          "text": "Protein supplies [[amino acid|amino acids]] used to build and repair tissues. Carbohydrate is a convenient training fuel and helps refill glycogen. Fat supplies essential fatty acids, supports cell membranes and helps absorb certain vitamins. Your body can use each macro for energy, but that does not make their other roles interchangeable."
+        },
+        {
+          "t": "video",
+          "id": "CwkOcEk9zr8",
+          "title": "Macros for Optimal Results",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: how protein, carbohydrate and fat fit together (Renaissance Periodization)."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Protein is only for bodybuilders.",
+              "back": "Protein supports tissues, enzymes and many normal body functions. Lifters may need more than sedentary adults."
+            },
+            {
+              "front": "Carbohydrate automatically becomes body fat.",
+              "back": "Weight gain needs a sustained energy surplus. Carbohydrate is also useful fuel for training."
+            },
+            {
+              "front": "Eating fat makes you fat.",
+              "back": "Dietary fat is essential. Its higher energy density means portions can add calories quickly."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Do percentages need to be perfect?"
+        },
+        {
+          "t": "p",
+          "text": "No. The adult [[AMDR]] gives broad ranges, not one magical split. It lists carbohydrate at 45–65% of energy and fat at 20–35%. Protein is often planned by body weight for lifters. Then carbohydrate can fill much of the remaining energy around your food preferences and training."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Useful questions",
+            "items": [
+              "Did I include a protein source?",
+              "Do I have enough food energy?",
+              "Are most carbs fibre-rich?",
+              "Are fats mostly unsaturated?"
+            ]
+          },
+          "right": {
+            "title": "Less useful questions",
+            "items": [
+              "Was every percentage exact?",
+              "Did I avoid one whole macro?",
+              "Was one meal perfectly balanced?",
+              "Did an app grade my banana?"
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Food first",
+          "text": "A normal meal can supply all three macros. Dal, rice, sabzi and curd bring protein, carbohydrate, fat, fibre and micronutrients together."
+        }
+      ],
+      "takeaways": [
+        "Protein, carbohydrate and fat supply energy plus different building materials.",
+        "Protein and carbohydrate provide about 4 kcal per gram; fat provides about 9.",
+        "Broad ranges and repeatable meals matter more than perfect macro percentages."
+      ],
+      "quiz": [
+        {
+          "q": "Which statement best describes dietary fat?",
+          "options": [
+            "It is essential and energy-dense",
+            "It is optional if protein is high",
+            "It should replace all carbohydrates"
+          ],
+          "answer": 0,
+          "why": "Fat supports vital functions and supplies about 9 kcal per gram."
+        },
+        {
+          "q": "Your meal contains dal, rice, sabzi and curd. What is most accurate?",
+          "options": [
+            "It contains carbohydrate only",
+            "It can contain all three macros",
+            "It counts only as a protein meal"
+          ],
+          "answer": 1,
+          "why": "Mixed meals usually provide several macronutrients at once."
+        }
+      ],
+      "sources": [
+        {
+          "label": "NASEM Dietary Reference Intakes for Energy — standard energy factors",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK591029/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Institute of Medicine Dietary Reference Intakes — adult AMDR table",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK208874/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-protein",
+      "title": "Protein: how much, and from where",
+      "summary": "Most lifters can cover protein with ordinary foods, a sensible daily target and several protein-containing meals.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can choose a practical daily protein range and spread protein across familiar meals. Resistance training places the construction order; food supplies the amino-acid bricks."
+        },
+        {
+          "t": "h",
+          "text": "A practical daily range"
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Where the protein range comes from",
+          "text": "For most healthy lifters, 1.4–2.0 g/kg/day is a useful working range. A large meta-analysis found gains levelled off near 1.6 g/kg/day on average, with an upper confidence limit near 2.2 g/kg/day. That upper value is not a minimum everyone must reach."
+        },
+        {
+          "t": "video",
+          "id": "T0ySHTwFGzc",
+          "title": "How Much Protein Do You Need For Muscle Growth?",
+          "channel": "Jeff Nippard",
+          "why": "Watch: understanding a practical protein target (Jeff Nippard)."
+        },
+        {
+          "t": "widget",
+          "w": "food-compare",
+          "params": {
+            "foods": [
+              "iL003",
+              "iB013",
+              "iM004",
+              "f2705956",
+              "f2705418",
+              "iL002"
+            ],
+            "metric": "per100g",
+            "labels": {
+              "iL003": "Paneer (ready to eat)",
+              "iB013": "Lentils / masoor dal (dry, uncooked)",
+              "iM004": "Whole egg (boiled, ready to eat)",
+              "f2705956": "Chicken breast (cooked, ready to eat)",
+              "f2705418": "Plain whole-milk yogurt / curd-style (ready to eat)",
+              "iL002": "Whole cow’s milk (ready to drink)"
+            }
+          },
+          "caption": "Per 100 g of the food as listed—not equal meal portions. Dry dal and ready-to-eat foods are not directly comparable plate portions."
+        },
+        {
+          "t": "h",
+          "text": "Spread the work"
+        },
+        {
+          "t": "p",
+          "text": "You do not lose protein because one meal is large. Still, spreading protein creates several chances to stimulate [[muscle protein synthesis]]. A review suggested roughly 0.4 g/kg per meal across at least four meals when chasing 1.6 g/kg/day. That is a useful pattern, not a compulsory alarm schedule."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Choose your daily target",
+              "text": "Start within 1.4–2.0 g/kg/day. Use the higher end during demanding training or a calorie deficit."
+            },
+            {
+              "title": "Count your usual meals",
+              "text": "Give three or four meals a clear protein anchor, such as dal, paneer, curd, eggs, tofu or chicken."
+            },
+            {
+              "title": "Check the total",
+              "text": "If food alone is awkward, see [[lesson:supp-protein-powder|protein powder]] as convenience, not magic."
+            }
+          ]
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Helpful protein anchors",
+            "items": [
+              "Dal plus curd",
+              "Paneer or tofu",
+              "Eggs with a meal",
+              "Chicken with rice and sabzi"
+            ]
+          },
+          "right": {
+            "title": "Easy-to-miss patterns",
+            "items": [
+              "Mostly tea and biscuits",
+              "Tiny dal serving only",
+              "Skipping meals all day",
+              "Saving all protein for dinner"
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Quality and variety",
+          "text": "Animal foods and soy are rich in essential amino acids. Pulses, grains, dairy, eggs and soy can also complement each other across the day."
+        }
+      ],
+      "takeaways": [
+        "Most healthy lifters can start around 1.4–2.0 g/kg/day of protein.",
+        "Benefits appear to level off near 1.6 g/kg/day on average.",
+        "Several protein-containing meals make the daily target easier to reach."
+      ],
+      "quiz": [
+        {
+          "q": "You weigh 70 kg and struggle to eat enough protein. What is the best first move?",
+          "options": [
+            "Add protein anchors to regular meals",
+            "Eat the whole target at bedtime",
+            "Remove most carbohydrate and fat"
+          ],
+          "answer": 0,
+          "why": "Regular protein anchors improve the daily total without forcing one huge meal."
+        },
+        {
+          "q": "What does the 1.6 g/kg finding mean?",
+          "options": [
+            "Nobody benefits below that amount",
+            "It is an average plateau estimate",
+            "Every person needs exactly that amount"
+          ],
+          "answer": 1,
+          "why": "Research estimates an average response. Individual needs and practical ranges still vary."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Morton RW et al. (2018) protein supplementation meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28698222/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Jäger R et al. (2017) ISSN position stand on protein and exercise",
+          "url": "https://jissn.biomedcentral.com/counter/pdf/10.1186/s12970-017-0177-8.pdf",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Schoenfeld BJ and Aragon AA (2018) protein per meal and distribution review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29497353/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-carbs-fats",
+      "title": "Carbs, fibre and fats",
+      "summary": "Carbohydrates support training, fibre supports health, and dietary fats are essential. Food quality and portions matter more than nutrient fear.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can choose useful carbohydrate and fat foods without treating either nutrient as the villain. Carbohydrate supports harder training; fat supports cells and vitamin transport."
+        },
+        {
+          "t": "h",
+          "text": "Choose carbohydrate by context"
+        },
+        {
+          "t": "p",
+          "text": "Rice, roti, oats, potatoes, fruit and pulses can all fuel training. [[whole grain|Whole grains]], fruit, vegetables and pulses usually bring more [[fibre]], vitamins and fullness than highly refined choices. Refined foods are not forbidden. They are simply easier to overeat and often bring fewer nutrients."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "How filling is this meal likely to feel?",
+            "stops": [
+              {
+                "value": 0,
+                "title": "Mostly refined snack",
+                "text": "A sweet drink and biscuits provide quick energy with little fibre or protein.",
+                "tag": "Low structure"
+              },
+              {
+                "value": 1,
+                "title": "Mixed meal",
+                "text": "Rice, dal and sabzi combine carbohydrate, fibre and protein.",
+                "tag": "Balanced"
+              },
+              {
+                "value": 2,
+                "title": "Fibre-rich mixed meal",
+                "text": "Whole-grain roti, rajma, vegetables and curd add volume and several nutrients.",
+                "tag": "More filling for many people"
+              }
+            ],
+            "initial": 1
+          },
+          "caption": "Fullness varies, but protein, fibre and food volume often help."
+        },
+        {
+          "t": "h",
+          "text": "Fibre is the slow lane"
+        },
+        {
+          "t": "p",
+          "text": "Fibre is carbohydrate that is not fully digested in the small intestine. It supports bowel function and feeds many gut microbes. WHO advises at least 25 g daily for people older than ten. Increase fibre gradually and drink enough fluid, or your stomach may file a complaint."
+        },
+        {
+          "t": "h",
+          "text": "Fat quality matters"
+        },
+        {
+          "t": "p",
+          "text": "[[unsaturated fat|Unsaturated fats]] from nuts, seeds and many plant oils are useful choices. [[saturated fat]] is found in foods such as butter, ghee, coconut oil and higher-fat dairy. WHO recommends replacing saturated fat with unsaturated fat when practical. Essential fats must come from food because your body cannot make them."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Build most meals around",
+            "items": [
+              "Whole grains or potatoes",
+              "Fruit and vegetables",
+              "Pulses such as dal or rajma",
+              "Nuts, seeds and plant oils"
+            ]
+          },
+          "right": {
+            "title": "Enjoy with awareness",
+            "items": [
+              "Sugary drinks",
+              "Deep-fried snacks",
+              "Large oil or ghee portions",
+              "Low-fibre bakery foods"
+            ]
+          }
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Carbs at night cause fat gain.",
+              "back": "Total intake and long-term energy balance matter more than the clock."
+            },
+            {
+              "front": "Low-fat always means lower calorie.",
+              "back": "Labels decide. Some low-fat foods add sugar or starch, while portions still matter."
+            }
+          ]
+        }
+      ],
+      "takeaways": [
+        "Carbohydrate is useful training fuel, and fibre-rich sources add nutrients and fullness.",
+        "Dietary fat is essential, but it packs more energy per gram.",
+        "Choose mostly unsaturated fats and keep room for foods you enjoy."
+      ],
+      "quiz": [
+        {
+          "q": "Which meal is most likely to provide both fibre and training fuel?",
+          "options": [
+            "Rajma with rice and vegetables",
+            "A sweet drink with biscuits",
+            "Plain cooking oil with tea"
+          ],
+          "answer": 0,
+          "why": "Pulses, rice and vegetables provide carbohydrate, fibre and several nutrients."
+        },
+        {
+          "q": "What is a useful fat-quality swap?",
+          "options": [
+            "Replace dal with a sugary drink",
+            "Replace all fat with protein",
+            "Use nuts or plant oil more often"
+          ],
+          "answer": 2,
+          "why": "Unsaturated-fat foods can replace some sources richer in saturated fat."
+        }
+      ],
+      "sources": [
+        {
+          "label": "WHO healthy diet fact sheet — carbohydrates, fibre and dietary fats",
+          "url": "https://www.who.int/en/news-room/fact-sheets/detail/healthy-diet",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Institute of Medicine Dietary Reference Intakes — adult AMDR table",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK208874/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-plate",
+      "title": "Food groups: building a plate",
+      "summary": "A plate is a flexible checklist: include colourful plants, a protein anchor, a useful starch and some healthy fat.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can build a flexible meal with plants, a protein anchor, useful starch and some fat. The plate is a visual checklist, not a weighing prescription."
+        },
+        {
+          "t": "widget",
+          "w": "plate",
+          "params": {
+            "title": "Build a flexible plate",
+            "variants": [
+              {
+                "name": "Everyday plate",
+                "wedges": [
+                  {
+                    "label": "Vegetables and fruit",
+                    "share": 0.5,
+                    "examples": [
+                      "sabzi",
+                      "salad",
+                      "fruit"
+                    ],
+                    "why": "Add fibre, vitamins, minerals and food volume."
+                  },
+                  {
+                    "label": "Protein foods",
+                    "share": 0.25,
+                    "examples": [
+                      "dal",
+                      "paneer",
+                      "eggs",
+                      "chicken"
+                    ],
+                    "why": "Give the meal a clear protein anchor."
+                  },
+                  {
+                    "label": "Whole grains or starch",
+                    "share": 0.25,
+                    "examples": [
+                      "roti",
+                      "rice",
+                      "millets",
+                      "potato"
+                    ],
+                    "why": "Supply useful energy and training fuel."
+                  }
+                ]
+              },
+              {
+                "name": "Training day",
+                "wedges": [
+                  {
+                    "label": "Vegetables and fruit",
+                    "share": 0.25,
+                    "examples": [
+                      "sabzi",
+                      "banana",
+                      "salad"
+                    ],
+                    "why": "Keep plant variety while allowing more fuel."
+                  },
+                  {
+                    "label": "Protein foods",
+                    "share": 0.25,
+                    "examples": [
+                      "dal",
+                      "curd",
+                      "paneer",
+                      "eggs",
+                      "chicken"
+                    ],
+                    "why": "Support the daily protein target."
+                  },
+                  {
+                    "label": "Grains or starch",
+                    "share": 0.5,
+                    "examples": [
+                      "rice",
+                      "roti",
+                      "oats",
+                      "potato"
+                    ],
+                    "why": "An active person may want a larger carbohydrate portion."
+                  }
+                ]
+              },
+              {
+                "name": "Indian-style meal (illustration)",
+                "wedges": [
+                  {
+                    "label": "Vegetables and fruit",
+                    "share": 0.4,
+                    "examples": [
+                      "two sabzis",
+                      "salad",
+                      "seasonal fruit"
+                    ],
+                    "why": "Use different colours and preparations."
+                  },
+                  {
+                    "label": "Protein foods",
+                    "share": 0.3,
+                    "examples": [
+                      "dal",
+                      "rajma",
+                      "curd",
+                      "paneer",
+                      "eggs",
+                      "chicken"
+                    ],
+                    "why": "Mix pulses with dairy, eggs or meat as preferred."
+                  },
+                  {
+                    "label": "Cereals and millets",
+                    "share": 0.25,
+                    "examples": [
+                      "roti",
+                      "rice",
+                      "jowar",
+                      "bajra"
+                    ],
+                    "why": "Choose the amount around appetite and activity."
+                  },
+                  {
+                    "label": "Nuts, seeds or oils",
+                    "share": 0.05,
+                    "examples": [
+                      "peanuts",
+                      "sesame",
+                      "cooking oil"
+                    ],
+                    "why": "Small portions add essential fats and flavour."
+                  }
+                ]
+              }
+            ],
+            "hypothetical": true
+          },
+          "caption": "Illustration — these are invented meal templates, not ICMR-NIN’s official daily plate or prescribed proportions. Adjust portions to your needs."
+        },
+        {
+          "t": "h",
+          "text": "What each group brings"
+        },
+        {
+          "t": "p",
+          "text": "Vegetables and fruit supply fibre and many [[micronutrient|micronutrients]]. Grains and starchy foods supply carbohydrate. Pulses, dairy, eggs, soy and meat can anchor protein. Nuts, seeds and oils add concentrated energy and fats. No single food group can do every job."
+        },
+        {
+          "t": "h",
+          "text": "Indian food already fits"
+        },
+        {
+          "t": "p",
+          "text": "A balanced meal does not need imported superfoods. Dal, roti, rice, sabzi, curd, paneer, eggs and chicken can all fit. ICMR-NIN's My Plate for the Day also emphasises variety across cereals, pulses, milk or curd, vegetables, fruit, nuts and oils."
+        },
+        {
+          "t": "video",
+          "id": "UuvvbGSe_Y4",
+          "title": "Our Plate",
+          "channel": "Harvard T.H. Chan School of Public Health",
+          "why": "Watch: building a balanced plate (Harvard T.H. Chan)."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Start with plants",
+              "text": "Choose one or two vegetables, plus fruit somewhere in the day."
+            },
+            {
+              "title": "Add a protein anchor",
+              "text": "Use dal, rajma, chana, paneer, curd, tofu, eggs or chicken."
+            },
+            {
+              "title": "Add useful fuel",
+              "text": "Choose rice, roti, millets, oats or potatoes around appetite and training."
+            },
+            {
+              "title": "Season and enjoy",
+              "text": "Use oils, nuts, seeds, herbs and spices in portions that suit your energy needs."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "The plate can flex",
+          "text": "A smaller person and a tall active person may use the same pattern with very different portions. Training days may need more starch."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Variety across a week",
+            "items": [
+              "Different coloured vegetables",
+              "Several pulses or beans",
+              "More than one grain",
+              "Dairy, soy, eggs or meat as preferred"
+            ]
+          },
+          "right": {
+            "title": "False perfection",
+            "items": [
+              "Every meal looks identical",
+              "One food must be a superfood",
+              "Rice or roti is banned",
+              "A celebration meal ruins the week"
+            ]
+          }
+        }
+      ],
+      "takeaways": [
+        "Use the plate as a flexible checklist, not a rigid prescription.",
+        "Include plants, a protein anchor, a useful starch and some healthy fat.",
+        "Indian staples can build balanced, vegetarian-friendly meals."
+      ],
+      "quiz": [
+        {
+          "q": "Your lunch is mostly rice with a spoon of gravy. What would improve the plate most?",
+          "options": [
+            "Add dal and a vegetable",
+            "Remove every grain serving",
+            "Add only another sweet drink"
+          ],
+          "answer": 0,
+          "why": "Dal adds protein and fibre, while vegetables add volume and micronutrients."
+        },
+        {
+          "q": "Why might a training-day plate contain more starch?",
+          "options": [
+            "Starch replaces the need for protein",
+            "Carbohydrate can support training fuel",
+            "Vegetables stop working after exercise"
+          ],
+          "answer": 1,
+          "why": "Active days may need more carbohydrate, while protein and plants still matter."
+        }
+      ],
+      "sources": [
+        {
+          "label": "ICMR-NIN (2024) My Plate for the Day",
+          "url": "https://www.nin.res.in/downloads/My_Plate_for_the_day_J24.pdf",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "WHO healthy diet fact sheet — adequacy, balance, moderation and diversity",
+          "url": "https://www.who.int/en/news-room/fact-sheets/detail/healthy-diet",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-micros-water",
+      "title": "Vitamins, minerals and water",
+      "summary": "Micronutrients and water do quiet jobs that keep training possible. Variety, fortified foods and sensible hydration cover many needs.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can name common nutrient gaps and use hydration clues without diagnosing yourself. Micronutrients work backstage in bones, blood, nerves, muscles and chemical reactions."
+        },
+        {
+          "t": "h",
+          "text": "Four gaps worth knowing"
+        },
+        {
+          "t": "p",
+          "text": "[[vitamin D]] supports calcium handling and bone health, but food sources are limited. [[vitamin B12]] supports blood and nerve function and needs attention in vegetarian diets. [[iron]] helps carry oxygen. [[calcium]] supports bones, muscle action and nerve signalling. Needs differ by age, sex, diet and health."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Vitamin D",
+              "back": "Sources include sunlight exposure, fortified foods and some animal foods. Blood status cannot be guessed from sunshine alone."
+            },
+            {
+              "front": "Vitamin B12",
+              "back": "Reliable sources include dairy, eggs and fortified foods. Fully plant-based eaters need a dependable plan with a clinician or dietitian."
+            },
+            {
+              "front": "Iron",
+              "back": "Sources include pulses, beans, leafy greens, fortified foods, eggs and meat. Vitamin C can help absorb plant iron."
+            },
+            {
+              "front": "Calcium",
+              "back": "Sources include milk, curd, paneer, calcium-set tofu, ragi and some leafy vegetables."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Hydration without bottle maths"
+        },
+        {
+          "t": "p",
+          "text": "[[hydration]] needs change with heat, sweat, body size, illness and activity. Water, milk and other lower-sugar drinks can contribute. Food also supplies fluid. A practical signal for many healthy people is urine that stays pale yellow. Thirst, training conditions and sweat also matter."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "A simple hydration check",
+            "stops": [
+              {
+                "value": 0,
+                "title": "Clear all day",
+                "text": "You may be drinking more than needed. Do not force water endlessly.",
+                "tag": "Check context"
+              },
+              {
+                "value": 1,
+                "title": "Pale yellow",
+                "text": "This is a useful everyday target for many healthy people.",
+                "tag": "Often hydrated"
+              },
+              {
+                "value": 2,
+                "title": "Dark yellow",
+                "text": "Drink and reassess, especially after heat or exercise.",
+                "tag": "May need fluid"
+              }
+            ],
+            "initial": 1
+          },
+          "caption": "Urine colour is only a rough guide. Medicines, foods and health conditions can change it."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Eat variety",
+              "text": "Rotate vegetables, fruit, pulses, grains, dairy or alternatives, nuts and seeds."
+            },
+            {
+              "title": "Use fortified foods wisely",
+              "text": "Check labels for vitamin D, B12, calcium or iron when your diet lacks reliable sources."
+            },
+            {
+              "title": "Drink around your day",
+              "text": "Bring water to training and drink more during hot, sweaty or long sessions."
+            },
+            {
+              "title": "Ask before treating a deficiency",
+              "text": "Testing and treatment belong with a qualified clinician, especially for iron and vitamin D."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Symptoms need proper assessment",
+          "text": "Persistent fatigue, dizziness, weakness or unusual thirst can have many causes. Do not diagnose a deficiency from an app lesson."
+        }
+      ],
+      "takeaways": [
+        "Food variety helps cover vitamins and minerals that no single food provides.",
+        "Vegetarians should pay particular attention to reliable vitamin B12 and iron sources.",
+        "Use thirst, conditions and pale-yellow urine as practical hydration clues."
+      ],
+      "quiz": [
+        {
+          "q": "Which approach best covers micronutrients?",
+          "options": [
+            "Rotate foods across several groups",
+            "Eat one favourite food repeatedly",
+            "Judge needs from symptoms alone"
+          ],
+          "answer": 0,
+          "why": "Dietary variety improves the chance of covering many different nutrients."
+        },
+        {
+          "q": "Your urine is dark after a hot, sweaty session. What is a sensible first step?",
+          "options": [
+            "Ignore it for the whole day",
+            "Drink some fluid and reassess",
+            "Force several litres immediately"
+          ],
+          "answer": 1,
+          "why": "Heat and sweat raise fluid needs, but hydration should still be gradual and context-aware."
+        }
+      ],
+      "sources": [
+        {
+          "label": "NIH ODS vitamin D fact sheet for health professionals",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS vitamin B12 fact sheet for health professionals",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS iron fact sheet for health professionals",
+          "url": "https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS calcium fact sheet for health professionals",
+          "url": "https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHS water, drinks and hydration guidance",
+          "url": "https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/water-drinks-nutrition/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-vegetarian",
+      "title": "Building muscle as a vegetarian",
+      "summary": "Vegetarian diets can support muscle growth when total protein, food variety, meal structure and key micronutrients are covered.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can give each vegetarian meal a clear protein anchor. Muscles respond to training, enough energy and amino acids, not to the label on dinner."
+        },
+        {
+          "t": "h",
+          "text": "Protein quality, minus the panic"
+        },
+        {
+          "t": "p",
+          "text": "[[protein quality]] describes digestion and the pattern of [[essential amino acid|essential amino acids]]. Dairy, eggs and soy provide strong amino-acid profiles. Pulses, grains, nuts and seeds contribute too. You do not need to combine foods perfectly at every meal. Variety across the day works."
+        },
+        {
+          "t": "video",
+          "id": "_qoyoItiB1E",
+          "title": "VEGAN DIET SCIENCE: Are Eggs Bad? Vegan Bodybuilding? Is Red Meat Bad?",
+          "channel": "Jeff Nippard",
+          "why": "Watch: protein and muscle-building questions in plant-based diets (Jeff Nippard)."
+        },
+        {
+          "t": "widget",
+          "w": "food-compare",
+          "params": {
+            "foods": [
+              "iL003",
+              "iB013",
+              "iB020",
+              "f2707451",
+              "f2705418",
+              "s172448",
+              "f2707514"
+            ],
+            "metric": "per100g",
+            "labels": {
+              "iL003": "Paneer (ready to eat)",
+              "iB013": "Lentils / masoor dal (dry, uncooked)",
+              "iB020": "Rajma, red (dry, uncooked)",
+              "f2707451": "Soya chunks / textured vegetable protein (dry, uncooked)",
+              "f2705418": "Plain whole-milk yogurt / curd-style (ready to eat)",
+              "s172448": "Firm tofu (ready to eat)",
+              "f2707514": "Peanuts (unroasted, ready to eat)"
+            }
+          },
+          "caption": "Per 100 g of the food as listed—not equal meal portions. Dry pulses and dry soya chunks absorb water during cooking, so 100 g dry is not 100 g on your plate."
+        },
+        {
+          "t": "h",
+          "text": "Build meals from anchors"
+        },
+        {
+          "t": "p",
+          "text": "Useful Indian options include dal, chana, rajma, soybeans, soya chunks, tofu, paneer, milk, curd, Greek-style yogurt, eggs, peanuts and seeds. Soya chunks vary by brand and preparation, so check the label. Pulses also bring carbohydrate and fibre, while nuts bring substantial fat and energy."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Pick three or four anchors",
+              "text": "Choose foods you genuinely like, such as dal, paneer, tofu, curd, eggs or soybeans."
+            },
+            {
+              "title": "Give each main meal one anchor",
+              "text": "Try dal plus curd, tofu bhurji, paneer with roti, or rajma with rice."
+            },
+            {
+              "title": "Increase portions gradually",
+              "text": "A little extra dal or curd at several meals is easier than one heroic dinner."
+            },
+            {
+              "title": "Check the full day",
+              "text": "Aim for the range in [[lesson:nut-protein|the protein lesson]], then adjust meals."
+            }
+          ]
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Build a meal around these",
+            "items": [
+              "Paneer or firm tofu",
+              "Curd or yogurt; strained/high-protein versions usually concentrate protein—check the label.",
+              "Eggs, if included",
+              "Soybeans or soya chunks"
+            ]
+          },
+          "right": {
+            "title": "Also contribute protein and energy",
+            "items": [
+              "Peanuts",
+              "Nut butters",
+              "Seeds",
+              "Full-fat cheese"
+            ]
+          }
+        },
+        {
+          "t": "p",
+          "text": "Protein per 100 g and per 100 kcal answer different questions; serving size matters. Use the comparison to notice trade-offs, then build a meal from portions you actually eat."
+        },
+        {
+          "t": "p",
+          "text": "Vegetarian diets also deserve attention to B12, iron, calcium and vitamin D. See [[lesson:nut-micros-water|vitamins, minerals and water]] for food sources and safety. If convenient protein is still difficult, [[lesson:supp-protein-powder|protein powder]] is covered separately."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Your Monday move",
+          "text": "Write down tomorrow's three main meals. Circle the protein anchor in each. If one meal has none, add one familiar food."
+        }
+      ],
+      "takeaways": [
+        "Vegetarian diets can support muscle growth with enough total protein and energy.",
+        "Use a clear protein anchor in each main meal.",
+        "Mix dairy, eggs, soy, pulses, grains, nuts and seeds according to your diet."
+      ],
+      "quiz": [
+        {
+          "q": "Breakfast is tea and toast with little protein. What is the most practical upgrade?",
+          "options": [
+            "Add curd, milk, eggs or tofu",
+            "Remove breakfast every training day",
+            "Add more jam and another toast"
+          ],
+          "answer": 0,
+          "why": "A familiar protein anchor raises the meal's contribution without rebuilding the whole diet."
+        },
+        {
+          "q": "Do lentils and rice need to be eaten in the same mouthful?",
+          "options": [
+            "Yes, or their protein is wasted",
+            "Only after evening training",
+            "No, daily variety is sufficient"
+          ],
+          "answer": 2,
+          "why": "Your amino-acid supply reflects foods eaten across the day, not a perfect bite-by-bite pairing."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Jäger R et al. (2017) ISSN position stand on protein quality and intake",
+          "url": "https://jissn.biomedcentral.com/counter/pdf/10.1186/s12970-017-0177-8.pdf",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "ICMR-NIN (2024) Dietary Guidelines for Indians — official reader",
+          "url": "https://www.nin.res.in/dietaryguidelines/index.html",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "WHO healthy diet fact sheet — diverse plant protein foods",
+          "url": "https://www.who.int/en/news-room/fact-sheets/detail/healthy-diet",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-goals",
+      "title": "Bulk, cut or recomp?",
+      "summary": "Choose one main goal, start with an estimate, and adjust slowly from weekly weight and training trends.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can choose fat loss, maintenance or lean gain and adjust an estimate from your trend. A [[calorie deficit]] supports loss; a [[calorie surplus]] supports gain."
+        },
+        {
+          "t": "h",
+          "text": "Pick the goal that matches the job"
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Choose fat loss when",
+            "items": [
+              "Reducing body fat is your clear priority",
+              "You can train while eating a modest deficit",
+              "You accept slower gym progress"
+            ]
+          },
+          "right": {
+            "title": "Choose lean gain when",
+            "items": [
+              "Muscle gain is your clear priority",
+              "You accept a slow scale increase",
+              "You can train progressively and recover"
+            ]
+          }
+        },
+        {
+          "t": "p",
+          "text": "Maintenance or recomp suits beginners, people returning after a break, and anyone who wants stable body weight. A cut does not need punishment. A lean gain does not require an all-you-can-eat festival. Your training, protein and patience still matter in every phase."
+        },
+        {
+          "t": "video",
+          "id": "M4K0s792wAU",
+          "title": "How To Build Muscle And Lose Fat At The Same Time: Step By Step Explained (Body Recomposition)",
+          "channel": "Jeff Nippard",
+          "why": "Watch: how body recomposition works (Jeff Nippard)."
+        },
+        {
+          "t": "p",
+          "text": "The calorie offsets below are app-chosen examples, not research-established optimal percentages. They do not predict a particular weekly change. These broad activity categories are rough guesses; your weight trend is the check."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Check the floor before dieting",
+          "text": "Adult estimates only. Do not use this calculator during pregnancy or breastfeeding, for teenagers, or to plan weight loss when underweight. The calculator won’t show a fat-loss target below about 1,200 kcal for women, 1,500 kcal for men, or below your resting needs. If your estimate reaches that floor, talk to a doctor or registered dietitian before cutting calories."
+        },
+        {
+          "t": "widget",
+          "w": "macro-calc",
+          "params": {
+            "activity": [
+              {
+                "label": "Mostly seated",
+                "factor": 1.2
+              },
+              {
+                "label": "Light overall activity",
+                "factor": 1.375
+              },
+              {
+                "label": "Moderate overall activity",
+                "factor": 1.55
+              },
+              {
+                "label": "Very active week",
+                "factor": 1.725
+              },
+              {
+                "label": "Extremely active work and training",
+                "factor": 1.9
+              }
+            ],
+            "goals": [
+              {
+                "label": "Fat loss — illustrative start (about −17.5%)",
+                "kcalPct": -17.5,
+                "proteinPerKg": [
+                  1.6,
+                  2.2
+                ]
+              },
+              {
+                "label": "Maintain",
+                "kcalPct": 0,
+                "proteinPerKg": [
+                  1.4,
+                  2.0
+                ]
+              },
+              {
+                "label": "Lean gain — illustrative start (about +7.5%)",
+                "kcalPct": 7.5,
+                "proteinPerKg": [
+                  1.6,
+                  2.2
+                ]
+              }
+            ],
+            "fatPctKcal": [
+              20,
+              35
+            ],
+            "sources_note": "Mifflin estimates resting expenditure; the activity multipliers are common rule-of-thumb factors. Protein and fat ranges have separate sources. The calorie offsets are LiftLog’s conservative starting choices, adjusted by weekly trend; the physique reviews support only the separately described rate guidance.",
+            "hypothetical": true
+          },
+          "caption": "Choose protein and fat within these goal-specific working ranges; carbohydrate fills the remaining calories. Do not combine all three upper limits. These are not minimums everyone must reach."
+        },
+        {
+          "t": "h",
+          "text": "Use rates, not deadlines"
+        },
+        {
+          "t": "p",
+          "text": "Helms and colleagues suggested losing about 0.5–1% of body weight per week during contest preparation. Beginners do not need the aggressive edge of that range. Iraki and colleagues suggested gaining about 0.25–0.5% weekly for novice or intermediate lifters. Advanced lifters should be more conservative."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "Weekly body-weight change",
+            "stops": [
+              {
+                "value": -1,
+                "title": "Faster loss",
+                "text": "Around 1% down per week can be demanding. Recovery and gym performance need close attention.",
+                "tag": "Use caution"
+              },
+              {
+                "value": -0.5,
+                "title": "Moderate loss",
+                "text": "Around 0.5% down per week is a common evidence-based reference point.",
+                "tag": "Often manageable"
+              },
+              {
+                "value": 0,
+                "title": "Maintenance or recomp",
+                "text": "Scale weight can stay similar while strength, measurements and photos change.",
+                "tag": "Slow signal"
+              },
+              {
+                "value": 0.25,
+                "title": "Slow gain",
+                "text": "Around 0.25% up per week may limit unnecessary fat gain.",
+                "tag": "Lean-gain pace"
+              },
+              {
+                "value": 0.5,
+                "title": "Faster gain",
+                "text": "Around 0.5% up per week may suit some newer lifters, but monitor the trend.",
+                "tag": "Upper reference"
+              }
+            ],
+            "initial": 0
+          },
+          "caption": "These are reference rates from physique-sport reviews, not promises or medical targets."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Estimate",
+              "text": "Use the calculator as a starting point, not a verdict."
+            },
+            {
+              "title": "Collect two to three weeks",
+              "text": "Track several morning weights, training performance, hunger and recovery."
+            },
+            {
+              "title": "Average the trend",
+              "text": "Ignore single-day jumps and compare weekly averages."
+            },
+            {
+              "title": "Make a small adjustment",
+              "text": "If the trend misses the goal, change intake modestly and observe again."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Dieting is not medical care",
+          "text": "No crash diets. Anyone with diabetes, kidney disease, pregnancy or an eating-disorder history should speak with a doctor or registered dietitian before changing intake."
+        }
+      ],
+      "takeaways": [
+        "Choose one main goal and use the calculator only as a starting estimate.",
+        "Lose or gain weight slowly enough to protect training and recovery.",
+        "Adjust calories from multi-week trends, not one weigh-in."
+      ],
+      "quiz": [
+        {
+          "q": "The calculator predicts maintenance, but your weekly average falls for three weeks. What should you conclude?",
+          "options": [
+            "The estimate needs adjustment",
+            "The scale must be broken",
+            "Energy balance has stopped working"
+          ],
+          "answer": 0,
+          "why": "Equations are estimates. Your repeated trend is useful feedback about actual intake and expenditure."
+        },
+        {
+          "q": "Which lean-gain plan is most sensible?",
+          "options": [
+            "Add as much food as possible",
+            "Aim for slow gain and monitor",
+            "Ignore protein and training progress"
+          ],
+          "answer": 1,
+          "why": "A modest surplus and slow trend support muscle gain while limiting unnecessary fat gain."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Mifflin MD et al. (1990) resting energy expenditure equation",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/2305711/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "My Nutrition Index (2022) — five reported physical activity factors",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8862522/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Helms ER et al. (2014) contest-preparation recommendations",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24864135/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Iraki J et al. (2019) off-season muscle-gain recommendations",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31247944/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Morton RW et al. (2018) protein meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28698222/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Jäger R et al. (2017) ISSN position stand on protein and exercise",
+          "url": "https://jissn.biomedcentral.com/counter/pdf/10.1186/s12970-017-0177-8.pdf",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Institute of Medicine Dietary Reference Intakes — adult fat AMDR",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK208874/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Harvard Health (2024) — calorie intake should not fall below 1,200 kcal for women or 1,500 kcal for men without professional supervision",
+          "url": "https://www.health.harvard.edu/staying-healthy/calorie-counting-made-easy",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-timing",
+      "title": "Meal timing and the 'anabolic window'",
+      "summary": "Daily calories and protein do most of the work. Meals around training can improve comfort, fuel and convenience.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can place meals around training without racing a tiny “anabolic window.” Daily protein and energy matter more than eating within a few emergency minutes."
+        },
+        {
+          "t": "h",
+          "text": "The priority ladder"
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Hit the daily total",
+              "text": "Enough calories and protein across the day matter most."
+            },
+            {
+              "title": "Spread protein reasonably",
+              "text": "Several protein-containing meals create repeated chances for muscle protein synthesis."
+            },
+            {
+              "title": "Place food around training",
+              "text": "Use pre- and post-workout meals for fuel, recovery and convenience."
+            },
+            {
+              "title": "Fine-tune only if useful",
+              "text": "Exact minutes matter far less than a pattern you can repeat."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "text": "A protein-containing meal within a few hours before training still supplies amino acids afterward. If you trained after a normal meal, you do not need to sprint toward a shaker. If you trained fasted or will not eat for many hours, eating sooner becomes more useful."
+        },
+        {
+          "t": "video",
+          "id": "tALUxxVxqA8",
+          "title": "The Post-Workout Anabolic Window (MYTH BUSTED with Science)",
+          "channel": "Jeff Nippard",
+          "why": "Watch: why the post-workout window is wider than thirty minutes (Jeff Nippard)."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "line",
+            "title": "Two workable protein patterns",
+            "xLabel": "Earlier → later meals",
+            "yLabel": "Less → more (illustration)",
+            "x": [
+              "Breakfast",
+              "Lunch",
+              "After training",
+              "Dinner"
+            ],
+            "series": [
+              {
+                "name": "Even spread",
+                "values": [
+                  25,
+                  30,
+                  30,
+                  25
+                ],
+                "style": "solid"
+              },
+              {
+                "name": "Back-loaded",
+                "values": [
+                  10,
+                  20,
+                  20,
+                  60
+                ],
+                "style": "dashed"
+              }
+            ],
+            "note": "Both totals equal 110 in this fictional example. The even pattern creates more balanced meal opportunities.",
+            "hypothetical": true
+          },
+          "caption": "The chart teaches distribution. It does not prescribe 110 g or these meal times."
+        },
+        {
+          "t": "h",
+          "text": "Before and after training"
+        },
+        {
+          "t": "p",
+          "text": "Before training, choose familiar food that digests comfortably. Carbohydrate can support a demanding session, while protein contributes to the day's total. After training, eat a normal protein-containing meal when practical. Large fatty or very fibrous meals immediately before lifting may feel heavy for some people."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "You must eat protein within 30 minutes.",
+              "back": "The window is wider. Your previous meal, total protein and next meal all matter."
+            },
+            {
+              "front": "Training fasted always burns more body fat.",
+              "back": "Fuel use during one session does not decide long-term fat loss. Energy balance still matters."
+            },
+            {
+              "front": "Night eating automatically causes fat gain.",
+              "back": "Meal timing can affect comfort and habits, but total intake drives the larger trend."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "A simple schedule",
+          "text": "Place a protein-containing meal one to three hours before or after training when convenient. Do not let timing anxiety ruin a good daily diet."
+        }
+      ],
+      "takeaways": [
+        "Daily protein and calories matter more than exact meal timing.",
+        "The post-workout opportunity lasts longer than a narrow thirty-minute window.",
+        "Use meals around training for fuel, comfort and consistency."
+      ],
+      "quiz": [
+        {
+          "q": "You trained two hours after a protein-containing lunch. What should you do afterward?",
+          "options": [
+            "Eat your next normal meal when practical",
+            "Rush to eat within ten minutes",
+            "Skip dinner to avoid excess protein"
+          ],
+          "answer": 0,
+          "why": "Your earlier meal still matters, and the post-workout opportunity is not a tiny deadline."
+        },
+        {
+          "q": "When does eating soon after training become more useful?",
+          "options": [
+            "After every warm-up set",
+            "After training fasted for hours",
+            "Only on a rest day"
+          ],
+          "answer": 1,
+          "why": "If no recent meal is supplying nutrients, eating afterward closes a longer gap."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Aragon AA and Schoenfeld BJ (2013) nutrient timing and the anabolic window",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23360586/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Schoenfeld BJ and Aragon AA (2018) protein per meal and distribution review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29497353/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Jäger R et al. (2017) ISSN position stand on protein timing",
+          "url": "https://jissn.biomedcentral.com/counter/pdf/10.1186/s12970-017-0177-8.pdf",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "nut-labels-habits",
+      "title": "Reading labels and building habits",
+      "summary": "Labels help you compare foods. Simple shopping, meal and tracking habits make good choices easier to repeat.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can match a label column to the amount you eat and choose one repeatable food habit. Front labels advertise; the useful comparison details usually sit on the back."
+        },
+        {
+          "t": "h",
+          "text": "Read in this order"
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Serving size",
+              "text": "Check whether the numbers are per serving, per 100 g/ml, or per whole pack. Match them to the amount you eat."
+            },
+            {
+              "title": "Calories and macros",
+              "text": "Look at energy, protein, carbohydrate and fat for the amount you expect to eat."
+            },
+            {
+              "title": "Fibre and key limits",
+              "text": "Compare fibre, saturated fat, sodium and added sugars between similar products."
+            },
+            {
+              "title": "Ingredients",
+              "text": "Ingredients appear by weight. Use the list for allergies, preferences and product quality."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "text": "A serving size is not a command. It is the basis for one label column. If you eat two servings, double the per-serving numbers—not a per-pack column. Compare similar products using the same serving weight when possible."
+        },
+        {
+          "t": "video",
+          "id": "nXBeE1KhUKI",
+          "title": "Mayo Clinic Minute: How to read the new Nutrition Facts label",
+          "channel": "Mayo Clinic",
+          "why": "Watch: how to read a Nutrition Facts label (Mayo Clinic)."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "US FDA %DV guide per serving",
+            "stops": [
+              {
+                "value": 5,
+                "title": "5% DV or less",
+                "text": "The FDA considers this low for that nutrient.",
+                "tag": "Low"
+              },
+              {
+                "value": 12,
+                "title": "Between the guideposts",
+                "text": "Use context and compare similar products.",
+                "tag": "Middle"
+              },
+              {
+                "value": 20,
+                "title": "20% DV or more",
+                "text": "The FDA considers this high for that nutrient.",
+                "tag": "High"
+              }
+            ],
+            "initial": 12
+          },
+          "caption": "The US FDA [[percent daily value|%DV]] guide helps read US-style labels; other countries use different reference systems. It is not your personal target for every meal."
+        },
+        {
+          "t": "h",
+          "text": "Habits beat heroic willpower"
+        },
+        {
+          "t": "p",
+          "text": "Make the better option the easier option. Keep two fast breakfasts, two portable snacks and three simple dinners available. Shop with a short list. Cook extra dal, rice or sabzi. Put fruit where you can see it. A boring backup meal can rescue a chaotic Wednesday."
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Your repeatable food system",
+            "groups": [
+              {
+                "title": "At home",
+                "items": [
+                  "Keep one quick protein food ready",
+                  "Keep fruit or vegetables visible",
+                  "Batch-cook one useful staple"
+                ]
+              },
+              {
+                "title": "At work or outside",
+                "items": [
+                  "Carry water",
+                  "Pack a protein-containing snack",
+                  "Check serving size before comparing labels"
+                ]
+              },
+              {
+                "title": "Each week",
+                "items": [
+                  "Review weight trend only if relevant",
+                  "Plan three easy dinners",
+                  "Leave room for enjoyable foods"
+                ]
+              }
+            ],
+            "persistKey": "nutrition-habits"
+          },
+          "caption": "Tick only habits that genuinely fit your life. Reset and simplify when the list becomes clutter."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Flexible habits",
+            "items": [
+              "Mostly repeatable meals",
+              "Planned enjoyable foods",
+              "Small changes after trends",
+              "Return at the next meal"
+            ]
+          },
+          "right": {
+            "title": "All-or-nothing traps",
+            "items": [
+              "Perfect eating or failure",
+              "Banning every favourite food",
+              "Reacting to one weigh-in",
+              "Waiting for next Monday"
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "One shop experiment",
+          "text": "Compare two similar curds, breads or cereals. Match the serving weight, then compare protein, fibre, saturated fat, sodium and added sugars."
+        }
+      ],
+      "takeaways": [
+        "Read serving size before calories or nutrients.",
+        "Compare similar foods using the same serving amount.",
+        "Build a few easy defaults instead of relying on daily motivation.",
+        "One unusual meal does not erase a consistent week."
+      ],
+      "quiz": [
+        {
+          "q": "The label’s per-serving column describes one serving. The pack contains two servings and you eat it all. How do you use that column?",
+          "options": [
+            "Double the per-serving calories and nutrients",
+            "Use the per-serving numbers once",
+            "Ignore the label because it is packaged"
+          ],
+          "answer": 0,
+          "why": "The chosen column is per serving, so eating two servings means doubling that column. A per-pack column would already cover the whole pack."
+        },
+        {
+          "q": "Which habit is most likely to survive a busy week?",
+          "options": [
+            "Cook every meal from scratch",
+            "Keep a simple backup meal ready",
+            "Ban all convenience foods forever"
+          ],
+          "answer": 1,
+          "why": "A low-friction backup reduces the need for perfect planning or motivation."
+        }
+      ],
+      "sources": [
+        {
+          "label": "FDA guide to understanding and using the Nutrition Facts label",
+          "url": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "WHO healthy diet fact sheet — adequacy, balance, moderation and diversity",
+          "url": "https://www.who.int/en/news-room/fact-sheets/detail/healthy-diet",
+          "checked": "2026-10-10"
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "calorie",
+      "def": "A unit of energy. Food labels use kilocalories, commonly written as Calories or kcal."
+    },
+    {
+      "term": "energy balance",
+      "def": "The long-term relationship between energy eaten and energy used by the body."
+    },
+    {
+      "term": "basal metabolic rate",
+      "def": "Estimated energy used for essential body functions while resting under controlled conditions."
+    },
+    {
+      "term": "NEAT",
+      "def": "Energy used by everyday movement outside planned exercise, sleeping and eating."
+    },
+    {
+      "term": "thermic effect of food",
+      "def": "Energy used to digest, absorb, process and store nutrients after eating."
+    },
+    {
+      "term": "glycogen",
+      "def": "Stored carbohydrate in muscles and liver that also holds water."
+    },
+    {
+      "term": "macronutrient",
+      "def": "A nutrient eaten in relatively large amounts, mainly protein, carbohydrate and fat."
+    },
+    {
+      "term": "protein",
+      "def": "A nutrient made of amino acids that supports tissues, enzymes and many body functions."
+    },
+    {
+      "term": "carbohydrate",
+      "def": "A nutrient that includes sugars, starches and fibre and supplies useful energy."
+    },
+    {
+      "term": "dietary fat",
+      "def": "An energy-dense nutrient that supplies essential fats and helps absorb certain vitamins."
+    },
+    {
+      "term": "amino acid",
+      "def": "A small building block used to make proteins in food and the body."
+    },
+    {
+      "term": "AMDR",
+      "def": "A broad recommended range for the percentage of energy supplied by each macronutrient."
+    },
+    {
+      "term": "muscle protein synthesis",
+      "def": "The process of building new muscle proteins from available amino acids."
+    },
+    {
+      "term": "whole grain",
+      "def": "A grain food retaining the bran, germ and starchy inner part."
+    },
+    {
+      "term": "fibre",
+      "def": "Carbohydrate from plants that is not fully digested in the small intestine."
+    },
+    {
+      "term": "unsaturated fat",
+      "def": "A type of fat common in nuts, seeds, avocados and many plant oils."
+    },
+    {
+      "term": "saturated fat",
+      "def": "A type of fat common in butter, ghee, coconut oil and higher-fat animal foods."
+    },
+    {
+      "term": "micronutrient",
+      "def": "A vitamin or mineral needed in small amounts for normal body functions."
+    },
+    {
+      "term": "vitamin",
+      "def": "An organic nutrient needed in small amounts for growth, health and body processes."
+    },
+    {
+      "term": "mineral",
+      "def": "A chemical element needed for structures and processes such as bones, nerves and blood."
+    },
+    {
+      "term": "vitamin D",
+      "def": "A vitamin involved in calcium absorption, bones, muscles and other body functions."
+    },
+    {
+      "term": "vitamin B12",
+      "def": "A vitamin needed for blood formation, nerves and DNA production."
+    },
+    {
+      "term": "iron",
+      "def": "A mineral used in proteins that carry and use oxygen."
+    },
+    {
+      "term": "calcium",
+      "def": "A mineral important for bones, muscle action, nerves and blood clotting."
+    },
+    {
+      "term": "hydration",
+      "def": "Having enough body water for normal function, activity and temperature control."
+    },
+    {
+      "term": "protein quality",
+      "def": "How well a protein is digested and supplies essential amino acids."
+    },
+    {
+      "term": "essential amino acid",
+      "def": "An amino acid the body cannot make in sufficient amounts and must obtain from food."
+    },
+    {
+      "term": "calorie surplus",
+      "def": "A period when energy intake is higher than energy expenditure."
+    },
+    {
+      "term": "calorie deficit",
+      "def": "A period when energy intake is lower than energy expenditure."
+    },
+    {
+      "term": "body recomposition",
+      "def": "Gaining muscle while losing body fat, sometimes with little scale-weight change."
+    },
+    {
+      "term": "anabolic window",
+      "def": "The proposed period around training when nutrients may support muscle-building responses."
+    },
+    {
+      "term": "serving size",
+      "def": "The standard food amount used for the nutrition information on a label."
+    },
+    {
+      "term": "percent daily value",
+      "def": "A label reference showing how much one serving contributes toward a general daily amount."
+    }
+  ]
+}

@@ -1,0 +1,1053 @@
+{
+  "section": "programming",
+  "lessons": [
+    {
+      "id": "prog-progressive-overload",
+      "title": "Progressive overload",
+      "summary": "Progress means asking your body to handle a little more over time, usually through extra clean reps or a small weight increase.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can choose a small next-step progression instead of changing everything at once. [[progressive overload]] means making training gradually harder as a challenge becomes familiar."
+        },
+        {
+          "t": "h",
+          "text": "More does not mean reckless"
+        },
+        {
+          "t": "p",
+          "text": "Progressive overload is not adding weight at every workout, whatever happens. It means improving the training challenge across many sessions while your reps stay controlled. You might lift more weight, complete more clean reps, add a useful set, or improve your range and control. Think of it like turning a dial, not launching a rocket."
+        },
+        {
+          "t": "video",
+          "id": "k0J8URJfUTg",
+          "title": "Everyone Is Confused About Progressive Overload",
+          "channel": "Jeff Nippard",
+          "why": "Watch: how progressive overload works (Jeff Nippard)."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Start inside the range",
+              "text": "Imagine your plan says 3 sets of 8–10 reps. You use 20 kg and record 8, 8, and 8 clean reps. This is an example, not a prescription."
+            },
+            {
+              "title": "Build reps first",
+              "text": "Across later workouts, keep 20 kg and try to earn more clean reps. Your log might move to 10, 9, and 8, then 10, 10, and 10."
+            },
+            {
+              "title": "Add a small amount",
+              "text": "Once every set reaches the top of the range, move to 22.5 kg. Your reps may return near the bottom. That is normal."
+            },
+            {
+              "title": "Repeat the climb",
+              "text": "Build the reps again before the next increase. This reps-then-weight loop is called [[double progression]]."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Reps or weight can both work",
+          "text": "A study in newer lifters found that progressing by repetitions or by load produced similar improvements over its training period. That supports using the option your equipment and program make practical."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "line",
+            "title": "Progress rarely forms a perfect staircase",
+            "xLabel": "Earlier → later",
+            "yLabel": "Less → more (illustration)",
+            "x": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "series": [
+              {
+                "name": "Logged performance",
+                "values": [
+                  20,
+                  22,
+                  21,
+                  24,
+                  24,
+                  27
+                ],
+                "style": "solid"
+              }
+            ],
+            "note": "Some weeks hold steady or dip. Look for the longer trend.",
+            "hypothetical": true
+          },
+          "caption": "Illustration: real progress includes flat days, small dips, and later breakthroughs."
+        },
+        {
+          "t": "h",
+          "text": "What to do in LiftLog"
+        },
+        {
+          "t": "p",
+          "text": "Follow the Built With Science Upper/Lower routine as written. LiftLog pre-fills your last weight and reps, so the next sensible target is visible. Try to beat one useful detail without changing five others. If technique changes, the comparison is less meaningful. Use [[lesson:tech-choosing-weight|Choosing the right weight]] when a load is clearly too light or too heavy."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Useful progress",
+            "items": [
+              "One more clean rep at the same weight",
+              "The same reps with slightly more weight",
+              "Better control at the same weight and reps"
+            ]
+          },
+          "right": {
+            "title": "Progress-shaped noise",
+            "items": [
+              "Shortening the movement to claim extra reps",
+              "Changing every exercise before trends appear",
+              "Adding weight while technique falls apart"
+            ]
+          }
+        }
+      ],
+      "takeaways": [
+        "Progressive overload means gradually increasing a useful training challenge.",
+        "Double progression builds reps first, then adds a small amount of weight.",
+        "Judge progress across several sessions, not one unusually good or bad day.",
+        "LiftLog’s previous-set values make the next sensible target easy to spot."
+      ],
+      "quiz": [
+        {
+          "q": "You reach the top of your rep range on every set with clean form. What is the clearest next step?",
+          "options": [
+            "Add a small amount of weight next time",
+            "Change the entire workout next time",
+            "Repeat fewer reps with the same weight"
+          ],
+          "answer": 0,
+          "why": "In double progression, reaching the top across all sets earns a small load increase. Reps can then return near the range’s bottom."
+        },
+        {
+          "q": "Your reps rise only because you shorten the movement. Did you clearly progress?",
+          "options": [
+            "Yes, because any extra rep proves progress",
+            "No, because the task changed during the comparison",
+            "Yes, because range never matters when logging"
+          ],
+          "answer": 1,
+          "why": "A shorter movement is a different task. Keep execution comparable so the log reflects a real performance change."
+        }
+      ],
+      "sources": [
+        {
+          "label": "American College of Sports Medicine (2009) — Progression models in resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19204579/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Chaves TS et al. (2024) — Load versus repetition progression protocols",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38286426/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "prog-volume",
+      "title": "How many sets? Training volume",
+      "summary": "Weekly hard sets are a useful way to count training volume, but more work brings diminishing returns and more fatigue.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can count useful weekly sets and know when not to add more. [[Training volume]] is the work you perform; for muscle growth, weekly [[hard set|hard sets]] are a practical shortcut."
+        },
+        {
+          "t": "h",
+          "text": "Count useful sets, not every warm-up"
+        },
+        {
+          "t": "p",
+          "text": "A hard set is challenging enough to be a meaningful growth signal. Easy warm-up sets prepare you, but they are not counted the same way. A pressing set may train several muscles, so set counting is always an estimate. It is a map, not a laboratory scan."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "Weekly hard sets for one muscle",
+            "stops": [
+              {
+                "value": 4,
+                "title": "Under 5 sets",
+                "text": "The lowest weekly-dose category in the 2017 review. It can still be useful and leaves room to add work later.",
+                "tag": "Lower dose"
+              },
+              {
+                "value": 7,
+                "title": "5–9 sets",
+                "text": "A middle research category. Using it as a beginner starting example is a coaching suggestion, not a proven optimum.",
+                "tag": "Conservative example"
+              },
+              {
+                "value": 10,
+                "title": "10+ sets",
+                "text": "A higher-dose category in this review, not a personal target or an unlimited-more-is-better rule.",
+                "tag": "Higher dose"
+              }
+            ],
+            "initial": 7
+          },
+          "caption": "These are the 2017 review’s research categories. Choosing the middle band as a beginner starting example is a coaching suggestion, not a proven optimum."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Why we say returns can shrink",
+          "text": "The 2017 review found more growth in higher weekly-set categories, but it did not identify one perfect number for every person. Exercise choice, effort, training age and recovery change what you can use."
+        },
+        {
+          "t": "video",
+          "id": "lj82X3E0enQ",
+          "title": "How Many Sets Per Exercise is BEST?",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: choosing a useful number of sets (Renaissance Periodization)."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "line",
+            "title": "More volume, smaller extra returns",
+            "xLabel": "Lower → higher weekly set dose",
+            "yLabel": "Less → more (illustration)",
+            "x": [
+              "Low",
+              "Moderate",
+              "High",
+              "Very high"
+            ],
+            "series": [
+              {
+                "name": "Possible response",
+                "values": [
+                  2,
+                  6,
+                  8,
+                  9
+                ],
+                "style": "solid"
+              },
+              {
+                "name": "Recovery cost",
+                "values": [
+                  1,
+                  3,
+                  6,
+                  9
+                ],
+                "style": "dashed"
+              }
+            ],
+            "note": "The shapes explain diminishing returns. They are not measured values.",
+            "hypothetical": true
+          },
+          "caption": "Illustration: useful work can rise while each extra set buys less."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Start with the routine you have",
+          "text": "The Built With Science Upper/Lower plan already distributes work across the week. Do not add sets just because a slider has a bigger number. First log the plan consistently and see whether performance rises."
+        },
+        {
+          "t": "h",
+          "text": "When should volume change?"
+        },
+        {
+          "t": "p",
+          "text": "Keep volume steady while you are progressing and recovering. Consider a small increase only when performance has stalled, technique is sound, effort is appropriate, and recovery is fine. If several exercises slide backward and you feel worn down, more sets are unlikely to be the first answer. Use the checklist in [[lesson:prog-deloads-plateaus|Plateaus and deloads]] before editing the plan."
+        }
+      ],
+      "takeaways": [
+        "Count challenging working sets, not every warm-up set.",
+        "More weekly sets can help, but the extra benefit tends to shrink.",
+        "Beginners should start modestly and add work only when results and recovery support it.",
+        "A repeatable plan beats chasing the largest possible set count."
+      ],
+      "quiz": [
+        {
+          "q": "Your planned volume is producing steady progress. What should you do first?",
+          "options": [
+            "Double every exercise’s weekly sets",
+            "Keep the plan steady and keep logging",
+            "Add random sets whenever energy feels high"
+          ],
+          "answer": 1,
+          "why": "Volume is already doing its job. More work adds fatigue and is not automatically better."
+        },
+        {
+          "q": "Which set is least useful to count as a hard growth set?",
+          "options": [
+            "A challenging working set near your limit",
+            "A controlled working set that slows near the end",
+            "An easy warm-up set used to prepare"
+          ],
+          "answer": 2,
+          "why": "Warm-ups are useful preparation, but they do not create the same training challenge as hard working sets."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Schoenfeld BJ, Ogborn D, Krieger JW (2017) — Weekly volume dose-response meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27433992/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "prog-frequency-splits",
+      "title": "How often: frequency and splits",
+      "summary": "Frequency is how often a muscle trains; a split is how the week is organised. Choose a schedule you can repeat.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can choose a weekly split that fits your calendar and spreads work sensibly. [[Training frequency]] is how often a muscle trains; a [[training split]] packages movements across days."
+        },
+        {
+          "t": "h",
+          "text": "Why train a muscle more than once?"
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "What the updated review found",
+          "text": "Training a muscle more often can spread your weekly work across shorter, less tiring sessions. An updated review found no meaningful muscle-growth advantage from higher frequency when weekly volume was equal. Choose a schedule that lets you complete good-quality work and recover."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Full body",
+            "items": [
+              "Most major muscle groups each session",
+              "Works well with fewer training days",
+              "Sessions can feel broad and busy"
+            ]
+          },
+          "right": {
+            "title": "Upper/lower",
+            "items": [
+              "Upper and lower sessions alternate",
+              "Each muscle can appear about twice weekly",
+              "Matches LiftLog’s Built With Science routine"
+            ]
+          }
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Push-pull-legs",
+            "items": [
+              "Pressing, pulling, and leg days rotate",
+              "Can suit people who enjoy more gym days",
+              "Missed days may shift the whole rotation"
+            ]
+          },
+          "right": {
+            "title": "The best split",
+            "items": [
+              "Fits your real weekly calendar",
+              "Lets you recover between similar sessions",
+              "Makes the planned weekly work repeatable"
+            ]
+          }
+        },
+        {
+          "t": "h",
+          "text": "The split is packaging"
+        },
+        {
+          "t": "p",
+          "text": "A split is not magic by itself. Muscle growth depends more on useful weekly training than on the name printed above Monday. When weekly volume is similar, several schedules can work. The winning schedule is usually the one you can perform with good effort, sensible recovery, and few skipped sessions."
+        },
+        {
+          "t": "video",
+          "id": "5RtVbWCX5y0",
+          "title": "Which Workout Split Is Actually Best? (Science-Based)",
+          "channel": "Jeff Nippard",
+          "why": "Watch: how common workout splits compare (Jeff Nippard)."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Use the plan already loaded",
+          "text": "The Built With Science Upper/Lower routine gives each half of your body repeated practice across the week. Keep its order unless your calendar truly demands a change. If you miss a day, resume the sequence instead of cramming everything into one marathon session."
+        },
+        {
+          "t": "p",
+          "text": "Your week also needs space between hard sessions for the same muscles. Recovery needs vary, so link to [[lesson:rec-rest-days|Rest days and active recovery]] rather than guessing from soreness alone. A schedule that looks elegant on paper but fails every busy week is just decorative stationery."
+        }
+      ],
+      "takeaways": [
+        "Frequency describes how often a muscle trains; a split organises exercises across the week.",
+        "About twice weekly is a practical scheduling option, not a proven requirement for superior growth.",
+        "Full body, upper/lower, and push-pull-legs can all work when weekly training is sensible.",
+        "Choose the schedule you can repeat, recover from, and fit around real life."
+      ],
+      "quiz": [
+        {
+          "q": "Two plans provide similar weekly work. Which split is the better choice?",
+          "options": [
+            "The one with the most impressive name",
+            "The one that fits your week and recovery",
+            "The one requiring the longest single session"
+          ],
+          "answer": 1,
+          "why": "A split is a way to organise useful work. Consistency and recovery matter more than the label."
+        },
+        {
+          "q": "You miss an upper-body day in your normal rotation. What is usually sensible?",
+          "options": [
+            "Resume the sequence at the next opportunity",
+            "Repeat the last lower session immediately",
+            "Combine every missed set into one giant workout"
+          ],
+          "answer": 0,
+          "why": "Resuming the sequence protects the plan’s balance without turning one missed day into an excessive catch-up session."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Schoenfeld BJ, Grgic J, Krieger J (2019) — Updated resistance-training frequency and hypertrophy meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30558493/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "prog-effort-failure",
+      "title": "How hard: effort and failure",
+      "summary": "Hard sets should approach your clean-rep limit, but reaching failure on every set is unnecessary and can create extra fatigue.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can judge whether a set was hard enough without forcing every set to failure. [[RIR]] means “reps in reserve”: clean reps you believe remained."
+        },
+        {
+          "t": "h",
+          "text": "Use the fuel-gauge idea"
+        },
+        {
+          "t": "p",
+          "text": "Picture a fuel gauge counting down toward empty. Four RIR means you likely had four clean reps left. Zero RIR means no clean rep remained. That endpoint is [[muscular failure]]. Estimating RIR is a skill, so beginners often improve with practice and honest logging."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "Reps left in the tank",
+            "stops": [
+              {
+                "value": 0,
+                "title": "0 RIR",
+                "text": "No clean rep remains. This is muscular failure.",
+                "tag": "Limit"
+              },
+              {
+                "value": 1,
+                "title": "1 RIR",
+                "text": "One clean rep probably remains. The set is very hard.",
+                "tag": "Very hard"
+              },
+              {
+                "value": 2,
+                "title": "2 RIR",
+                "text": "Two clean reps probably remain. This is hard without being all-out.",
+                "tag": "Hard"
+              },
+              {
+                "value": 3,
+                "title": "3 RIR",
+                "text": "Three clean reps probably remain. This can still be productive.",
+                "tag": "Challenging"
+              },
+              {
+                "value": 4,
+                "title": "4 RIR",
+                "text": "Four clean reps probably remain. Useful for practice or managing fatigue.",
+                "tag": "Moderate"
+              }
+            ],
+            "initial": 2
+          },
+          "caption": "RIR is an estimate of clean reps remaining, not a perfect measurement."
+        },
+        {
+          "t": "p",
+          "text": "Reviews find that reaching failure is not required for strength or muscle growth. Sets still need enough effort to create a useful challenge. The exact best distance from failure is not settled, and the relationship may not be a simple straight line. “Closer” is not automatically “better” forever."
+        },
+        {
+          "t": "video",
+          "id": "deDlhPmT2SY",
+          "title": "How To Tell If You're Training Hard Enough (Using Science)",
+          "channel": "Jeff Nippard",
+          "why": "Watch: judging whether a set is hard enough (Jeff Nippard)."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Stopping just short",
+            "items": [
+              "Keeps one or more clean reps available",
+              "Usually creates less immediate fatigue",
+              "Often suits repeated compound movements"
+            ]
+          },
+          "right": {
+            "title": "Reaching failure",
+            "items": [
+              "Confirms no clean rep remains",
+              "Can be easier to judge on stable movements",
+              "May cost more fatigue for little extra benefit"
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Technique is the boundary",
+          "text": "Stop when another rep would require a major technique change or create pain. Muscular failure is about clean reps, not forcing the weight through any possible path."
+        },
+        {
+          "t": "h",
+          "text": "What to do on Monday"
+        },
+        {
+          "t": "p",
+          "text": "Follow the routine’s target effort. Record your estimate after the set, before hindsight edits the story. If you finish with four or more clean reps available, the set may be too easy for its goal. If every set becomes an all-out battle, reduce the load or stop sooner. Learn the moment-to-moment skill in [[lesson:tech-choosing-weight|Choosing the right weight]]."
+        }
+      ],
+      "takeaways": [
+        "RIR estimates how many clean reps remained when you stopped.",
+        "Training to failure is not required for strength or muscle growth.",
+        "Hard, controlled sets can be productive without becoming all-out battles.",
+        "Stop when technique breaks down or pain appears."
+      ],
+      "quiz": [
+        {
+          "q": "You finish a set and believe two clean reps remained. What should you log?",
+          "options": [
+            "0 RIR",
+            "2 RIR",
+            "4 RIR"
+          ],
+          "answer": 1,
+          "why": "RIR records your estimate of clean repetitions still available. Two remaining reps means 2 RIR."
+        },
+        {
+          "q": "Must every working set reach muscular failure to build muscle?",
+          "options": [
+            "Yes, every set must end at failure",
+            "No, challenging non-failure sets can work",
+            "Yes, unless the workout feels very long"
+          ],
+          "answer": 1,
+          "why": "Meta-analyses do not show that momentary failure is required. Appropriate effort matters, but all-out sets are optional."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Grgic J et al. (2022) — Failure versus non-failure training meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33497853/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Refalo MC et al. (2023) — Proximity-to-failure and hypertrophy meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36334240/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "prog-deloads-plateaus",
+      "title": "Plateaus and deloads",
+      "summary": "A plateau is a trend, not one bad workout. Check the basics first; a deload can reduce accumulated fatigue when needed.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can tell one rough workout from a real plateau and choose a sensible next step. A [[plateau]] is stalled progress across repeated, comparable sessions."
+        },
+        {
+          "t": "h",
+          "text": "Troubleshoot before rebuilding everything"
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Plateau troubleshooting",
+            "groups": [
+              {
+                "title": "Check the log",
+                "items": [
+                  "Have several comparable sessions actually stalled?",
+                  "Did range of motion and technique stay consistent?",
+                  "Did exercise order or equipment change?"
+                ]
+              },
+              {
+                "title": "Check the training",
+                "items": [
+                  "Are hard sets challenging enough?",
+                  "Are you adding extra sets that create fatigue?",
+                  "Have you followed the program long enough to see a trend?"
+                ]
+              },
+              {
+                "title": "Check recovery",
+                "items": [
+                  "Has sleep recently been worse?",
+                  "Has food intake or body-weight trend changed?",
+                  "Has work, travel, illness, or life stress risen?"
+                ]
+              }
+            ],
+            "persistKey": "plateau-checklist"
+          },
+          "caption": "Tick what you have checked. The list stays on this device until you reset it."
+        },
+        {
+          "t": "p",
+          "text": "A stalled log can come from many places. The load may be too heavy, effort may be too low, or added volume may exceed your recovery. Sometimes the problem is simply comparison noise: different equipment, shorter movement, or a changed exercise order."
+        },
+        {
+          "t": "h",
+          "text": "What is a deload?"
+        },
+        {
+          "t": "p",
+          "text": "A [[deload]] is a brief period of reduced training stress. Coaches commonly use it to reduce physical and mental fatigue, improve recovery, and prepare for later training. Research on the best design is limited, so there is no universal deload recipe."
+        },
+        {
+          "t": "video",
+          "id": "ZEhA-4sS08A",
+          "title": "When and How to Deload for SIZE | Hypertrophy Made Simple #10",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: when and how a deload can help (Renaissance Periodization)."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Confirm the trend",
+              "text": "Review several comparable sessions. If one workout dipped after a poor day, continue and observe."
+            },
+            {
+              "title": "Fix the obvious cause",
+              "text": "Correct inconsistent technique, unrealistic loading, missed sessions, or recovery problems before changing the entire program."
+            },
+            {
+              "title": "Reduce training stress",
+              "text": "If fatigue has accumulated, temporarily use fewer hard sets, lighter loads, more reps in reserve, or a combination."
+            },
+            {
+              "title": "Return and reassess",
+              "text": "Resume normal training gradually. Use the log to see whether performance and motivation improve."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Deload evidence is still developing",
+          "text": "The main deload guidance comes from expert consensus and coaching practice, not a large collection of direct trials. Treat it as a flexible fatigue-management tool, not a mandatory calendar ritual."
+        },
+        {
+          "t": "p",
+          "text": "LiftLog gives you the evidence needed for this decision: previous weights, reps, and completed sessions. Pair that record with [[lesson:rec-sleep|Sleep]] and [[lesson:rec-stress-overreaching|Stress, fatigue and overreaching]]. If pain, illness, or unusual symptoms drive the decline, do not treat a programming checklist as medical advice."
+        }
+      ],
+      "takeaways": [
+        "A plateau is repeated stalled performance under comparable conditions, not one bad day.",
+        "Check technique, effort, volume, consistency, food, sleep, and life stress before rewriting the plan.",
+        "A deload briefly reduces training stress to manage accumulated fatigue.",
+        "Deload design is flexible because direct research remains limited."
+      ],
+      "quiz": [
+        {
+          "q": "One workout is worse after a stressful day. Is that clearly a plateau?",
+          "options": [
+            "Yes, one decline proves the program failed",
+            "No, look for a repeated comparable trend",
+            "Yes, immediately replace every exercise"
+          ],
+          "answer": 1,
+          "why": "Single-session performance is noisy. A plateau needs a repeated pattern under reasonably comparable conditions."
+        },
+        {
+          "q": "What is the main purpose of a deload?",
+          "options": [
+            "To reduce training stress and manage fatigue",
+            "To test your hardest possible lifts",
+            "To add extra work before a holiday"
+          ],
+          "answer": 0,
+          "why": "A deload lowers training stress for a short period so fatigue can fall before normal training resumes."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Bell L et al. (2023) — International Delphi consensus on integrating deloads",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37730925/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "prog-cardio-and-lifting",
+      "title": "Cardio and lifting together",
+      "summary": "Cardio supports health and can coexist with lifting. Manage hard sessions so fatigue does not crowd out your priority work.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can place cardio beside lifting without treating them as rival sports. Doing both is [[concurrent training]], and the schedule matters more than choosing one camp."
+        },
+        {
+          "t": "h",
+          "text": "The health target is bigger than the gym"
+        },
+        {
+          "t": "p",
+          "text": "WHO recommends adults complete 150–300 minutes of moderate aerobic activity, or 75–150 minutes of vigorous activity, each week. It also recommends muscle-strengthening work for all major muscle groups on at least 2 days weekly. Your Upper/Lower sessions can cover the strengthening part when performed consistently."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Daily movement counts",
+          "text": "Walking, cycling for transport, active chores, and planned cardio all contribute to movement. You do not need to make every health-focused session exhausting."
+        },
+        {
+          "t": "h",
+          "text": "Will cardio erase your gains?"
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "What the combined-training review found",
+          "text": "Combining aerobic and strength training did not meaningfully reduce muscle growth or maximal strength on average. Explosive strength showed a small interference effect, especially when both modes shared one session. For most beginners, this is a scheduling detail, not a reason to avoid cardio."
+        },
+        {
+          "t": "video",
+          "id": "3Y2vxKsaK9A",
+          "title": "How To Do Cardio (Without Losing Muscle)",
+          "channel": "Jeff Nippard",
+          "why": "Watch: combining cardio with muscle-focused training (Jeff Nippard)."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "When lifting is the priority",
+            "items": [
+              "Lift before hard cardio in the same session",
+              "Keep easy cardio genuinely easy",
+              "Separate demanding sessions when practical"
+            ]
+          },
+          "right": {
+            "title": "When cardio is the priority",
+            "items": [
+              "Do the important cardio while fresh",
+              "Place hard leg lifting away from key cardio",
+              "Accept that both goals share recovery"
+            ]
+          }
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Place your four lifting days",
+              "text": "Keep the Built With Science Upper/Lower sequence as the week’s strength framework."
+            },
+            {
+              "title": "Add easy movement",
+              "text": "Use walks or comfortable cardio where they fit. Easy work should not turn every day into a recovery test."
+            },
+            {
+              "title": "Place demanding cardio",
+              "text": "Avoid stacking your hardest cardio directly before a lower-body session when leg performance matters."
+            },
+            {
+              "title": "Watch the log",
+              "text": "If lower-body performance repeatedly falls, adjust cardio timing, intensity, or total workload instead of abandoning it."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "text": "Start below the weekly guideline if you are currently inactive, then build gradually. The target is a weekly total, not a punishment due by Sunday night. If a health condition, pregnancy, pain, or unusual symptoms affect exercise, seek individual guidance rather than using a general lesson as a prescription."
+        }
+      ],
+      "takeaways": [
+        "Cardio and lifting can coexist without ruining muscle growth or maximal strength.",
+        "WHO recommends weekly aerobic activity plus muscle strengthening on at least two days.",
+        "Do your priority work while fresh and separate demanding sessions when practical.",
+        "Use your lifting log to catch repeated fatigue instead of fearing cardio automatically."
+      ],
+      "quiz": [
+        {
+          "q": "You must lift and do hard cardio in one session, and strength is your priority. What is sensible?",
+          "options": [
+            "Do the lifting first while you are fresh",
+            "Do the hardest cardio immediately before lifting",
+            "Skip strength work whenever cardio appears"
+          ],
+          "answer": 0,
+          "why": "Placing the priority first protects its quality. Hard cardio beforehand can add fatigue to the lifting session."
+        },
+        {
+          "q": "Does combining cardio and lifting automatically stop muscle growth?",
+          "options": [
+            "Yes, the two exercise forms always cancel each other",
+            "No, they generally coexist when workload is managed",
+            "Yes, unless every session is performed together"
+          ],
+          "answer": 1,
+          "why": "The updated review found no meaningful compromise in hypertrophy or maximal strength, though explosive strength may be more sensitive."
+        }
+      ],
+      "sources": [
+        {
+          "label": "World Health Organization (2020) — Guidelines on physical activity and sedentary behaviour",
+          "url": "https://www.who.int/publications/i/item/9789240015128",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Schumann M et al. (2022) — Concurrent aerobic and strength training meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34757594/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "prog-tracking",
+      "title": "Tracking your progress",
+      "summary": "A useful log turns fuzzy memories into comparable evidence. Track performance and a few slow-changing outcomes, then judge trends.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can use a log to choose your next weight or rep target. Memory turns last month’s training into guesswork; tracking gives [[progressive overload]] a scoreboard."
+        },
+        {
+          "t": "h",
+          "text": "Track the inputs you can act on"
+        },
+        {
+          "t": "p",
+          "text": "Record the exercise, load, completed reps, and your effort estimate. Add a short note when equipment, range, pain, or technique changed. Those details make later comparisons fair. A log is most useful when it records the task you actually performed, not the heroic version your brain edits overnight."
+        },
+        {
+          "t": "video",
+          "id": "9PddYqoe1xI",
+          "title": "Don't Track Progress LIKE THIS!",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: avoiding misleading progress tracking (Renaissance Periodization)."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Strong signals",
+            "items": [
+              "More clean reps at the same load",
+              "The same reps with more load",
+              "Repeated progress across comparable sessions",
+              "Better control with the same task"
+            ]
+          },
+          "right": {
+            "title": "Noisy signals",
+            "items": [
+              "One unusually energetic workout",
+              "A different machine with different numbers",
+              "Extra reps from a shorter movement",
+              "A single scale reading after a salty meal"
+            ]
+          }
+        },
+        {
+          "t": "h",
+          "text": "LiftLog does the boring part"
+        },
+        {
+          "t": "list",
+          "items": [
+            "Previous-set prefill shows the last weight and reps beside today’s set.",
+            "Workout history lets you compare several sessions instead of trusting one memory.",
+            "The body-weight chart shows a [[trend]] more clearly than isolated readings.",
+            "Progress photos and measurements can add context when appearance is a goal."
+          ]
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "line",
+            "title": "Look at the trend, not every wiggle",
+            "xLabel": "Earlier → later",
+            "yLabel": "Less → more (illustration)",
+            "x": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "series": [
+              {
+                "name": "Daily reading",
+                "values": [
+                  70,
+                  71,
+                  70,
+                  70,
+                  70,
+                  70,
+                  70
+                ],
+                "style": "dotted"
+              },
+              {
+                "name": "Longer trend",
+                "values": [
+                  70,
+                  70,
+                  70,
+                  70,
+                  70,
+                  70,
+                  70
+                ],
+                "style": "solid"
+              }
+            ],
+            "note": "Made-up values show how short-term readings can bounce around a slower trend.",
+            "hypothetical": true
+          },
+          "caption": "Illustration: one measurement can move opposite to the longer pattern."
+        },
+        {
+          "t": "p",
+          "text": "Body weight can change from food, fluid, and timing. Compare readings taken under similar conditions, and use the longer pattern. Photos also vary with lighting, pose, and distance. Standardising those details makes them more useful. None of these measures deserves daily emotional authority."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "A simple post-workout review",
+          "text": "After saving the workout, ask three questions: Did any lift improve? Did technique stay comparable? Did fatigue affect several exercises? Then leave the log alone until it is time to plan the next session."
+        },
+        {
+          "t": "p",
+          "text": "Tracking should support decisions, not become homework with a barbell. Start with weights and reps because LiftLog already captures them. Add effort notes when they help. Add body weight, measurements, or photos only if they connect to your goal. Review patterns periodically, then make one change at a time."
+        }
+      ],
+      "takeaways": [
+        "Log exercise, load, reps, and useful context so sessions remain comparable.",
+        "LiftLog’s previous-set prefill makes small performance targets visible.",
+        "Judge repeated trends, not one workout, weigh-in, photo, or measurement.",
+        "Track only information that can guide a decision tied to your goal."
+      ],
+      "quiz": [
+        {
+          "q": "Today’s machine uses different numbers from last week’s machine. What is the safest conclusion?",
+          "options": [
+            "The larger number proves immediate progress",
+            "The sessions are not directly comparable",
+            "The smaller number proves muscle loss"
+          ],
+          "answer": 1,
+          "why": "Different machines can change the task and displayed load. Treat the comparison cautiously and keep future sessions consistent."
+        },
+        {
+          "q": "One body-weight reading jumps after an unusual meal. What should guide your decision?",
+          "options": [
+            "The longer trend under similar conditions",
+            "That single reading by itself",
+            "A random change to the workout plan"
+          ],
+          "answer": 0,
+          "why": "Short-term readings can move for reasons unrelated to tissue change. Comparable measurements and the longer trend are more informative."
+        }
+      ],
+      "sources": [
+        {
+          "label": "American College of Sports Medicine (2009) — Progression models in resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19204579/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Helms ER et al. (2020) — Methods for regulating and monitoring resistance training",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33312273/",
+          "checked": "2026-10-10"
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "progressive overload",
+      "def": "Gradually increasing a useful training challenge as your body adapts."
+    },
+    {
+      "term": "double progression",
+      "def": "A method that builds repetitions within a range before increasing weight."
+    },
+    {
+      "term": "training volume",
+      "def": "The amount of training work performed, often estimated with weekly hard sets."
+    },
+    {
+      "term": "hard set",
+      "def": "A challenging working set performed close enough to your clean-rep limit to provide a useful stimulus."
+    },
+    {
+      "term": "training frequency",
+      "def": "How often you train a muscle or perform a type of session within a period."
+    },
+    {
+      "term": "training split",
+      "def": "The way a program distributes muscles or movement types across training days."
+    },
+    {
+      "term": "RIR",
+      "def": "Reps in reserve: your estimate of how many clean repetitions remained when a set ended."
+    },
+    {
+      "term": "muscular failure",
+      "def": "The point where you cannot complete another clean repetition in that set."
+    },
+    {
+      "term": "plateau",
+      "def": "A repeated lack of progress across comparable sessions, rather than one poor performance."
+    },
+    {
+      "term": "deload",
+      "def": "A brief period of reduced training stress used to manage fatigue and support recovery."
+    },
+    {
+      "term": "concurrent training",
+      "def": "Combining aerobic exercise and strength training within the same overall program."
+    },
+    {
+      "term": "interference effect",
+      "def": "A possible reduction in some adaptations when demanding aerobic and strength training compete for recovery."
+    },
+    {
+      "term": "trend",
+      "def": "The longer direction shown by several measurements, rather than one isolated reading."
+    }
+  ]
+}

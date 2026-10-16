@@ -1,0 +1,248 @@
+{
+  "section": "parts",
+  "lessons": [
+    {
+      "id": "part-chest",
+      "title": "Chest",
+      "summary": "Your chest brings the upper arm across your body. Presses build the base; flyes add focused work through a wide arc.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"front","focus":["chest-upper","chest-mid","chest-lower"],"prompt":"Tap the upper, middle, and lower chest regions."},"caption":"The chest is one broad muscle with fibres running in different directions."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can choose a press or fly and explain what your chest does. The pectoralis major pulls your upper arm across your body; its fibres approach that job from different angles, like a folding fan."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Flat presses** train the chest through a strong push, with help from the triceps and front delts.","**Incline presses** shift more work toward the upper chest, while a very steep bench becomes more shoulder-dominant.","**Flyes** sweep the arms together with little elbow movement, so the triceps contribute less.","**High-to-low flyes or chest dips** can emphasise fibres that run toward the lower chest." ]},
+        {"t":"exercises","title":"Chest exercises to explore","slugs":["incline-bench-press-dumbbell","flat-dumbbell-press","chest-press-machine","cable-crossover","pec-deck-machine-fly","banded-push-ups"]},
+        {"t":"video","id":"hWbUlkb5Ms4","title":"How To Bench Press With Perfect Technique (5 Steps)","channel":"Jeff Nippard","why":"Watch: Jeff Nippard demonstrates a stable bench-press setup and rep."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Set the shoulders","text":"Gently draw your shoulder blades back and down against the bench or pad."},{"title":"Aim the elbows","text":"Keep your elbows below the shoulders, not flared straight sideways like startled chicken wings."},{"title":"Own the stretch","text":"Lower until you feel the chest stretch while the shoulder still feels comfortable and controlled."},{"title":"Bring the upper arms together","text":"Think about moving your elbows toward each other. Your hands merely hold the handles."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Keep your feet and upper back planted during presses.","Use a smooth path and a range you can control.","Let presses and flyes share the work across the week."]},"right":{"title":"Avoid ✕","items":["Bouncing the weight from the bottom position.","Turning every incline into an almost upright shoulder press.","Chasing a squeeze by rounding both shoulders far forward."]}},
+        {"t":"callout","kind":"science","title":"Incline changes the emphasis, not the entire muscle","text":"A training study found that incline pressing produced more growth at one upper-chest measurement, while most other outcomes were similar. That supports a modest regional bias, not a magic angle. Electrical-activity studies can show which area works during a rep, but they cannot prove which setup grows best over months."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:chest-press-machine|Chest Press (Machine)]] and [[ex:pec-deck-machine-fly|Pec-Deck Machine Fly]]. The stable setup lets you learn pressing and fly patterns without juggling dumbbells."}
+      ],
+      "takeaways":["Presses are the chest-building base; flyes add focused work without much triceps help.","Incline work may bias the upper chest, but every press still trains several chest regions.","Control the bottom position and keep the shoulder comfortable instead of forcing extra depth."],
+      "quiz":[
+        {"q":"You want a chest exercise with less help from the triceps. Which pattern fits best?","options":["A cable or machine fly","A heavy overhead press","A close-grip bench press"],"answer":0,"why":"A fly brings the upper arms together while the elbows barely change angle, so the triceps do less."},
+        {"q":"Your incline press feels almost entirely like a shoulder press. What is the best first adjustment?","options":["Flare the elbows wider","Bounce from the bottom","Lower the bench angle"],"answer":2,"why":"A steep incline shifts more work toward the front delts. A lower incline usually restores more chest emphasis."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — muscles of the pectoral girdle and upper limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs","checked":"2026-10-10"},
+        {"label":"Chaves SFN et al. (2020) Int J Exerc Sci — horizontal versus incline bench-press adaptations","url":"https://pubmed.ncbi.nlm.nih.gov/32922646/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-back",
+      "title": "Back",
+      "summary": "Your back is a team, not one muscle. Vertical pulls train the lats; rows train lats and upper back; hinges challenge the lower back.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"back","focus":["lats","upper-back","lower-back","traps-upper"],"prompt":"Tap each back region to see its different job."},"caption":"Back exercises change emphasis by changing the direction of your elbows and shoulder blades."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can match vertical pulls, rows and hinges to the back regions they train. Lats pull the arms down and back, upper-back muscles guide each [[scapula|shoulder blade]], and spinal erectors steady the trunk."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Vertical pulls** bring the elbows from overhead toward your sides. Pull-ups and pulldowns mainly target the lats.","**Horizontal pulls** bring the elbows behind you. Tucked elbows bias the lats; flared elbows bring in more upper back and rear delts.","**Straight-arm pulls** train shoulder extension with little biceps help.","**Hinges and back extensions** ask the lower back to hold or move the trunk while the hips work." ]},
+        {"t":"exercises","title":"Back exercises to explore","slugs":["pull-ups","lat-pulldown","kneeling-one-arm-lat-pulldown","db-chest-supported-row-mid-upper-back","seated-cable-row-mid-upper-back","back-extension"]},
+        {"t":"video","id":"hnSqbBk15tw","title":"Stop Messing Up Your Lat Pulldowns","channel":"Jeff Nippard","why":"Watch: Jeff Nippard demonstrates lat-pulldown form and common mistakes."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Choose the target","text":"For lats, drive the elbow toward your hip. For upper back, pull wider toward your chest."},{"title":"Let the reach happen","text":"Allow the arm or shoulder blade to travel forward at the start while you stay controlled."},{"title":"Move the elbow","text":"Treat your hand like a hook. Pulling with the elbow can stop your grip from stealing the show."},{"title":"Keep the torso honest","text":"A small planned lean is fine. Repeated rocking turns the row into a seesaw."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Use a full overhead reach on pulldowns when comfortable.","Choose chest support if your lower back tires first.","Keep the neck long instead of craning toward the handle."]},"right":{"title":"Avoid ✕","items":["Shrugging every pull toward your ears.","Yanking the weight with a sudden torso swing.","Calling all back exercises interchangeable because they feel nearby."]}},
+        {"t":"callout","kind":"science","title":"Elbow path changes the job","text":"Research on the latissimus dorsi supports shoulder extension and adduction as major actions. In LiftLog's authored exercise data, a tucked elbow pulling toward the hip biases the lats. A flared elbow pulling toward the chest biases the mid and upper back."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:lat-pulldown|Lat Pulldown]] and [[ex:db-chest-supported-row-mid-upper-back|DB Chest Supported Row]]. Together they teach a vertical pull and a stable horizontal pull."}
+      ],
+      "takeaways":["Vertical pulls mainly train the lats; rows share work between the lats and upper back.","Pull toward the hip for more lat emphasis and toward the chest for more upper-back emphasis.","Chest support is useful when torso fatigue stops you from training the intended back muscles."],
+      "quiz":[
+        {"q":"You want a row to emphasise the mid and upper back. Which elbow path is most useful?","options":["Tucked toward the hip","Flared toward the chest","Straight above the head"],"answer":1,"why":"A wider, flared elbow path asks more from the upper back and rear delts."},
+        {"q":"Your lower back ends a dumbbell row before your upper back is tired. What is a sensible swap?","options":["Use a chest-supported row","Keep rowing while the torso swings","Shorten every repetition"],"answer":0,"why":"Chest support removes much of the trunk-holding demand, letting the intended back muscles limit the set."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — muscles of the pectoral girdle and upper limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs","checked":"2026-10-10"},
+        {"label":"Park SY, Yoo WG (2014) J Electromyogr Kinesiol — latissimus dorsi activation during shoulder actions","url":"https://pubmed.ncbi.nlm.nih.gov/24462394/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-shoulders",
+      "title": "Shoulders",
+      "summary": "Front, side, and rear delts move your arm in different directions. Press, raise, and pull with a shoulder-friendly path.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"both","focus":["delt-front","delt-side","delt-rear"],"prompt":"Switch views to find all three deltoid regions."},"caption":"The deltoid wraps around the shoulder like a three-sided cap."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can match presses, lateral raises and rear-delt work to the shoulder regions they emphasise. The delts move the arm; the [[rotator cuff]] helps centre and steer the upper-arm bone."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Overhead presses** train the front delts, with help from the side delts and triceps.","**Lateral raises** focus on the side delts. A cable can load the bottom position when its pull is angled across your arm; pulley height and where you stand matter. Dumbbells are another option.","**Reverse flyes and face pulls** train the rear delts with the upper back.","Front raises exist, but most beginners already give the front delts plenty of work through chest and shoulder presses." ]},
+        {"t":"exercises","title":"Shoulder exercises to explore","slugs":["strict-military-press-barbell","shoulder-press-machine","cable-lateral-raise","dumbbell-lateral-raise","reverse-fly-cable","face-pull-cable"]},
+        {"t":"video","id":"f_OGBg2KxgY","title":"Stop Messing Up Lateral Raises (Easy Fix)","channel":"Jeff Nippard","why":"Watch: Jeff Nippard demonstrates a controlled lateral raise for the side delts."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Set a comfortable path","text":"Let the elbows travel slightly forward of a straight side-on line during presses and raises."},{"title":"Keep ribs stacked","text":"Brace gently so an overhead press stays a shoulder movement, not a dramatic lower-back arch."},{"title":"Lead with the elbows","text":"During lateral raises, lift the elbows outward while the hands simply carry the weight."},{"title":"Use smooth reps","text":"Shoulder isolation work rarely needs heroic loads. Choose a weight you can guide rather than fling."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Use a neutral or comfortable grip when it feels better.","Stop a raise around shoulder height unless your plan says otherwise.","Train the rear delts as deliberately as the front and side delts."]},"right":{"title":"Avoid ✕","items":["Shrugging every lateral raise into a trap exercise.","Forcing a painful path because a diagram looked tidy.","Arching hard to turn an overhead press into an incline press."]}},
+        {"t":"callout","kind":"science","title":"Exercise labels are not perfect borders","text":"A systematic review found different exercise categories emphasised different deltoid regions. It relied on electrical-activity studies, which show short-term activation rather than long-term growth. Use the pattern as a guide, then judge exercises by control, comfort, and progress."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:shoulder-press-machine|Shoulder Press (Machine)]] and [[ex:dumbbell-lateral-raise|Dumbbell Lateral Raise]]. Add rear-delt work once those patterns feel familiar."}
+      ],
+      "takeaways":["Presses favour the front delts, lateral raises favour the side delts, and reverse flyes favour the rear delts.","The rotator cuff guides and stabilises the shoulder while larger muscles create movement.","Use controlled loads and a comfortable arm path instead of forcing one textbook shape."],
+      "quiz":[
+        {"q":"Which exercise most directly targets the side delts?","options":["A strict cable pushdown","A slow chest-supported row","A controlled lateral raise"],"answer":2,"why":"Lateral raises train the arm-moving-away action led by the side delts."},
+        {"q":"Your torso arches hard during an overhead press. What should you try first?","options":["Press faster from the bottom","Brace and reduce the load","Widen the grip as far as possible"],"answer":1,"why":"A lighter load and a steady brace help keep the movement at the shoulders instead of the lower back."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — muscles of the pectoral girdle and upper limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs","checked":"2026-10-10"},
+        {"label":"Rabello R et al. (2024) J Bodyw Mov Ther — systematic review of deltoid activation","url":"https://pubmed.ncbi.nlm.nih.gov/39593452/","checked":"2026-10-10"},
+        {"label":"Escamilla RF et al. (2009) Sports Med — shoulder muscle function in strengthening exercises","url":"https://pubmed.ncbi.nlm.nih.gov/19769415/","checked":"2026-10-10"},
+        {"label":"Larsen S et al. (2025) Front Physiol — cable lateral-raise resistance profile and pulley setup","url":"https://pubmed.ncbi.nlm.nih.gov/40692697/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-arms",
+      "title": "Arms: biceps, triceps and forearms",
+      "summary": "Biceps bend the elbow and help turn the palm upward. Triceps straighten the elbow; forearm muscles control the wrist and grip.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"both","focus":["biceps","triceps","forearms"],"prompt":"Rotate the view to compare the front and back of the arms."},"caption":"Arm training covers elbow movement, wrist movement, and grip."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can choose basic biceps, triceps and forearm work by the joint action. Biceps bend the elbow and help turn the palm up; triceps straighten it; forearms control the wrist and grip."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Palms-up curls** train both biceps heads. An arm behind the torso places the long head in a stretched position.","**Hammer and reverse curls** add more work for the brachialis and forearms.","**Pushdowns** train the triceps with the arms by your sides.","**Overhead extensions** lengthen the triceps long head because the arm is raised.","**Wrist curls, wrist extensions, and heavy holds** train the forearms and grip more directly." ]},
+        {"t":"exercises","title":"Arm exercises to explore","slugs":["barbell-curl","incline-dumbbell-curls","hammer-curl-dumbbell","triceps-pushdown-cable-straight-bar","incline-db-overhead-extensions","wrist-curl"]},
+        {"t":"video","id":"fZPeULMIZDw","title":"Best Scientific Arm Day (Biceps, Triceps, Forearms)","channel":"Jeff Nippard","why":"Watch: Jeff Nippard connects biceps, triceps and forearm exercises in one arm session."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Place the upper arm","text":"Choose where your elbow lives, then keep it mostly there while the forearm moves."},{"title":"Use the intended grip","text":"Turn the palm up for biceps, keep it neutral for hammer curls, or face it down for more forearm emphasis."},{"title":"Reach the useful end","text":"Straighten the elbow on triceps work and lower curls under control without letting the shoulder roll forward."},{"title":"Remove the body swing","text":"If your hips start conducting the orchestra, lower the weight and make the arms play their own part."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Pair one curl with one triceps movement.","Include at least one exercise that loads a stretched position.","Keep wrists stacked unless the exercise deliberately moves them."]},"right":{"title":"Avoid ✕","items":["Turning curls into repeated backward leans.","Letting elbows wander forward on every pushdown rep.","Ignoring grip fatigue when it limits pulling exercises."]}},
+        {"t":"callout","kind":"science","title":"The stretched position can matter","text":"In a direct training study, overhead cable extensions produced more triceps growth than extensions with the arm by the side. The result was strongest for the long head. One study is not a universal rule, but it supports including an overhead option when it feels comfortable."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:barbell-curl|Barbell Curl]] and [[ex:triceps-pushdown-cable-straight-bar|Triceps Pushdown]]. They are easy to set up, easy to track, and teach the two main elbow actions."}
+      ],
+      "takeaways":["Curls bend the elbow; triceps exercises straighten it; forearm work supports the wrist and grip.","Arm position and grip change which tissues receive more emphasis.","Include a stable basic movement before adding clever variations."],
+      "quiz":[
+        {"q":"Which exercise places the triceps long head in a more stretched position?","options":["An overhead cable extension","A strict straight-bar pushdown","A neutral-grip hammer curl"],"answer":0,"why":"Raising the arm overhead lengthens the triceps long head before the elbow extends."},
+        {"q":"Your hips swing on every curl. What is the best response?","options":["Curl faster through the middle","Move the elbows farther forward","Reduce the load and steady the torso"],"answer":2,"why":"A stable torso makes elbow flexion, rather than momentum, drive the repetition."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — muscles of the pectoral girdle and upper limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs","checked":"2026-10-10"},
+        {"label":"Maeo S et al. (2023) Eur J Sport Sci — overhead versus neutral-arm triceps extension training","url":"https://pubmed.ncbi.nlm.nih.gov/35819335/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-quads",
+      "title": "Quads",
+      "summary": "Your quadriceps straighten the knee and help you rise from deep bends. Squats, presses, lunges, and extensions train them in complementary ways.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"front","focus":["quads","adductors","glutes"],"prompt":"Tap the front thigh, then compare the nearby hip muscles."},"caption":"Squat patterns share work across the quads, glutes, and inner thigh."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can choose a knee-dominant exercise and recognise what your quads do. The four quadriceps muscles create [[knee extension|knee straightening]]; rectus femoris also crosses the hip."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Squats** train knee and hip extension together. A more upright torso and more knee bend usually increase quad emphasis.","**Leg presses** provide a supported squat pattern. Lower foot placement usually creates more knee bend for the quads.","**Lunges and split squats** train one leg at a time and ask the hip to stay balanced.","**Leg extensions** isolate knee extension and train rectus femoris differently from most squat patterns." ]},
+        {"t":"exercises","title":"Quad exercises to explore","slugs":["barbell-back-squat","heel-elevated-goblet-squat","quad-focused-leg-press","bulgarian-split-squat-quad-focus","leg-extension-machine","sissy-squat"]},
+        {"t":"video","id":"AIZ8q1qruKw","title":"How to Perform a PERFECT Squat","channel":"Squat University","why":"Watch: Squat University demonstrates the main setup and movement of a squat."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Make a stable foot","text":"Keep the heel, big-toe base, and little-toe base connected to the floor or platform."},{"title":"Let the knees travel","text":"Allow the knees to move in the same direction as the toes. They may pass the toes during a controlled squat."},{"title":"Sit between the legs","text":"Bend the knees and hips together instead of pushing the hips back as far as possible."},{"title":"Use your available depth","text":"Descend as far as you can control while keeping balance and the intended foot pressure."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Use heel elevation if ankle motion limits an upright squat.","Choose a depth you can repeat without losing control.","Let the machine setup fit your joints before loading it."]},"right":{"title":"Avoid ✕","items":["Forcing every person into the same stance width.","Keeping the knees behind the toes at all costs.","Bouncing through the bottom to claim extra depth."]}},
+        {"t":"callout","kind":"science","title":"Knees over toes are not automatically wrong","text":"Restricting forward knee travel in a squat reduced demand at the knee but greatly shifted demand toward the hip. The lesson is not that one position is always best. Knee travel is a normal way to load the quads, provided the movement is controlled and tolerable."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:heel-elevated-goblet-squat|Heel Elevated Goblet Squat]] and [[ex:leg-extension-machine|Leg Extension (Machine)]]. One teaches a stable squat; the other makes knee extension easy to feel."}
+      ],
+      "takeaways":["The quads straighten the knee; squat patterns train them alongside the hips.","Forward knee travel is normal and useful when it is controlled and comfortable.","Combine a squat or press pattern with a leg-extension pattern for broad quad training."],
+      "quiz":[
+        {"q":"Your goal is more quad emphasis in a goblet squat. Which change is most useful?","options":["Push the hips far behind you","Raise the heels and stay upright","Turn the movement into a hinge"],"answer":1,"why":"Heel elevation can allow more forward knee travel and a more upright torso, which increases quad emphasis."},
+        {"q":"Which exercise isolates knee extension most directly?","options":["A leg-extension machine","A Romanian deadlift","A chest-supported row"],"answer":0,"why":"The leg-extension machine asks the quadriceps to straighten the knee without also extending the hip."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — appendicular muscles of the pelvic girdle and lower limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs","checked":"2026-10-10"},
+        {"label":"Fry AC et al. (2003) J Strength Cond Res — effect of restricting forward knee movement during squats","url":"https://pubmed.ncbi.nlm.nih.gov/14636100/","checked":"2026-10-10"},
+        {"label":"Pedrosa GF et al. (2022) Eur J Sport Sci — knee-extension range and regional quadriceps hypertrophy","url":"https://pubmed.ncbi.nlm.nih.gov/33977835/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-glutes-hamstrings",
+      "title": "Glutes and hamstrings",
+      "summary": "Glutes and hamstrings drive the hips. Hinges, thrusts, squats, and curls train different jobs across your posterior chain.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"back","focus":["glutes","glute-med","hamstrings","lower-back"],"prompt":"Tap the hips and back of the thighs."},"caption":"The posterior chain links the hips, back of the thighs, and spinal support muscles."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can separate a hip hinge from a knee curl and choose one of each. Glutes and hamstrings create [[hip extension|hip straightening]], while the hamstrings also bend the knee."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Hip hinges** push the hips backward while the shins stay fairly quiet. Romanian deadlifts load the hamstrings and glutes in a long position.","**Hip thrusts** train hip extension hardest near the top, where the glutes are shortened.","**Squats and split squats** train the glutes with the quads. A longer stride and forward torso lean can add glute emphasis.","**Leg curls** train the hamstrings at the knee, a job that hinges do not fully replace." ]},
+        {"t":"exercises","title":"Glute and hamstring exercises to explore","slugs":["barbell-romanian-deadlift","barbell-hip-thrust","bulgarian-split-squat-glute-focus","seated-leg-curl-machine","lying-leg-curl-machine","hyperextensions-glute-focus"]},
+        {"t":"video","id":"_oyxCn2iSjU","title":"HOW TO DO ROMANIAN DEADLIFTS (RDLs): Build Beefy Hamstrings With Perfect Technique","channel":"Jeff Nippard","why":"Watch: Jeff Nippard demonstrates the hip hinge and hamstring stretch in an RDL."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Start from the hips","text":"On a hinge, send the hips backward as though closing a car door with your backside."},{"title":"Keep the load close","text":"Let the bar or dumbbells skim near your legs so the weight does not drag you forward."},{"title":"Stop at your hamstring range","text":"End the descent when the hamstrings are stretched and your trunk position is still controlled."},{"title":"Finish with the glutes","text":"Stand tall or lock out a thrust by squeezing the glutes, not by leaning the spine backward."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Use both a hip-extension pattern and a knee-curl pattern.","Keep the hips against the pad during leg curls.","Choose single-leg work when balance and side-to-side control need practice."]},"right":{"title":"Avoid ✕","items":["Turning an RDL into a deep knee-bending squat.","Hyperextending the lower back at the top of a thrust.","Assuming soreness proves the glutes received better training."]}},
+        {"t":"callout","kind":"science","title":"Hip position changes a leg curl","text":"A direct study found more hamstring growth from seated leg curls than prone leg curls. Sitting places the hip-crossing hamstrings at a longer length. Both versions still trained the hamstrings, so use the one your gym has and add the seated version when available."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:barbell-hip-thrust|Barbell Hip Thrust]] and [[ex:seated-leg-curl-machine|Seated Leg Curl (Machine)]]. They separate the two main jobs: extending the hip and bending the knee."}
+      ],
+      "takeaways":["Hinges and thrusts extend the hip; leg curls train the hamstrings as knee flexors.","The gluteus medius helps keep the pelvis level during single-leg work.","Use a hip-extension exercise plus a leg curl instead of expecting one movement to cover everything."],
+      "quiz":[
+        {"q":"Which pairing covers hip extension and knee flexion most directly?","options":["Lateral raise plus pushdown","Hip thrust plus leg curl","Calf raise plus chest fly"],"answer":1,"why":"The hip thrust extends the hip, while the leg curl trains the hamstrings to bend the knee."},
+        {"q":"During an RDL, what should start the downward movement?","options":["The knees sliding far forward","The shoulders shrugging upward","The hips moving backward"],"answer":2,"why":"An RDL is a hip hinge. Sending the hips back lengthens the hamstrings while the knees stay softly bent."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — appendicular muscles of the pelvic girdle and lower limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs","checked":"2026-10-10"},
+        {"label":"Maeo S et al. (2021) Med Sci Sports Exerc — seated versus prone leg-curl hypertrophy","url":"https://pubmed.ncbi.nlm.nih.gov/33009197/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-calves",
+      "title": "Calves",
+      "summary": "Calf raises train the muscles that lift your heel. Use a comfortable, repeatable range; knee position changes gastrocnemius involvement.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"back","focus":["calves","soleus"],"prompt":"Tap the upper calf and the deeper soleus region."},"caption":"The gastrocnemius crosses the knee; the soleus sits deeper and only crosses the ankle."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can choose straight-knee and bent-knee calf raises and explain the difference. The calf muscles create [[plantar flexion]], which lifts your heel. The gastrocnemius crosses the knee. The soleus sits underneath and contributes in both straight-knee and bent-knee raises."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Straight-knee raises** emphasise the gastrocnemius while the soleus still helps.","**Bent-knee raises** shorten the gastrocnemius at the knee, reducing its contribution relative to the soleus.","**Single-leg raises** make bodyweight challenging and reveal side-to-side differences.","**Machine and leg-press raises** make progression easy because the setup is stable." ]},
+        {"t":"exercises","title":"Calf exercises to explore","slugs":["standing-weighted-calf-raises-barbell-or-dumbbell","seated-calf-raise-machine","leg-press-calf-raise","toes-elevated-smith-machine-calf-raise","single-leg-weighted-calf-raise"]},
+        {"t":"video","id":"baEXLy09Ncc","title":"Get NOTICEABLY BIGGER Calves With This Technique","channel":"Jeff Nippard","why":"Watch: Jeff Nippard demonstrates calf-raise technique with attention to the stretched position."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Secure the foot","text":"Place the ball of the foot firmly on the edge or platform before the set begins."},{"title":"Lower into the stretch","text":"Lower your heel through a comfortable range you can control. Going below the platform is optional, not a test of a good rep."},{"title":"Pause briefly","text":"Own the bottom position so the Achilles tendon does not bounce you into the next rep."},{"title":"Rise through the big toe","text":"Push the floor away and finish tall without rolling the ankle toward its outer edge."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Train a straight-knee and a bent-knee variation.","Use support for balance during single-leg raises.","Count only the reps that keep the same range."]},"right":{"title":"Avoid ✕","items":["Bouncing rapidly through the bottom position.","Adding load while the range becomes smaller each week.","Letting the knees bend during a planned straight-knee raise."]}},
+        {"t":"callout","kind":"science","title":"The bottom half deserves attention","text":"In one study of young women, bottom-range calf raises produced more gastrocnemius growth than top-range raises. This supports interest in training at longer muscle lengths, not forcing depth. A brief pause is a coaching aid for control; the study did not test pause duration."},
+        {"t":"callout","kind":"safety","title":"Keep the range symptom-limited","text":"Do not force a deep heel drop through Achilles or ankle pain. Stop the painful movement and seek qualified advice if symptoms persist."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:standing-weighted-calf-raises-barbell-or-dumbbell|Standing Weighted Calf Raise]] and [[ex:seated-calf-raise-machine|Seated Calf Raise (Machine)]]. This pair covers straight-knee and bent-knee work."}
+      ],
+      "takeaways":["Straight-knee raises train both main calf muscles; bending the knee reduces gastrocnemius involvement, not necessarily increasing soleus growth.","A controlled stretched bottom position is more useful than fast bouncing.","Progress calf raises only while the range and pauses stay consistent."],
+      "quiz":[
+        {"q":"Which setup gives the soleus the clearest emphasis?","options":["A seated bent-knee calf raise","A standing straight-knee raise","A leg-press calf raise with nearly straight knees"],"answer":0,"why":"Bending the knee reduces gastrocnemius involvement relative to the soleus. It does not establish greater soleus growth than standing raises."},
+        {"q":"Your calf repetitions get shorter as the set continues. What should you do?","options":["Bounce harder from the bottom","Add more weight next session","Reduce load and keep the range"],"answer":2,"why":"A repeatable range makes the set trainable and measurable. More load is not progress if the movement disappears."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — appendicular muscles of the pelvic girdle and lower limbs","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs","checked":"2026-10-10"},
+        {"label":"Kassiano W et al. (2023) J Strength Cond Res — gastrocnemius hypertrophy after partial-range training at long muscle lengths","url":"https://pubmed.ncbi.nlm.nih.gov/37015016/","checked":"2026-10-10"},
+        {"label":"Kinoshita M et al. (2023) Front Physiol — standing versus seated calf-raise hypertrophy","url":"https://pubmed.ncbi.nlm.nih.gov/38156065/","checked":"2026-10-10"}
+      ]
+    },
+    {
+      "id": "part-core",
+      "title": "Core and abs",
+      "summary": "Your core can move the trunk or stop it moving. Train crunching, bracing, and lower-back strength—but not for targeted belly-fat loss.",
+      "blocks": [
+        {"t":"widget","w":"body-atlas","params":{"view":"both","focus":["abs","obliques","serratus","lower-back"],"prompt":"Switch front and back to see the whole trunk team."},"caption":"The core wraps around the trunk; it is more than the visible front abs."},
+        {"t":"h","text":"What it does"},
+        {"t":"p","text":"After this lesson, you can choose between bending the trunk and bracing it against movement. Abs, obliques, deep core and lower-back muscles work together like the walls of a pressurised can."},
+        {"t":"h","text":"Movement patterns"},
+        {"t":"list","items":["**Crunch patterns** move the spine and train the abs directly.","**Bracing patterns** resist extension, side bending, or rotation while the arms and legs create force.","**Carries, squats, rows, and deadlifts** train the core to hold position while other muscles move.","**Back extensions and reverse hyperextensions** train the rear of the trunk with the hips." ]},
+        {"t":"exercises","title":"Core exercises to explore","slugs":["barbell-deadlift","crunch","crunch-machine","back-extension","reverse-hyperextensions"]},
+        {"t":"video","id":"GxVVrocCGKo","title":"The #1 Method To Build A STRONG CORE","channel":"Squat University","why":"Watch: Squat University demonstrates how core stability supports loaded movement."},
+        {"t":"h","text":"What to think about"},
+        {"t":"steps","items":[{"title":"Choose move or resist","text":"In a crunch, deliberately curl the trunk. In a deadlift, resist unwanted trunk movement."},{"title":"Set the ribs and pelvis","text":"Bring them into a comfortable stacked position before creating tension around your middle."},{"title":"Breathe for the task","text":"Use the breathing approach from [[lesson:tech-breathing-bracing|Breathing and bracing]] instead of holding every breath automatically."},{"title":"Stop before compensation","text":"End the set when the hips, neck, or momentum takes over the job you intended for the trunk."}]},
+        {"t":"compare","left":{"title":"Do ✓","items":["Train the front, sides, and back of the trunk over time.","Use loaded crunches when bodyweight reps become easy.","Practise bracing inside compound lifts as a skill."]},"right":{"title":"Avoid ✕","items":["Pulling the head forward during crunches.","Arching the lower back to finish every abdominal rep.","Expecting hundreds of crunches to uncover the abs." ]}},
+        {"t":"callout","kind":"myth","title":"Ab exercises do not selectively remove belly fat","text":"This idea is called [[spot reduction]]. In a controlled study, abdominal training improved muscular endurance but did not reduce abdominal fat. Direct core work can make the muscles stronger and larger. Changing the fat over them depends on whole-body energy balance, not where you feel a burn."},
+        {"t":"callout","kind":"try","title":"Beginner starter","text":"Start with [[ex:crunch-machine|Crunch (Machine)]] and [[ex:back-extension|Back Extension]]. One trains trunk flexion; the other trains the rear trunk and hips. Keep both controlled."}
+      ],
+      "takeaways":["The core both moves the trunk and resists unwanted movement.","Crunches train the abs directly; compound lifts train bracing under load.","Core exercise strengthens muscle but cannot reliably choose where body fat is lost."],
+      "quiz":[
+        {"q":"What is the core doing during a well-braced deadlift?","options":["Twisting quickly under load","Resisting unwanted trunk movement","Relaxing so the hips move freely"],"answer":1,"why":"The trunk muscles create stiffness so force can travel between the legs, hips, and bar without unwanted spinal motion."},
+        {"q":"What is the most accurate expectation from regular crunches?","options":["Stronger abdominal muscles","Fat loss only around the waist","No useful training effect at all"],"answer":0,"why":"Crunches can strengthen and grow the abs, but they do not reliably remove fat specifically from the belly."}
+      ],
+      "sources":[
+        {"label":"OpenStax Anatomy and Physiology — axial muscles of the abdominal wall and thorax","url":"https://openstax.org/books/anatomy-and-physiology/pages/11-4-axial-muscles-of-the-abdominal-wall-and-thorax","checked":"2026-10-10"},
+        {"label":"Vispute SS et al. (2011) J Strength Cond Res — abdominal exercise and abdominal fat","url":"https://pubmed.ncbi.nlm.nih.gov/21804427/","checked":"2026-10-10"}
+      ]
+    }
+  ],
+  "glossary": [
+    {"term":"horizontal adduction","def":"Moving your upper arm across the front of your body, as in a fly or press."},
+    {"term":"scapula","def":"Your shoulder blade, a flat bone that moves and provides a base for many upper-body muscles."},
+    {"term":"shoulder abduction","def":"Moving your arm away from the side of your body."},
+    {"term":"rotator cuff","def":"Four small shoulder muscles that move and help centre the upper-arm bone in its socket."},
+    {"term":"elbow flexion","def":"Bending the elbow so the forearm moves toward the upper arm."},
+    {"term":"elbow extension","def":"Straightening the elbow so the forearm moves away from the upper arm."},
+    {"term":"knee extension","def":"Straightening the knee, mainly through the quadriceps."},
+    {"term":"hip extension","def":"Moving the thigh backward or straightening the hip from a bent position."},
+    {"term":"posterior chain","def":"A convenient name for muscles along the back side, especially glutes, hamstrings, and spinal erectors."},
+    {"term":"plantar flexion","def":"Pointing the foot downward by raising the heel, as in a calf raise."},
+    {"term":"brace","def":"Tightening your trunk around the spine so your torso resists unwanted movement."},
+    {"term":"spot reduction","def":"The unsupported idea that exercising one area makes fat disappear specifically from that area."}
+  ]
+}

@@ -1,0 +1,1115 @@
+{
+  "section": "recovery",
+  "lessons": [
+    {
+      "id": "rec-what-recovery-is",
+      "title": "What recovery actually is",
+      "summary": "Training gives your body a reason to change. Recovery supplies the time, sleep and food that support that change.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can separate temporary [[fatigue]] from the slower process of adaptation. Training orders the renovation; recovery gives the construction crew time and materials."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Why we say rebuilding continues",
+          "text": "Training can raise muscle protein synthesis after you leave the gym. Phillips and colleagues observed it at 24 and 48 hours in untrained adults. Damas and colleagues found that early protein building also accompanied damage, then related more closely to growth as training became familiar. These findings are not a universal recovery countdown or a reason to chase damage."
+        },
+        {
+          "t": "widget",
+          "w": "chart",
+          "params": {
+            "kind": "line",
+            "title": "Fatigue can hide useful progress",
+            "xLabel": "Earlier → later",
+            "yLabel": "Less → more (illustration)",
+            "x": [
+              "Before",
+              "Just after",
+              "Recovering",
+              "Ready again"
+            ],
+            "series": [
+              {
+                "name": "Underlying ability",
+                "values": [
+                  5,
+                  5,
+                  5,
+                  6
+                ],
+                "style": "solid"
+              },
+              {
+                "name": "Temporary fatigue",
+                "values": [
+                  0,
+                  4,
+                  2,
+                  0
+                ],
+                "style": "dashed"
+              }
+            ],
+            "note": "These invented curves explain an idea. They do not predict your readiness, growth or recovery time.",
+            "hypothetical": true
+          },
+          "caption": "Tap the curves. Underlying ability and temporary fatigue are separate ideas. Neither illustrated curve is a measurement or a promise."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "The signal",
+            "items": [
+              "Training challenges your muscles and movement skills. Repeating useful practice gives your body a reason to adapt.",
+              "A hard session can temporarily reduce performance. Feeling tired immediately afterwards does not mean you lost your progress."
+            ]
+          },
+          "right": {
+            "title": "The support",
+            "items": [
+              "Sleep, enough food and appropriate gaps between hard sessions support the work that follows training.",
+              "Feeling fresh is useful information, not proof that every tissue is fully recovered. Look at performance and discomfort together."
+            ]
+          }
+        },
+        {
+          "t": "p",
+          "text": "[[Adaptation]] means becoming better prepared for a repeated demand. It builds across training and recovery cycles, not one magical night. Your muscles, movement skills and energy stores do not all follow the same timetable. A protein-building study cannot tell you exactly when your next hard session should happen."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your next-day check-in",
+          "text": "Ask whether you slept reasonably, ate normal meals, and can move comfortably. Then notice how your planned warm-up feels. If you feel unusually drained, choose an easier session or rest. For scheduling decisions, use [[lesson:prog-frequency-splits|frequency and splits]] rather than treating this illustration as a calendar."
+        }
+      ],
+      "takeaways": [
+        "Training gives the signal; recovery supports the response.",
+        "Muscle repair and muscle growth are related, but they are not the same thing.",
+        "Recovery time varies, so judge readiness using sleep, comfortable movement and your usual performance."
+      ],
+      "quiz": [
+        {
+          "q": "You feel tired immediately after a productive workout. What does that tell you?",
+          "options": [
+            "You probably lost the strength you had before training.",
+            "Temporary fatigue may be hiding your underlying ability.",
+            "Your muscles are already completely recovered and ready."
+          ],
+          "answer": 1,
+          "why": "Fatigue temporarily affects performance. Useful adaptations develop across repeated training and recovery cycles."
+        },
+        {
+          "q": "A study finds protein building elevated at 48 hours. How should you use that finding?",
+          "options": [
+            "See it as evidence that rebuilding can continue after training.",
+            "Use it as the exact recovery timer for every muscle and person.",
+            "Train again precisely then regardless of discomfort or sleep."
+          ],
+          "answer": 0,
+          "why": "A biological response in a study is not an individual readiness test or a universal timetable."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Phillips SM et al. (1997) — Mixed muscle protein synthesis and breakdown after resistance exercise in humans",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9252485/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Damas F et al. (2016) — Protein synthesis relates to growth after muscle damage attenuates",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27219125/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-sleep",
+      "title": "Sleep: the best recovery tool",
+      "summary": "For adults, regularly getting at least seven hours is a health baseline. Protect enough good-quality sleep before chasing recovery gadgets.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can make one realistic sleep change and adjust training after a poor night. Sleep supports your brain, health and recovery; gadgets cannot replace enough sleep opportunity."
+        },
+        {
+          "t": "p",
+          "text": "Hours matter, but so do quality and regular timing. Time in bed is not always time asleep. Teenagers need more sleep than the adult baseline, so do not use this adult slider as a target for children. Your needs can also change with illness, missed sleep and daily demands."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "What short-sleep studies show",
+          "text": "A review found that acute sleep loss generally reduced physical performance, including strength tasks, but results varied. One short night does not create a predictable personal penalty. Use alertness and your warm-up to guide the day."
+        },
+        {
+          "t": "video",
+          "id": "gedoSfZvBgE",
+          "title": "The benefits of a good night's sleep - Shai Marcu",
+          "channel": "TED-Ed",
+          "why": "Watch: what good sleep does for your brain and body (TED-Ed)."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "Adult sleep opportunity: hours per night",
+            "initial": 7,
+            "stops": [
+              {
+                "value": 4,
+                "title": "4 hours: well below the adult baseline",
+                "text": "Prioritise sleep opportunity. If you feel drowsy, avoid risky training or driving. This is not a prediction of your performance."
+              },
+              {
+                "value": 5,
+                "title": "5 hours: still short",
+                "text": "Look for a practical schedule change. Needing less sleep is not something you can prove by feeling used to tiredness."
+              },
+              {
+                "value": 6,
+                "title": "6 hours: below the recommendation",
+                "text": "Regularly sleeping this little remains below the adult 7-or-more-hour health recommendation."
+              },
+              {
+                "value": 7,
+                "title": "7 hours: reaches the adult baseline",
+                "text": "This meets the duration baseline if you actually sleep this long. Quality and individual needs still matter."
+              },
+              {
+                "value": 8,
+                "title": "8 hours: assess how you feel",
+                "text": "Notice daytime alertness and whether this schedule is sustainable. This is not a promise of greater muscle growth."
+              },
+              {
+                "value": 9,
+                "title": "9 hours: may suit your needs",
+                "text": "Some people need more sleep. Persistent exhaustion despite enough opportunity deserves a healthcare discussion."
+              }
+            ]
+          },
+          "caption": "These are adult duration examples, not dose-by-dose performance predictions. Seven hours is a minimum health recommendation, not an upper limit."
+        },
+        {
+          "t": "p",
+          "text": "Short sleep can also make hunger harder to manage and interfere with concentration. That can make training and meal decisions feel more demanding. It is not a character flaw. Rather than trying to out-discipline exhaustion, make sleep easier to access and keep normal meals available."
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Make tonight easier",
+            "persistKey": "sleep-checklist",
+            "groups": [
+              {
+                "title": "Your schedule",
+                "items": [
+                  "Protect enough time to actually sleep.",
+                  "Keep bedtime and waking time reasonably consistent.",
+                  "Spend some time outdoors during the day when possible."
+                ]
+              },
+              {
+                "title": "Your wind-down",
+                "items": [
+                  "Use a calm routine before bed.",
+                  "Reduce bright screens near bedtime.",
+                  "Move late coffee or tea earlier if it disrupts sleep.",
+                  "Make the bedroom quiet, dark and comfortably cool."
+                ]
+              }
+            ]
+          },
+          "caption": "Choose a change you can repeat. Ticks save on this device; they do not measure sleep quality or replace a sleep assessment."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "A realistic Monday plan",
+          "text": "Choose a consistent waking time and work backwards to protect enough sleep opportunity. If childcare or shift work limits your options, aim for the best workable routine, not perfection. After a poor night, consider an easier workout instead of trying to prove how tough you are."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "When habits are not enough",
+          "text": "This is education, not medical advice. Speak with a doctor about persistent sleep difficulty, major daytime sleepiness, or loud snoring with gasping. Sleepiness that makes driving unsafe needs immediate attention. A checklist cannot diagnose or treat a sleep disorder."
+        }
+      ],
+      "takeaways": [
+        "Adults should regularly sleep at least seven hours; individual needs and sleep quality also matter.",
+        "Sleep loss can impair performance and make hunger and concentration harder to manage.",
+        "Protect a repeatable sleep routine before spending money on recovery extras."
+      ],
+      "quiz": [
+        {
+          "q": "You sleep seven hours but often gasp at night and feel very sleepy during the day. What next?",
+          "options": [
+            "Buy a stronger recovery gadget and keep your routine unchanged.",
+            "Assume meeting the hour target rules out any sleep problem.",
+            "Discuss the symptoms with a doctor rather than relying on hours."
+          ],
+          "answer": 2,
+          "why": "Duration alone cannot rule out a sleep disorder. Gasping and persistent daytime sleepiness warrant a healthcare discussion."
+        },
+        {
+          "q": "After a short night, your usual warm-up feels unusually difficult. What is reasonable?",
+          "options": [
+            "Make today's workout easier and protect tonight's sleep.",
+            "Add extra hard sets to compensate for the missing recovery.",
+            "Ignore alertness because only total weekly sleep matters."
+          ],
+          "answer": 0,
+          "why": "Adjusting the session to your current readiness is reasonable. More hard work is not a substitute for sleep."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Watson NF et al. (2015) — AASM/SRS consensus on adult sleep duration",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26039963/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Craven J et al. (2022) — Effects of acute sleep loss on physical performance: systematic and meta-analytical review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35708888/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHLBI — Healthy sleep habits",
+          "url": "https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHLBI — How sleep affects your health",
+          "url": "https://www.nhlbi.nih.gov/health/sleep-deprivation/health-effects",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHLBI — Sleep apnea symptoms and when to discuss them with a doctor",
+          "url": "https://www.nhlbi.nih.gov/health/sleep-apnea/symptoms",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHLBI — How much sleep is enough: age-specific recommendations",
+          "url": "https://www.nhlbi.nih.gov/health/sleep-deprivation/how-much-sleep",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-rest-days",
+      "title": "Rest days and active recovery",
+      "summary": "Rest from hard training does not require lying still. Use comfortable movement and sensible spacing, then adjust to how you recover.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can plan a rest day without treating it as lost progress. Recovery continues between sessions, and easy movement can fit without becoming another hard workout."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "What active-recovery research can and cannot say",
+          "text": "A review found that easy active recovery could reduce reported soreness. Feeling better does not prove faster muscle growth or complete tissue recovery. Keep the movement comfortable, not another demanding workout."
+        },
+        {
+          "t": "p",
+          "text": "There is no exact recovery clock that works for every person or muscle. The effort, unfamiliarity and size of a session all matter. An easy planning starting point is to leave a non-lifting day between hard full-body sessions. Treat that as a practical schedule idea, not a proven biological deadline."
+        },
+        {
+          "t": "video",
+          "id": "vqWKT6tgWTs",
+          "title": "THIS is Why You Need Rest Days",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: why rest days belong in a training plan (Renaissance Periodization)."
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Is this actually a recovery activity?",
+            "groups": [
+              {
+                "title": "Keep it comfortable",
+                "items": [
+                  "I can talk comfortably while moving.",
+                  "I am not chasing a distance, pace or calorie target.",
+                  "The activity does not increase discomfort.",
+                  "I finish feeling no more drained than when I started."
+                ]
+              }
+            ]
+          },
+          "caption": "This is a practical self-check, not a validated readiness test. If the activity feels like another workout, choose something easier or rest."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Check the starting point",
+              "text": "Notice sleep, general energy and whether everyday movement is comfortable. A tiring day at work counts as a demand on your schedule, too. You do not have to earn permission to rest."
+            },
+            {
+              "title": "Pick an easy option",
+              "text": "Choose comfortable walking or gentle movement you enjoy. Start without a performance target. If movement hurts, do not use it as a treatment experiment; follow [[lesson:rec-pain-injury|pain and injury guidance]]."
+            },
+            {
+              "title": "Recheck rather than escalate",
+              "text": "If you feel worse as you move, stop. If you feel fine, keep the activity easy instead of turning it into a challenge. Afterwards, return to normal meals and protect your sleep."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "text": "For the next hard session, use your planned warm-up as information. Comfortable movement and familiar performance are useful signs. Marked soreness, unusual weakness or poor control are reasons to adjust. Mild stiffness does not automatically require complete inactivity, but severe symptoms are not something to push through."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Rest is a scheduling tool",
+          "text": "Training a different area can sometimes fit while another area rests, but whole-body tiredness still matters. See [[lesson:prog-frequency-splits|frequency and splits]] for organising sessions and [[lesson:prog-cardio-and-lifting|cardio alongside lifting]] for harder conditioning. A rest day does not need a secret second program."
+        }
+      ],
+      "takeaways": [
+        "A rest day means a break from demanding training, not a ban on comfortable everyday movement.",
+        "Active recovery may ease soreness, but feeling better does not prove full recovery.",
+        "Use a sensible schedule and adjust when sleep, movement or performance suggest you need more recovery."
+      ],
+      "quiz": [
+        {
+          "q": "Your recovery walk becomes a breathless challenge that leaves you exhausted. What changed?",
+          "options": [
+            "It became more effective recovery because the effort increased.",
+            "It became another training demand rather than easy recovery.",
+            "It became necessary because resting completely loses muscle."
+          ],
+          "answer": 1,
+          "why": "Active recovery is deliberately easy. Adding substantial fatigue changes the purpose of the activity."
+        },
+        {
+          "q": "The calendar says training day, but movement is markedly sore and your warm-up is unusually weak. What next?",
+          "options": [
+            "Keep the planned effort because the calendar proves readiness.",
+            "Do extra hard work so the sore muscles learn to recover faster.",
+            "Adjust the session or rest rather than obeying a fixed timer."
+          ],
+          "answer": 2,
+          "why": "Scheduling helps, but it does not replace attention to how you move and perform."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Dupuy O et al. (2018) — Post-exercise recovery techniques: systematic review and meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29755363/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Phillips SM et al. (1997) — Muscle protein synthesis and breakdown after resistance exercise",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9252485/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Cleveland Clinic — Delayed onset muscle soreness",
+          "url": "https://my.clevelandclinic.org/health/diseases/delayed-onset-muscle-soreness",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-soreness",
+      "title": "Muscle soreness (DOMS)",
+      "summary": "Delayed soreness is common after unfamiliar exercise. It is not a workout score, and severe or unusual pain needs assessment.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can tell common [[DOMS|delayed muscle soreness]] from warning signs that need a different response. Soreness can follow unfamiliar training, but it is not a workout score."
+        },
+        {
+          "t": "p",
+          "text": "Think of soreness as a smoke alarm, not a progress report. It tells you something deserves attention, but not how much muscle you built. New exercises and [[eccentric|muscle-lengthening work]] can make soreness more noticeable. Eccentric means your muscle stays active while lengthening, such as when controlling a weight down."
+        },
+        {
+          "t": "video",
+          "id": "Tn9CSQjGEUE",
+          "title": "Does Muscle Soreness Mean Muscle Growth? (\"DOMS\" Explained)",
+          "channel": "Jeremy Ethier",
+          "why": "Watch: why soreness is not a muscle-growth score (Jeremy Ethier)."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Lactic acid hanging around causes tomorrow's soreness.",
+              "back": "No. Delayed soreness is not leftover lactic acid trapped in your muscles. Its causes involve the response to unfamiliar loading, and the full picture is complex."
+            },
+            {
+              "front": "No soreness means the workout did nothing.",
+              "back": "No. Useful training can happen without soreness. Damas and colleagues found that damage decreased as people became accustomed to training while growth-related responses remained."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "text": "Soreness commonly feels like a broad, tender ache in muscles you used, with some stiffness. It should gradually settle. A sharp pain during a repetition is not delayed soreness. Neither timing nor location can diagnose an injury, so check the warning signs in [[lesson:rec-pain-injury|pain versus injury]]."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "How sore do you feel? Subjective examples, not medical thresholds",
+            "initial": 2,
+            "stops": [
+              {
+                "value": 0,
+                "title": "0: no soreness",
+                "text": "You do not need soreness for progress. Use your usual plan if energy and comfortable movement support it."
+              },
+              {
+                "value": 2,
+                "title": "2: mild ache",
+                "text": "Try comfortable daily movement. Keep the next session appropriate to how you move, not to a soreness target."
+              },
+              {
+                "value": 5,
+                "title": "5: noticeable limitation",
+                "text": "Consider easing or skipping hard work for the affected muscles. Check whether your technique or ordinary movement changes."
+              },
+              {
+                "value": 8,
+                "title": "8: severe soreness",
+                "text": "Do not force hard training. Seek professional advice for severe, unusual or worsening symptoms, regardless of the number."
+              },
+              {
+                "value": 10,
+                "title": "10: extreme pain",
+                "text": "Seek urgent medical assessment for extreme pain, especially with swelling, major weakness or dark urine."
+              }
+            ]
+          },
+          "caption": "The numbers are personal descriptions, not validated cutoffs. Sharp pain, joint pain, swelling or numbness override any low score."
+        },
+        {
+          "t": "p",
+          "text": "For Monday, avoid turning soreness into a competition. Use a familiar plan, introduce changes gradually, and choose easy movement if it feels comfortable. If soreness repeatedly disrupts normal life, review your training with [[lesson:prog-volume|training volume]] and [[lesson:prog-deloads-plateaus|plateaus and easier weeks]]. More damage is not the goal."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Do not label every ache DOMS",
+          "text": "This is not medical advice. Stop the provoking activity and see a doctor or physio for sharp or joint pain, swelling, numbness, changed movement, or symptoms that persist or worsen. Severe muscle pain with dark urine or major weakness needs urgent medical care."
+        }
+      ],
+      "takeaways": [
+        "DOMS is delayed muscle soreness, often after unfamiliar or demanding exercise.",
+        "Soreness does not measure workout quality or muscle growth.",
+        "Use symptoms and comfortable movement to guide adjustments; seek care for severe, persistent or unusual pain."
+      ],
+      "quiz": [
+        {
+          "q": "Your familiar workouts no longer make you sore, but your performance improves. What is most reasonable?",
+          "options": [
+            "Keep progressing sensibly without chasing soreness.",
+            "Change every exercise so each session causes more damage.",
+            "Stop the program because painless workouts cannot work."
+          ],
+          "answer": 0,
+          "why": "Less soreness can accompany becoming accustomed to training. Progress does not require soreness."
+        },
+        {
+          "q": "A low soreness score comes with sharp knee pain and limping. Which detail matters most?",
+          "options": [
+            "The low number proves that continuing hard training is safe.",
+            "The warning signs matter more than the soreness number.",
+            "The absence of muscle tenderness rules out every injury."
+          ],
+          "answer": 1,
+          "why": "A subjective score cannot clear joint pain or altered movement. Stop the provoking activity and seek assessment."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Cleveland Clinic — Delayed onset muscle soreness: symptoms and when to seek care",
+          "url": "https://my.clevelandclinic.org/health/diseases/delayed-onset-muscle-soreness",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Damas F et al. (2016) — Muscle damage attenuates as growth-related responses develop",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27219125/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Wilke J and Behringer M (2021) — DOMS review: rejection of the lingering-lactate explanation",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8431437/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Schoenfeld BJ and Contreras B (2013) — Is postexercise muscle soreness a valid indicator of muscular adaptations?",
+          "url": "https://doi.org/10.1519/SSC.0b013e3182a61820",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHS — Sprains and strains: injury warning signs",
+          "url": "https://www.nhs.uk/conditions/sprains-and-strains/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-stretching",
+      "title": "Stretching and flexibility",
+      "summary": "Controlled movement fits a warm-up; held stretches can build flexibility. Stretching is optional for recovery and should never mean forcing pain.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can choose dynamic or static stretching for the job instead of stretching by ritual. [[Range of motion]] is how far a joint can move comfortably."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Static: hold a position",
+            "items": [
+              "[[Static stretching]] means staying in a comfortable stretch position rather than moving repeatedly. Use gentle tension, not pain.",
+              "Held stretches can be useful when you want to practise flexibility. After training or in a separate session can be convenient.",
+              "Long holds immediately before demanding lifting can temporarily reduce performance. The surrounding warm-up changes the picture."
+            ]
+          },
+          "right": {
+            "title": "Dynamic: move with control",
+            "items": [
+              "[[Dynamic stretching]] means controlled movement through a comfortable range. It is not bouncing hard at the end of a stretch.",
+              "It can fit a warm-up because you move rather than hold still. Keep the movement appropriate to the task ahead.",
+              "It does not replace practising the actual lift with lighter weights. See [[lesson:tech-warm-up|warming up]] for that part."
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Why timing and context matter",
+          "text": "A review found that stretching effects depended on type, duration and the surrounding warm-up. Longer static holds right before demanding performance differ from brief, comfortable stretches followed by dynamic movement."
+        },
+        {
+          "t": "video",
+          "id": "r-pxOslY-q4",
+          "title": "Static vs Dynamic Stretching: Which is Better? (Evidence-Based)",
+          "channel": "E3 Rehab",
+          "why": "Watch: static and dynamic stretching compared (E3 Rehab)."
+        },
+        {
+          "t": "p",
+          "text": "Lifting can improve flexibility too. Alizadeh and colleagues found improved movement range from resistance training, with no clear difference from stretching overall. Practising controlled movement through a comfortable available range can contribute. That does not mean every lift suits every joint, or that everybody needs maximal depth immediately."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Optional post-workout reset",
+              "text": "This is a routine idea, not a research-proven recovery dose. Choose only comfortable positions. Breathe normally, hold gently if you like, and leave out any position that feels wrong."
+            },
+            {
+              "title": "Calves and hips",
+              "text": "For a calf stretch, face a wall with hands supported and one leg behind you. Keep the back heel comfortable. For the front of the hip, use a supported split stance and a small, gentle weight shift."
+            },
+            {
+              "title": "Chest and shoulders",
+              "text": "Rest a forearm lightly against a doorway and turn your body only until you feel a mild chest stretch. Keep the shoulder comfortable. Skip this position if it creates joint discomfort rather than a gentle muscle pull."
+            },
+            {
+              "title": "Finish without forcing",
+              "text": "Ease out of each position and compare sides without chasing symmetry. The aim is a comfortable habit, not a flexibility record. You can also finish your workout without stretching and still follow a useful training plan."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "myth",
+          "title": "Stretching is not soreness insurance",
+          "text": "Recovery research has not shown a meaningful soreness benefit from post-exercise stretching. Use it because you enjoy it or want to practise flexibility, not because you must prevent every ache. For the bigger recovery basics, return to [[lesson:rec-sleep|sleep]] and [[lesson:rec-rest-days|rest days]]."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "A stretch should not need bravery",
+          "text": "This is not medical advice. Stop for sharp or joint pain, swelling, numbness or a change in how you move. See a doctor or physio if symptoms persist or worsen. Do not stretch through a suspected injury to test whether it is serious."
+        }
+      ],
+      "takeaways": [
+        "Dynamic stretching involves controlled movement; static stretching involves a comfortable hold.",
+        "Lifting can also improve flexibility when you practise an appropriate movement range.",
+        "Stretch for comfort or flexibility, not as a guaranteed soreness cure."
+      ],
+      "quiz": [
+        {
+          "q": "You want to prepare for lifting, not test flexibility records. Which plan fits?",
+          "options": [
+            "Force long holds until discomfort disappears before touching weights.",
+            "Skip all movement practice because stretching always lowers strength.",
+            "Use controlled movement and practise your lift with lighter weights."
+          ],
+          "answer": 2,
+          "why": "Dynamic movement can fit a warm-up, while lighter practice prepares you for the actual lift."
+        },
+        {
+          "q": "You enjoy gentle stretching after training. What expectation is supported?",
+          "options": [
+            "It guarantees your muscles will not be sore after any workout.",
+            "It can serve comfort or flexibility without guaranteeing recovery.",
+            "It replaces sleep whenever the routine covers enough muscles."
+          ],
+          "answer": 1,
+          "why": "Stretching can serve a flexibility goal. It is not a reliable soreness-prevention method or a substitute for sleep."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Behm DG et al. (2016) — Acute stretching effects on performance, movement range and injury: systematic review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26642915/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Alizadeh S et al. (2023) — Resistance training improves range of motion: systematic review and meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36622555/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Dupuy O et al. (2018) — Recovery techniques, including stretching: systematic review and meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29755363/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHS — Sprains and strains: symptoms and when to get help",
+          "url": "https://www.nhs.uk/conditions/sprains-and-strains/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-foam-rolling-massage",
+      "title": "Foam rolling and massage",
+      "summary": "Rolling and massage may ease soreness and stiffness. They are optional comfort tools, not tissue demolition or a replacement for sleep and rest.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can use a foam roller for comfort without expecting it to repair tissue. Rolling is self-massage, not a rolling pin for flattening muscles."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "What rolling studies show",
+          "text": "A review found brief improvements in flexibility and small reductions in soreness, while performance effects were generally small or negligible. Feeling looser does not establish faster healing, and no universal routine emerged."
+        },
+        {
+          "t": "video",
+          "id": "sDCgV1qT4zc",
+          "title": "What Foam Rolling ACTUALLY Does",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: what foam rolling can and cannot do (Renaissance Periodization)."
+        },
+        {
+          "t": "p",
+          "text": "Massage has somewhat different evidence. Dupuy and colleagues found improvements in reported soreness and tiredness, with massage performing well among the techniques studied. Those outcomes matter, but they do not prove extra muscle growth. You can enjoy massage without pretending it replaces normal meals, sleep or appropriate training demands."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Choose a comfortable area",
+              "text": "Start with a fleshy muscle area, such as the calf or thigh, away from joints and bones. This is an optional demonstration, not treatment for an injury. Skip swollen, bruised or injured areas."
+            },
+            {
+              "title": "Control the pressure",
+              "text": "Use your hands or the other leg for support so you can unload some body weight. Start gently. You should be able to breathe normally rather than brace against pain."
+            },
+            {
+              "title": "Move slowly and recheck",
+              "text": "Roll through a small comfortable area without grinding into a tender point. Pause or lighten the pressure if discomfort builds. Stop for sharp pain, tingling or numbness rather than trying to push through it."
+            },
+            {
+              "title": "Finish when it stops helping",
+              "text": "Step off and notice how comfortable movement feels. More pressure or more time is not automatically better. For a professional massage, tell the therapist your comfort limits and any injury concerns before starting."
+            }
+          ]
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Rolling breaks up fascia like smashing knots in a rope.",
+              "back": "That claim is not established. [[Fascia]] is connective tissue, not a knot you must crush. Several explanations for feeling looser are proposed, including changes in pain perception; mechanisms remain uncertain."
+            },
+            {
+              "front": "Massage flushes workout toxins out of your muscles.",
+              "back": "Recovery benefits in studies do not establish a toxin-flushing mechanism. Your goal can simply be feeling more comfortable. You do not need a detox story to justify an optional massage."
+            },
+            {
+              "front": "If gentle rolling helps, harder rolling must help more.",
+              "back": "There is no established rule that more pain produces more recovery. Your comfort limits matter. Do not confuse being able to tolerate pressure with needing that pressure."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Spend effort on the basics first",
+          "text": "If a roller is affordable and you enjoy it, fine. If not, you are not missing a compulsory recovery upgrade. Start with [[lesson:rec-sleep|sleep]] and [[lesson:rec-rest-days|sensible rest]]. Choose extras for a specific comfort goal, not because a gadget promises to repair everything."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Do not massage an injury away",
+          "text": "This is not medical advice. Stop for sharp or joint pain, swelling, numbness or altered movement. See a doctor or physio for persistent or worsening symptoms. Suspected fresh injuries need assessment rather than deep pressure. Severe symptoms require prompt medical attention."
+        }
+      ],
+      "takeaways": [
+        "Foam rolling may briefly improve flexibility and reduce soreness; performance effects are usually small.",
+        "Massage may ease soreness and tiredness without proving faster muscle growth.",
+        "Use comfortable pressure, and never grind through injury warning signs."
+      ],
+      "quiz": [
+        {
+          "q": "Rolling makes your legs feel looser. What can you reasonably conclude?",
+          "options": [
+            "It helped your comfort, not necessarily your tissue healing.",
+            "It permanently broke apart the fascia surrounding your muscles.",
+            "It fully replaced the need for sleep after demanding exercise."
+          ],
+          "answer": 0,
+          "why": "A short-term change in comfort or movement range does not prove faster healing or structural tissue release."
+        },
+        {
+          "q": "A tender area becomes numb when you press harder. What should you do?",
+          "options": [
+            "Keep pressing until the area releases and normal feeling returns.",
+            "Use a harder tool because numbness shows the roller is working.",
+            "Stop the pressure and seek advice for concerning symptoms."
+          ],
+          "answer": 2,
+          "why": "Numbness is a warning sign, not evidence of useful release. Do not continue the provoking pressure."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Wiewelhove T et al. (2019) — Foam rolling effects on performance and recovery: meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31024339/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Wiewelhove T et al. (2019) — Full text: proposed mechanisms and evidence limitations",
+          "url": "https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2019.00376/full",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Dupuy O et al. (2018) — Massage and other recovery techniques: systematic review and meta-analysis",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29755363/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHS — Sprains and strains: warning signs and avoiding massage after fresh injury",
+          "url": "https://www.nhs.uk/conditions/sprains-and-strains/",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-stress-overreaching",
+      "title": "Stress, fatigue and overreaching",
+      "summary": "Training is only one demand on your recovery. Watch patterns in sleep, mood and performance, and seek help when problems persist.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can spot a persistent fatigue pattern and reduce training stress before digging deeper. Work, family and training all draw from the same time and energy budget."
+        },
+        {
+          "t": "p",
+          "text": "[[Overreaching]] describes a training-related drop in performance. Some short-term drops resolve after enough recovery. More persistent problems are different. As a beginner, you do not need to deliberately exhaust yourself to make progress. Consistent, manageable practice is a better starting goal than finding the largest workload you can survive."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "A temporary tired patch",
+            "items": [
+              "A demanding session or busy day can leave you tired. One poor workout cannot diagnose a syndrome.",
+              "Check sleep, food, illness and unusual training changes before blaming motivation.",
+              "Easing the demand and allowing recovery can help you reassess what is happening."
+            ]
+          },
+          "right": {
+            "title": "A persistent pattern",
+            "items": [
+              "Repeated performance declines, lasting exhaustion and mood or sleep changes deserve attention together.",
+              "[[Overtraining syndrome]] involves prolonged problems and clinical assessment. Other causes must be considered.",
+              "No checklist, soreness score or single test reliably diagnoses it. Do not label yourself from an app."
+            ]
+          }
+        },
+        {
+          "t": "p",
+          "text": "The ECSS/ACSM consensus distinguishes short-term training fatigue from prolonged difficulties. It also warns that symptoms overlap with other conditions. Poor sleep, inadequate food, infections and other health problems can contribute. True overtraining is different from ordinary beginner fatigue. A tired day does not establish that diagnosis, and persistent symptoms still deserve care."
+        },
+        {
+          "t": "video",
+          "id": "xZHCNCGC6sg",
+          "title": "Overtraining? Here's How To Tell",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: recognising a persistent fatigue pattern (Renaissance Periodization)."
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Notice a pattern, not a score",
+            "groups": [
+              {
+                "title": "Performance and energy",
+                "items": [
+                  "My familiar training repeatedly feels harder than usual.",
+                  "My performance is dropping across sessions.",
+                  "I feel unusually tired outside the gym."
+                ]
+              },
+              {
+                "title": "Recovery and mood",
+                "items": [
+                  "My sleep has become difficult or unrefreshing.",
+                  "My mood or motivation has changed noticeably.",
+                  "My soreness keeps interfering with daily movement.",
+                  "I have added training while work or family demands increased."
+                ]
+              }
+            ]
+          },
+          "caption": "This is a reflection checklist, not a diagnostic test. There is no tick count that proves overreaching, overtraining or readiness."
+        },
+        {
+          "t": "p",
+          "text": "For Monday, look at your recent pattern rather than arguing with one bad session. Write down sleep, energy, discomfort and whether usual tasks feel harder. During a demanding week, choose a manageable session or rest. You can adjust a plan without abandoning your long-term goal."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Change the plan, not your identity",
+          "text": "If your training needs an easier stretch, see [[lesson:prog-deloads-plateaus|plateaus and easier weeks]] rather than adding more work here. Keep the basics repeatable: normal meals, enough sleep opportunity and a realistic schedule. Recovery is not a reward that only disciplined people deserve."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Do not self-diagnose persistent fatigue",
+          "text": "This is not medical advice. See a doctor when unusual fatigue or falling performance persists despite easing training and improving recovery. Seek prompt assessment for severe symptoms or illness. Pain, swelling or numbness also needs attention; follow [[lesson:rec-pain-injury|pain and injury guidance]]."
+        }
+      ],
+      "takeaways": [
+        "Training shares your time and energy with work, family, sleep and other demands.",
+        "Look for repeated changes in performance, mood and recovery rather than diagnosing yourself from one bad workout.",
+        "Persistent fatigue deserves medical assessment because training is not the only possible cause."
+      ],
+      "quiz": [
+        {
+          "q": "You have one weak session after a stressful, sleepless night. What does that establish?",
+          "options": [
+            "You definitely have overtraining syndrome and must quit lifting.",
+            "It proves your program needs substantially more demanding work.",
+            "It is a reason to reassess, not a diagnosis of a syndrome."
+          ],
+          "answer": 2,
+          "why": "One poor session is not a diagnosis. Consider sleep and other demands, then watch the pattern."
+        },
+        {
+          "q": "Exhaustion and performance decline persist despite easier training and better sleep opportunity. What next?",
+          "options": [
+            "Assume this is ordinary soreness and keep increasing effort.",
+            "Seek medical assessment for possible causes beyond training.",
+            "Diagnose yourself from the number of checklist boxes ticked."
+          ],
+          "answer": 1,
+          "why": "Persistent symptoms need assessment. Training-related problems overlap with illness and other possible causes."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Meeusen R et al. (2013) — ECSS/ACSM consensus on prevention, diagnosis and treatment of overtraining syndrome",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23247672/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHLBI — Sleep deficiency, daytime performance and mood",
+          "url": "https://www.nhlbi.nih.gov/health/sleep-deprivation/health-effects",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "rec-pain-injury",
+      "title": "Pain vs soreness vs injury",
+      "summary": "Normal effort, delayed soreness and injury warning signs are different. Stop provoking pain, adjust safely and get professional help when needed.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can respond differently to normal effort, soreness and warning-sign pain. Pain is a dashboard signal, not a toughness test, and this lesson cannot diagnose an injury."
+        },
+        {
+          "t": "p",
+          "text": "Normal exertion can include working-muscle tiredness and heavy breathing that ease when the set stops. [[DOMS]] is delayed aching after exercise, often in muscles you used. Injury symptoms can overlap with soreness, however. A description that sounds familiar does not prove that continuing is safe."
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "More consistent with ordinary soreness",
+            "items": [
+              "A broad muscle ache appears after unfamiliar training rather than as a sudden jab during a repetition.",
+              "Stiffness gradually settles, and everyday movement remains manageable.",
+              "This pattern is a clue, not a guarantee. Recheck symptoms instead of assuming every ache is harmless."
+            ]
+          },
+          "right": {
+            "title": "Stop and seek assessment",
+            "items": [
+              "Sharp or joint pain, swelling, numbness, or pain that changes how you move needs attention.",
+              "Symptoms that persist, worsen or prevent normal use deserve professional assessment.",
+              "Severe pain, major swelling, inability to bear weight or a new deformity warrants urgent medical help."
+            ]
+          }
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "Choose the description: actions are not a diagnosis",
+            "initial": 0,
+            "stops": [
+              {
+                "value": 0,
+                "title": "Ordinary effort during a set",
+                "text": "Working-muscle fatigue that eases afterwards can be normal. Stop if the feeling changes into pain or movement becomes uncontrolled."
+              },
+              {
+                "value": 1,
+                "title": "Delayed, mild muscle ache",
+                "text": "Choose comfortable daily movement and adjust hard training as needed. Monitor whether symptoms improve."
+              },
+              {
+                "value": 2,
+                "title": "Pain changes movement or keeps returning",
+                "text": "Stop the provoking activity. Arrange advice from a doctor or physio rather than repeatedly testing the same painful movement."
+              },
+              {
+                "value": 3,
+                "title": "Severe or emergency warning signs",
+                "text": "Seek urgent medical care for severe pain, major swelling, inability to use the area, deformity or new numbness after injury."
+              }
+            ]
+          },
+          "caption": "Select a description, not a pain threshold. A low pain rating does not overrule swelling, numbness or a changed walking pattern."
+        },
+        {
+          "t": "p",
+          "text": "For a non-emergency concern, stop the movement that provokes it. Do not keep adding weight to see whether pain eventually warms away. Tell a doctor or physio when it began, what brings it on, and how it affects normal activities. Those details are more useful than guessing a diagnosis."
+        },
+        {
+          "t": "p",
+          "text": "Modifying training does not mean you must stop every activity forever. Comfortable, unrelated movement may still be possible, depending on the problem. Keep it genuinely comfortable and follow any professional restrictions. A different exercise is not automatically safe just because its name or equipment changes."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "When to get help",
+          "text": "Not medical advice. See a doctor or physio for sharp or joint pain, swelling, numbness, altered movement, or pain that persists or worsens. Get urgent medical care for new numbness after injury, deformity, a cold injured limb, major swelling, severe pain or inability to bear weight. Severe muscle pain with dark urine or major weakness also needs urgent care."
+        },
+        {
+          "t": "callout",
+          "kind": "tip",
+          "title": "Your safe next step",
+          "text": "Choose assessment over internet detective work. Use [[lesson:start-safety|training safety basics]] for gym setup and [[lesson:rec-soreness|soreness guidance]] for familiar delayed aches. Once you have appropriate guidance, return gradually rather than trying to make up every missed session at once."
+        }
+      ],
+      "takeaways": [
+        "Normal exertion, delayed muscle soreness and injury warning signs are different, but symptoms can overlap.",
+        "Stop provoking sharp pain or altered movement; persistent or worsening symptoms deserve professional assessment.",
+        "Severe symptoms, new numbness after injury, deformity or dark urine with severe muscle pain need urgent care."
+      ],
+      "quiz": [
+        {
+          "q": "Your shoulder hurts sharply with each repetition, but you can still finish the set. What is sensible?",
+          "options": [
+            "Stop the provoking movement and arrange appropriate assessment.",
+            "Finish because completing repetitions proves that the joint is safe.",
+            "Force a deeper stretch so the pain cannot return next session."
+          ],
+          "answer": 0,
+          "why": "Being able to complete a movement does not establish safety. Sharp or joint pain is a reason to stop and seek advice."
+        },
+        {
+          "q": "After an injury, your leg is numb and you cannot bear weight. What should you do?",
+          "options": [
+            "Wait for your next workout and use the warm-up as a safety test.",
+            "Seek urgent medical care rather than trying another exercise.",
+            "Roll the injured area firmly until normal feeling returns."
+          ],
+          "answer": 1,
+          "why": "New numbness after injury and inability to bear weight warrant urgent assessment, not an exercise experiment."
+        }
+      ],
+      "sources": [
+        {
+          "label": "NHS — Sprains and strains: urgent and emergency warning signs, assessment and physiotherapy",
+          "url": "https://www.nhs.uk/conditions/sprains-and-strains/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Cleveland Clinic — Delayed onset muscle soreness and severe symptom warning signs",
+          "url": "https://my.clevelandclinic.org/health/diseases/delayed-onset-muscle-soreness",
+          "checked": "2026-10-10"
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "fatigue",
+      "def": "Temporary tiredness or reduced ability to perform, after training or other demands."
+    },
+    {
+      "term": "muscle protein synthesis",
+      "def": "The process of making new muscle proteins for maintenance, repair and growth."
+    },
+    {
+      "term": "adaptation",
+      "def": "A change that makes your body better prepared for a repeated demand."
+    },
+    {
+      "term": "active recovery",
+      "def": "Easy movement between demanding sessions, chosen for comfort rather than to add another hard workout."
+    },
+    {
+      "term": "DOMS",
+      "def": "Delayed onset muscle soreness: muscle aching and tenderness that develops after exercise rather than during it."
+    },
+    {
+      "term": "eccentric",
+      "def": "Muscle action in which an active muscle lengthens, such as while controlling a weight down."
+    },
+    {
+      "term": "range of motion",
+      "def": "How far a joint can move through a movement."
+    },
+    {
+      "term": "static stretching",
+      "def": "Holding a comfortable position that lengthens a muscle, without repeatedly moving in and out."
+    },
+    {
+      "term": "dynamic stretching",
+      "def": "Moving in a controlled way through a comfortable movement range rather than holding a position."
+    },
+    {
+      "term": "fascia",
+      "def": "Connective tissue that surrounds and connects structures such as muscles."
+    },
+    {
+      "term": "overreaching",
+      "def": "A training-related drop in performance; recovery may resolve it, but persistent problems need assessment."
+    },
+    {
+      "term": "overtraining syndrome",
+      "def": "A prolonged performance decline with other symptoms, diagnosed clinically after other possible causes are considered."
+    }
+  ]
+}

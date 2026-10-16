@@ -11,7 +11,8 @@ import {
   bodyWeightSeries, bodyWeightSVG, heatmapSVG,
   CARDIO_EXERCISES, isCardio, cardioMode, estimateKcal, latestBodyKg,
   fmtCardio, workoutKcal,
-  dropsOf, hasDrops, setVolumeKg, fmtSetChain, dropsToField
+  dropsOf, hasDrops, setVolumeKg, fmtSetChain, dropsToField,
+  cvKeyFor, sanitizeCv, fmtCvLine, buildSetRow
 } from './features.js';
 import { LIBRARY } from './exlib.js';
 import {
@@ -350,8 +351,9 @@ function showView(v) {
   $$('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.v === v
     || (v === 'wod' && b.dataset.v === 'history')
     // The exercise detail is a child of the Exercises tab, so the tab stays lit.
-    || ((v === 'exercises' || v === 'exdetail') && b.dataset.v === 'home')));
+    || ((v === 'exercises' || v === 'exdetail' || v === 'learn') && b.dataset.v === 'home')));
   if (v === 'home') renderHome();
+  if (v === 'learn') ensureLearn().then(m => m && m.resume && m.resume());
   if (v === 'history') renderHistory();
   if (v === 'food') renderFood();
   if (v === 'exercises') renderExerciseBrowser();
@@ -477,10 +479,17 @@ function renderHome() {
         <span class="tpl-meta">Browse every exercise — guides, tips and animations</span>
         <svg class="ic chev"><use href="#i-chev"/></svg></button>
     </div>
+    <h2 class="sec">Learn</h2>
+    <div class="list">
+      <button class="tpl" id="home-learn"><span class="tpl-name">Learn the science</span>
+        <span class="tpl-meta">Lifting, your body, recovery, food and supplements — for beginners</span>
+        <svg class="ic chev"><use href="#i-chev"/></svg></button>
+    </div>
     <h2 class="sec">Recent workouts</h2>
     <div class="list">${recent}</div>`;
   $('#start-empty').onclick = startEmptyWorkout;
   $('#home-exercises').onclick = () => showView('exercises');
+  $('#home-learn').onclick = () => showView('learn');
   const bw = $('#backup-warn');
   // The tap IS the user gesture the interactive token request needs, so this
   // is a real fix-it button, not just a link to Settings.
@@ -604,6 +613,7 @@ function cardHTML(ex, ei) {
     <header class="ex-head">
       <button class="ex-name" data-act="detail" data-ei="${ei}"><span>${esc(ex.name)}</span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <button class="icon-btn" data-act="tips" data-ei="${ei}" aria-label="Tips for ${esc(ex.name)}"><svg class="ic"><use href="#i-bulb"/></svg></button>
+      ${cvKeyFor(ex.exerciseId) && !ex.cardio ? `<button class="icon-btn cv-btn" data-act="cvset" data-ei="${ei}" aria-label="Analyse a set of ${esc(ex.name)} with the camera"><svg class="ic"><use href="#i-cam"/></svg></button>` : ''}
       <button class="icon-btn" data-act="cardmenu" data-ei="${ei}" aria-label="Exercise options"><svg class="ic"><use href="#i-dots"/></svg></button>
     </header>
     <div class="ex-target">
@@ -675,7 +685,8 @@ function rowHTML(ex, s, ei, si) {
   const badges =
     (s.isWarmup ? '<span class="badge warm">Warm-up</span>' : '') +
     (s.pr ? '<span class="badge pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span>' : '') +
-    (s.note ? `<span class="badge note" role="img" aria-label="Has note"><svg class="ic"><use href="#i-note"/></svg></span>` : '');
+    (s.note ? `<span class="badge note" role="img" aria-label="Has note"><svg class="ic"><use href="#i-note"/></svg></span>` : '') +
+    (s.cv ? `<span class="badge cv" role="img" aria-label="Analysed by camera: ${esc(s.cv.reps)} reps"><svg class="ic"><use href="#i-cam"/></svg></span>` : '');
   const dis = s.done ? 'disabled' : '';
   return `<div class="set-row${s.done ? ' done' : ''}${s.isWarmup ? ' warmup' : ''}" data-ei="${ei}" data-si="${si}">
     <span class="c-set">${s.n}${effortMark(ex, s)}${badges}</span>
@@ -944,6 +955,8 @@ function rowMenu(ei, si) {
     actions: [
       ...(ex.cardio ? [] : [{ label: s.isWarmup ? 'Unmark warm-up' : 'Mark as warm-up', onClick: () => { s.isWarmup = !s.isWarmup; saveActive(); renderActive(); } }]),
       { label: s.note ? 'Edit note' : 'Add note', onClick: () => noteModal(ei, si) },
+      ...(cvKeyFor(ex.exerciseId) && !ex.cardio ? [{ label: 'Analyse this set with camera', onClick: () => cvIntro(ei, si) }] : []),
+      ...(s.cv ? [{ label: 'View camera analysis', onClick: () => cvShowStored(ei, si) }] : []),
       /* Drop set: same set, immediately again at a lower weight, no rest. Not
          offered on cardio, which has no weight to drop. */
       ...(ex.cardio ? [] : [{
@@ -983,6 +996,242 @@ function noteModal(ei, si) {
   });
 }
 
+/* ================= set analysis (camera) =================
+   Post-set: the phone's own camera app records the set (file input with
+   capture=environment) or an existing video is chosen; formcheck/analyse.js
+   runs MediaPipe Pose on it frame by frame, ON DEVICE, and returns counted
+   reps plus fatigue numbers. Only a compact numeric summary (s.cv) is kept --
+   never the video. MediaPipe (+11 MB wasm, 5.8 MB model) is dynamic-imported
+   here on first use and is NOT in the sw.js precache. Which exercises offer
+   this is decided in ONE place: CV_EXERCISES in features.js. */
+let cvJob = null;       // AbortController of the analysis in flight
+let cvTarget = null;    // { ei, si, exId } the picked video is for
+let cvMod = null;       // formcheck/analyse.js + reps.js, once loaded
+
+async function cvModules() {
+  if (!cvMod) {
+    const [an, reps] = await Promise.all([import('./formcheck/analyse.js'), import('./formcheck/reps.js')]);
+    cvMod = { an, reps };
+  }
+  return cvMod;
+}
+
+/* Placement text per exercise, without loading reps.js up front. Mirrors
+   reps.js EXERCISES[...].placement (the results sheet shows that exact text). */
+const CV_PLACEMENT = {
+  side: 'Phone side-on at hip height, 2–3 m away, portrait. Head to knees in frame; the arm nearer the camera is tracked.',
+  front: 'Phone at chest height, 2–3 m in front of you, portrait. Head to hips in frame, both shoulders visible.'
+};
+const cvView = key => (key === 'lateral_raise' ? 'front' : 'side');
+
+function cvChooseSet(ei) {
+  const ex = state.active.exercises[ei];
+  if (!ex) return;
+  if (ex.sets.length === 1) return cvIntro(ei, 0);
+  if (!ex.sets.length) { toast('Add a set first'); return; }
+  showModal({
+    title: 'Analyse which set?',
+    body: `<p class="muted">${esc(ex.name)}</p>`,
+    actions: [
+      ...ex.sets.map((s, si) => ({
+        label: `Set ${s.n}` + (s.reps != null ? ` · ${s.weightKg != null ? fmtNum(dispKg(s.weightKg)) + ' × ' : ''}${s.reps}` : '') +
+          (s.done ? ' ✓' : '') + (s.cv ? ' · analysed' : ''),
+        onClick: () => cvIntro(ei, si)
+      })),
+      { label: 'Cancel' }
+    ]
+  });
+}
+
+function cvIntro(ei, si) {
+  const ex = state.active.exercises[ei], s = ex && ex.sets[si];
+  const key = ex && cvKeyFor(ex.exerciseId);
+  if (!s || !key) return;
+  cvTarget = { ei, si, exId: ex.exerciseId };
+  const view = cvView(key);
+  showModal({
+    title: `Analyse set ${s.n}`,
+    body: `<p><strong>${esc(ex.name)}</strong></p>
+      <p class="cv-place"><svg class="ic"><use href="#i-cam"/></svg><span><strong>${view === 'front' ? 'Front view.' : 'Side view.'}</strong> ${esc(CV_PLACEMENT[view])}</span></p>
+      <p class="muted small">Record the whole set, then come back. The video is analysed on this phone and is not kept or uploaded — only the rep numbers are saved.</p>`,
+    actions: [
+      { label: 'Record the set', primary: true, onClick: () => { $('#cv-rec').click(); } },
+      { label: 'Choose a video', onClick: () => { $('#cv-pick').click(); } },
+      { label: 'Cancel' }
+    ]
+  });
+}
+
+function cvOnFile(e) {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f || !cvTarget) return;
+  cvRun(f, cvTarget);
+}
+
+async function cvRun(file, target) {
+  const ex = state.active && state.active.exercises[target.ei];
+  if (!ex || ex.exerciseId !== target.exId || !ex.sets[target.si]) { toast('That set is no longer in the workout'); return; }
+  const key = cvKeyFor(ex.exerciseId);
+  closeModal();
+  if (cvJob) cvJob.abort();
+  const job = new AbortController();
+  cvJob = job;
+  openSheet(`<h2>Analysing set ${ex.sets[target.si].n}</h2>
+    <p class="muted">${esc(ex.name)}</p>
+    <div class="cv-prog" role="status" aria-live="polite">
+      <progress id="cv-bar" max="100" value="0"></progress>
+      <p id="cv-pct"><strong>Loading the pose model…</strong></p>
+      <p class="muted small">First time only: about 17 MB is downloaded, then it works offline. Keep this screen open.</p>
+    </div>
+    <div class="modal-actions"><button class="btn" id="cv-cancel">Cancel</button></div>`);
+  $('#cv-cancel').onclick = () => { job.abort(); closeSheet(); toast('Analysis cancelled'); };
+  let res;
+  try {
+    const { an } = await cvModules();
+    res = await an.analyseVideo(file, key, {
+      ...(window.__cvOpts || {}),   // test hook (headless walk forces delegate: 'CPU')
+      signal: job.signal,
+      onProgress: (p, info) => {
+        if (job.signal.aborted) return;
+        const pct = Math.round(p * 100), bar = $('#cv-bar'), txt = $('#cv-pct');
+        if (bar) bar.value = pct;
+        if (txt) txt.innerHTML = info && info.phase === 'model'
+          ? '<strong>Loading the pose model…</strong>'
+          : `<strong>Analysing… ${pct}%</strong>`;
+      }
+    });
+  } catch (err) {
+    if (cvJob === job) cvJob = null;
+    if (job.signal.aborted || (err && err.code === 'aborted')) return;
+    console.warn('set analysis failed', err);
+    cvShowError(err, key);
+    return;
+  }
+  if (cvJob === job) cvJob = null;
+  if (job.signal.aborted) return;
+  // The workout may have changed while we worked (set deleted, exercise swapped).
+  const ex2 = state.active && state.active.exercises[target.ei];
+  const s2 = ex2 && ex2.exerciseId === target.exId && ex2.sets[target.si];
+  if (!s2) { closeSheet(); toast('That set is no longer in the workout'); return; }
+  if (res.fatigue.repsCounted > 0) {
+    s2.cv = sanitizeCv(res.cv);
+    saveActive();
+    renderActive();
+  }
+  window.__cv = { reps: res.fatigue.repsCounted, diag: res.diag, cv: s2.cv || null, gatedPct: res.gatedPct, delegate: res.delegate, frames: res.framesProcessed, pose: res.framesWithPose };
+  cvShowResults(target, res);
+}
+
+function cvShowError(err, key) {
+  const where = CV_PLACEMENT[cvView(key)];
+  const code = err && err.code;
+  const msg = code === 'model_load'
+    ? 'The pose model could not load. Check your connection and try again — after the first successful run it works offline.'
+    : code === 'unsupported_video'
+      ? 'This phone’s browser cannot read that video. Record with the normal camera app (not slow-motion or HDR/HEVC-only), or choose another clip.'
+      : code === 'too_long' ? (err.message || 'That video is too long — record just the one set.')
+        : 'Something went wrong while analysing: ' + ((err && err.message) || 'unknown error');
+  window.__cv = { error: code || 'error', message: msg };
+  openSheet(`<h2>Could not analyse the set</h2>
+    <p class="warnline"><svg class="ic"><use href="#i-warn"/></svg><span>${esc(msg)}</span></p>
+    <p class="cv-place"><svg class="ic"><use href="#i-cam"/></svg><span>${esc(where)}</span></p>
+    <div class="modal-actions"><button class="btn" id="cv-close">Close</button></div>`);
+  $('#cv-close').onclick = closeSheet;
+}
+
+function cvLineHTML(l) {
+  const icon = l.kind === 'warn' ? 'i-warn' : l.kind === 'ok' ? 'i-check' : 'i-info';
+  const word = l.kind === 'warn' ? 'Watch: ' : l.kind === 'ok' ? 'OK: ' : '';
+  return `<li class="cv-line ${l.kind}"><svg class="ic" aria-hidden="true"><use href="#${icon}"/></svg><span><span class="sr">${word}</span>${esc(l.text)}</span></li>`;
+}
+
+function cvShowResults(target, res) {
+  const ex = state.active.exercises[target.ei], s = ex.sets[target.si];
+  const n = res.fatigue.repsCounted;
+  const diag = res.diag
+    ? `<p class="warnline"><svg class="ic"><use href="#i-warn"/></svg><span>${esc(res.diag.message)}</span></p>` : '';
+  const gated = res.gatedPct >= 40 && !res.diag
+    ? `<p class="warnline"><svg class="ic"><use href="#i-warn"/></svg><span>The camera lost sight of you in ${res.gatedPct}% of frames, so the count may be low. ${esc(CV_PLACEMENT[res.view])}</span></p>` : '';
+  const cues = res.fatigue.topFaults.length
+    ? `<h3 class="cv-h">Most common form cues</h3><ul class="cv-lines">${res.fatigue.topFaults.map(f =>
+        `<li class="cv-line warn"><svg class="ic" aria-hidden="true"><use href="#i-warn"/></svg><span>${f.count}× ${esc(f.cue)}</span></li>`).join('')}</ul>` : '';
+  const reps = res.reps.map(r => `<li class="cv-rep ${r.good ? 'good' : 'bad'}">
+      <span class="cv-rep-n">${r.good ? '<svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>' : '<svg class="ic" aria-hidden="true"><use href="#i-warn"/></svg>'}Rep ${r.n}</span>
+      <span class="cv-rep-t">${r.good ? 'Good rep' : esc(r.faults[0].cue) + (r.faults.length > 1 ? ` (+${r.faults.length - 1} more)` : '')}</span>
+      <span class="cv-rep-m muted small">${esc(r.rom.range)}° range · up ${esc(r.concentricS)} s · down ${esc(r.eccentricS)} s</span></li>`).join('');
+  const typed = s.reps != null && s.reps !== n;
+  openSheet(`<h2>Set ${s.n} — ${esc(ex.name)}</h2>
+    <div class="cv-big" role="status"><strong id="cv-count">${n}</strong><span>rep${n === 1 ? '' : 's'} counted by camera</span></div>
+    ${diag}${gated}
+    ${n ? `<h3 class="cv-h">How the set changed</h3><ul class="cv-lines">${res.lines.map(cvLineHTML).join('')}</ul>` : ''}
+    ${cues}
+    ${n ? `<h3 class="cv-h">Rep by rep</h3><ol class="cv-reps">${reps}</ol>` : ''}
+    <p class="cv-place"><svg class="ic"><use href="#i-cam"/></svg><span><strong>Camera placement:</strong> ${esc(res.placement)}</span></p>
+    <p class="muted small">Estimates from one phone camera — treat them as a guide. The video was not kept.</p>
+    <div class="modal-actions">
+      ${n ? `<button class="btn primary" id="cv-use">Use ${n} rep${n === 1 ? '' : 's'}</button>` : ''}
+      <button class="btn" id="cv-keep">${n ? `Keep my count${s.reps != null ? ' (' + esc(s.reps) + ')' : ''}` : 'Close'}</button>
+    </div>`);
+  $('#cv-keep').onclick = closeSheet;
+  const use = $('#cv-use');
+  if (use) use.onclick = () => {
+    if (!typed) { cvApplyReps(target, n); closeSheet(); return; }
+    showModal({
+      title: `Replace ${s.reps} with ${n}?`,
+      body: `<p>Set ${s.n} currently says <strong>${esc(s.reps)}</strong> reps. The camera counted <strong>${n}</strong>.</p>`,
+      actions: [
+        { label: `Use ${n} reps`, primary: true, onClick: () => { cvApplyReps(target, n); closeSheet(); } },
+        { label: `Keep ${s.reps}` }
+      ]
+    });
+  };
+}
+
+function cvApplyReps(target, n) {
+  const ex = state.active.exercises[target.ei], s = ex && ex.sets[target.si];
+  if (!s || ex.exerciseId !== target.exId) return;
+  s.reps = n;
+  if (s.done && !s.isWarmup) {
+    // Keep the PR flag honest for a set already ticked off.
+    const prior = bestPriorE1RMExcept(ex.exerciseId, s);
+    const cur = e1rm(s.weightKg, n);
+    s.pr = cur != null && cur > prior;
+  }
+  saveActive();
+  renderActive();
+  toast(`Set ${s.n}: ${n} reps`);
+}
+
+/* bestPriorE1RM counts the live workout's completed sets too, which would
+   include the very set being corrected. */
+function bestPriorE1RMExcept(exId, skip) {
+  const was = skip.done;
+  skip.done = false;
+  try { return bestPriorE1RM(exId); } finally { skip.done = was; }
+}
+
+/* Re-open a stored summary (no per-rep detail: only numbers were kept). */
+function cvShowStored(ei, si) {
+  const ex = state.active.exercises[ei], s = ex && ex.sets[si];
+  if (!s || !s.cv) return;
+  const c = s.cv;
+  const faults = Object.entries(c.faults || {}).sort((x, y) => y[1] - x[1]);
+  openSheet(`<h2>Set ${s.n} — ${esc(ex.name)}</h2>
+    <div class="cv-big"><strong>${esc(c.reps)}</strong><span>reps counted by camera</span></div>
+    <p class="muted">${esc(fmtCvLine(c))}</p>
+    ${faults.length ? `<p class="muted small">Form flags: ${esc(faults.map(([id, k]) => k + '× ' + id.replace(/_/g, ' ')).join(', '))}</p>` : ''}
+    <div class="modal-actions"><button class="btn" id="cv-clear">Remove analysis from this set</button><button class="btn" id="cv-close">Close</button></div>`);
+  $('#cv-close').onclick = closeSheet;
+  $('#cv-clear').onclick = () => { delete s.cv; saveActive(); renderActive(); closeSheet(); };
+}
+
+/* History (exercise sheet/detail): one short line per analysed set. */
+function cvHistoryLines(sets) {
+  return sets.filter(s => s.cv).map(s =>
+    `<span class="exh-cv"><svg class="ic" aria-hidden="true"><use href="#i-cam"/></svg>Set ${esc(s.setNumber)} · ${esc(fmtCvLine(s.cv))}</span>`).join('');
+}
+
 function cardMenu(ei) {
   const ex = state.active.exercises[ei];
   const list = state.active.exercises;
@@ -990,6 +1239,7 @@ function cardMenu(ei) {
     { label: 'Exercise details', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) },
     { label: 'Swap exercise', onClick: () => openExerciseSheet(ex.exerciseId, { ei }) }
   ];
+  if (cvKeyFor(ex.exerciseId) && !ex.cardio) acts.push({ label: 'Analyse a set with camera', onClick: () => cvChooseSet(ei) });
   /* A superset pairs this card with the one BELOW it, so the last card has
      nothing to pair with and the action is simply absent rather than offered
      and then refused. */
@@ -1301,40 +1551,10 @@ function finishFlow() {
 
 function saveWorkout(donePairs) {
   const a = state.active, end = Date.now();
-  const sets = donePairs.map(({ ex, s }) => {
-    const row = {
-      exerciseId: ex.exerciseId, exerciseName: ex.name, setNumber: s.n,
-      weightKg: s.weightKg == null ? 0 : s.weightKg, reps: s.reps == null ? 0 : s.reps,
-      isWarmup: !!s.isWarmup, note: s.note || '', pr: !!s.pr
-    };
-    /* The superset letter rides on the set rows so "Save as template" can carry
-       the grouping back out (templateFromWorkout reads the first row of each
-       exercise bucket). Added only when there IS one, so a normal set stays
-       byte-identical to what every earlier version wrote — the same rule the
-       drop-set and cardio fields follow. */
-    if (ex.superset) row.superset = ex.superset;
-    // Cardio fields are added only on cardio rows, so every existing lifting
-    // record keeps exactly the shape the exports and merges already expect.
-    /* Only completed drops are saved. An abandoned half-entered drop must not
-       become a phantom 0-rep segment in history, exactly as an incomplete set
-       is discarded on finish. */
-    const drops = dropsOf(s).filter(d => d && d.done);
-    if (drops.length) {
-      row.drops = drops.map(d => ({
-        weightKg: d.weightKg == null ? 0 : d.weightKg,
-        reps: d.reps == null ? 0 : d.reps
-      }));
-    }
-    if (s.cardio) {
-      row.cardio = true;
-      row.durationSec = s.durationSec == null ? 0 : s.durationSec;
-      if (s.speedKmh != null) row.speedKmh = s.speedKmh;
-      if (s.inclinePct != null) row.inclinePct = s.inclinePct;
-      if (s.kcal != null) row.kcal = s.kcal;
-      row.kcalEstimated = !s.kcalManual;
-    }
-    return row;
-  });
+  /* buildSetRow (features.js) adds superset / drops / cardio / cv fields only
+     when present, so a normal set stays byte-identical to what every earlier
+     version wrote. It is unit-tested in build/test_features.mjs. */
+  const sets = donePairs.map(({ ex, s }) => buildSetRow(ex, s));
   const rec = {
     id: a.id, templateId: a.templateId, templateName: a.templateName,
     startTime: a.startTime, endTime: end,
@@ -1787,7 +2007,11 @@ function openSheet(html) {
   $('#sheet-wrap').hidden = false;
   $('#sheet').scrollTop = 0;
 }
-function closeSheet() { $('#sheet-wrap').hidden = true; }
+function closeSheet() {
+  $('#sheet-wrap').hidden = true;
+  // Closing the sheet mid-analysis cancels it; nothing keeps running unseen.
+  if (cvJob) cvJob.abort();
+}
 
 function exerciseHistoryHTML(exId) {
   const sessions = [];
@@ -1805,7 +2029,7 @@ function exerciseHistoryHTML(exId) {
   if (!sessions.length) return '<p class="muted">No history for this exercise yet.</p>';
   const list = sessions.slice(0, 12).map(sn =>
     `<div class="exh"><span class="exh-date">${esc(sn.date)}</span>
-     <span class="exh-sets">${esc(sn.sets.map(s => `${s.weightKg > 0 ? fmtNum(dispKg(s.weightKg)) + ' × ' : ''}${s.reps}${s.isWarmup ? ' (wu)' : ''}`).join(' · '))}</span></div>`).join('');
+     <span class="exh-sets">${esc(sn.sets.map(s => `${s.weightKg > 0 ? fmtNum(dispKg(s.weightKg)) + ' × ' : ''}${s.reps}${s.isWarmup ? ' (wu)' : ''}`).join(' · '))}</span>${cvHistoryLines(sn.sets)}</div>`).join('');
   const hasE = sessions.some(s => s.best != null);
   const pts = sessions.slice(0, 20).reverse().map(sn => ({ x: sn.ts, y: hasE ? (sn.best ?? 0) : sn.top })).filter(p => p.y > 0);
   const label = hasE ? `Best estimated 1RM per session (${unit})` : 'Best set reps per session';
@@ -2011,6 +2235,29 @@ function guideMediaHTML(g, name, compact) {
     note + `</div>`;
 }
 
+/* ================= learn =================
+   learn.js (and its widgets) load on first visit only — most launches never
+   open Learn, so none of it sits on the boot path. Mounted once and kept, so
+   coming back from an exercise or another tab lands on the same lesson. */
+let learnMount = null;
+function ensureLearn() {
+  if (learnMount) return learnMount;
+  const root = $('#learn-body');
+  learnMount = import('./learn.js').then(m => m.mountLearn(root, {
+    base: './',
+    exit: () => showView('home'),
+    openExercise: slug => { state.exReturn = 'learn'; openExerciseDetail(slug); },
+    exerciseName: slug => { const l = LIBRARY.find(x => x.id === slug); return l ? l.name : null; },
+    loadFoods: () => loadFoodDb().then(db => (db && db.foods) || []),
+    reducedMotion: reduceMotion()
+  })).catch(e => {
+    learnMount = null;
+    console.warn('Learn failed to load', e);
+    root.innerHTML = '<p class="muted pad-s">Learn could not be loaded. Check your connection and try again.</p>';
+  });
+  return learnMount;
+}
+
 function openExerciseDetail(exId) {
   state.exDetailId = exId;
   showView('exdetail');
@@ -2185,6 +2432,7 @@ function openWod(id) {
             <span>${s.reps}</span>
             ${hasDrops(s) ? `<span class="ro-note">${esc(fmtSetChain(s, w => fmtNum(dispKg(w)) + ' ' + unit))}</span>` : ''}
             ${s.note ? `<span class="ro-note">Note: ${esc(s.note)}</span>` : ''}
+            ${s.cv ? `<span class="ro-note cv-note"><svg class="ic"><use href="#i-cam"/></svg>${esc(fmtCvLine(s.cv))}</span>` : ''}
           </div>`).join('');
       return `<article class="ex-card${cardio ? ' cardio-card' : ''}">
         <header class="ex-head"><span class="ex-name" style="cursor:default"><span>${esc(sets[0].exerciseName)}</span></span></header>
@@ -2748,7 +2996,13 @@ function wire() {
     const b = e.target.closest('[data-exb]');
     if (b) openExerciseDetail(b.dataset.exb);
   });
-  $('#exd-back').onclick = () => showView('exercises');
+  /* An exercise opened from a Learn lesson goes back to that lesson, not to
+     the library list it never came from. */
+  $('#exd-back').onclick = () => {
+    const back = state.exReturn || 'exercises';
+    state.exReturn = null;
+    showView(back);
+  };
   $('#exb-back').onclick = () => showView('home');
 
   // active workout — one delegated listener for all card interactions
@@ -2763,6 +3017,7 @@ function wire() {
     if (act === 'detail') openExerciseSheet(state.active.exercises[ei].exerciseId, { ei });
     else if (act === 'tips') openTipsPopup(state.active.exercises[ei].exerciseId);
     else if (act === 'cardmenu') cardMenu(ei);
+    else if (act === 'cvset') cvChooseSet(ei);
     else if (act === 'gloss') openGlossary(b.dataset.term);
     else if (act === 'check') toggleSet(ei, si);
     else if (act === 'dropcheck') toggleDrop(ei, si, +row.dataset.di);
@@ -2867,6 +3122,8 @@ function wire() {
 
   // sheet & modal
   $('#sheet-close').onclick = closeSheet;
+  $('#cv-rec').addEventListener('change', cvOnFile);
+  $('#cv-pick').addEventListener('change', cvOnFile);
   $('#sheet-backdrop').onclick = closeSheet;
   $('#modal-backdrop').onclick = closeModal;
 

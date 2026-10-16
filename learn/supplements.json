@@ -1,0 +1,1224 @@
+{
+  "section": "supplements",
+  "lessons": [
+    {
+      "id": "supp-do-you-need",
+      "title": "Do you need supplements?",
+      "summary": "Food first. Supplements are small add-ons, not entry tickets to the gym. Choose by evidence, your actual needs and product quality.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can decide whether a supplement solves a named need before spending money. Supplements are optional bicycle extras; food, training and recovery still provide the pedals."
+        },
+        {
+          "t": "p",
+          "text": "**Food first; supplements are small add-ons.** Start with [[lesson:nut-protein|protein from meals]] and [[lesson:nut-micros-water|vitamins, minerals and water]]. A supplement can fill a genuine gap or offer convenience. Strong evidence for an ingredient does not mean everyone needs it. Your budget is allowed to say no."
+        },
+        {
+          "t": "video",
+          "id": "YXW0oYFAndc",
+          "title": "Why Supplements Are So Overrated",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: why supplements stay secondary to training and food (Renaissance Periodization)."
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Our scope",
+          "text": "LiftLog only covers natural training. Drugs are outside its scope."
+        },
+        {
+          "t": "h",
+          "text": "Tap the evidence tier list"
+        },
+        {
+          "t": "widget",
+          "w": "tier-list",
+          "params": {
+            "tiers": [
+              {
+                "name": "Strong evidence",
+                "blurb": "Useful for a specific job, not compulsory for a beginner.",
+                "items": [
+                  {
+                    "name": "Creatine monohydrate",
+                    "what": "Helps repeated, short, hard efforts and can support gains alongside training.",
+                    "dose": "3–5 g daily, including rest days; loading is optional.",
+                    "note": "ISSN creatine position stand, 2017. Choose plain monohydrate; see the creatine lesson.",
+                    "caution": "Check suitability first if pregnant, breastfeeding, on medication, or living with a medical condition, especially kidney disease."
+                  },
+                  {
+                    "name": "Caffeine",
+                    "what": "Can improve exercise performance, but may harm sleep or cause anxiety.",
+                    "dose": "Adult studies commonly use 3–6 mg/kg about 60 minutes before exercise.",
+                    "note": "See the caffeine lesson before using study arithmetic. EFSA’s healthy-adult guidance does not make a dose necessary or suitable for everyone.",
+                    "caution": "Not a personal dose recommendation. Check suitability first; caffeine can worsen sleep, anxiety or other symptoms."
+                  },
+                  {
+                    "name": "Protein powder: convenient food",
+                    "what": "Helps you reach your protein target when meals are inconvenient.",
+                    "dose": "Only enough to fill your daily protein gap.",
+                    "note": "Counts toward total protein. More powder is not automatically more muscle; ordinary food can do the same job.",
+                    "caution": "Check allergies and medical suitability. A powder is optional, not a requirement."
+                  }
+                ]
+              },
+              {
+                "name": "Prevent or correct a nutrient gap",
+                "blurb": "Some prevent a dietary gap; others need assessment. Open the nutrient to see the difference.",
+                "items": [
+                  {
+                    "name": "Vitamin D",
+                    "what": "Supports bones and muscle function; correcting a deficiency matters.",
+                    "note": "A clinician can decide whether testing and a supplement are needed. Treatment doses are individual.",
+                    "caution": "Treatment doses are individual; use clinician guidance."
+                  },
+                  {
+                    "name": "Vitamin B12",
+                    "what": "Supports nerves and blood cells. Vegetarians and vegans need a reliable source.",
+                    "note": "Fortified foods or supplementation can prevent a gap; do not wait for symptoms or a low test result.",
+                    "caution": "Prevention need not wait for symptoms or a low test result."
+                  },
+                  {
+                    "name": "Iron",
+                    "what": "Corrects an identified shortage, not every case of tiredness.",
+                    "note": "Use only when a clinician recommends it after assessment. Too much iron can be harmful.",
+                    "caution": "Do not self-treat tiredness with iron; excess can be harmful."
+                  }
+                ]
+              },
+              {
+                "name": "Context-dependent or uncertain benefit",
+                "blurb": "Not a beginner lifting priority. The useful outcome and uncertainty differ by item.",
+                "items": [
+                  {
+                    "name": "Beta-alanine",
+                    "what": "May help sustained hard efforts lasting roughly 1–4 minutes; less relevant to ordinary beginner lifting.",
+                    "dose": "ISSN studies use 4–6 g daily over weeks, not just before a session.",
+                    "note": "Can cause tingling. Not a beginner priority; discuss suitability before using.",
+                    "caution": "Tingling can occur. This is not a beginner priority or a personal dose recommendation."
+                  },
+                  {
+                    "name": "Omega-3",
+                    "what": "A general nutrition consideration, not an established muscle-building shortcut.",
+                    "note": "Food first. General-health supplement benefits are mixed; consider fish or suitable alternatives before a capsule.",
+                    "caution": "Discuss suitability if you use medication or have a medical condition."
+                  }
+                ]
+              },
+              {
+                "name": "Skip",
+                "blurb": "Weak value for a well-fed beginner, with possible quality or safety concerns.",
+                "items": [
+                  {
+                    "name": "BCAAs with adequate protein",
+                    "what": "Extra portions of only some protein building blocks.",
+                    "note": "Prioritise adequate complete protein instead; extra BCAAs are not a necessary addition.",
+                    "caution": "Skip when your total protein is already adequate."
+                  },
+                  {
+                    "name": "Herbal 'testosterone booster' blends",
+                    "what": "Products marketed to beginners with muscle-gain promises.",
+                    "note": "A marketing promise does not establish a useful training benefit.",
+                    "caution": "Herbal 'testosterone booster' blends: little good evidence they raise muscle gain in healthy people; higher contamination risk. Skip."
+                  },
+                  {
+                    "name": "Fat burners",
+                    "what": "Products promising easier fat loss.",
+                    "note": "Benefits are often small or unproven, while side effects and unclear blends add risk.",
+                    "caution": "Benefits are often small or unproven, while unclear blends can add side effects. Skip."
+                  },
+                  {
+                    "name": "Detox teas",
+                    "what": "Products promising a cleanse or reset.",
+                    "note": "Compelling evidence for detox claims is lacking. A scale change does not prove toxin removal.",
+                    "caution": "Compelling evidence for commercial detox claims is lacking. Skip."
+                  }
+                ]
+              }
+            ]
+          },
+          "caption": "Tap an item for its job, caution and what studies used. The tiers describe evidence and usefulness, not what you must buy."
+        },
+        {
+          "t": "p",
+          "text": "A [[deficiency]] means you are short of a nutrient. Fixing that shortage differs from adding more when you already have enough. B12 prevention is an important exception to waiting for a low test. Discuss a reliable source if you eat little or no animal food."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Name the job",
+              "text": "Ask what problem you want to solve. Missing protein at lunch is a clearer problem than wanting a mysterious boost. If you cannot name the job, pause the purchase."
+            },
+            {
+              "title": "Check the basics",
+              "text": "Look at meals, your training routine and sleep before adding anything. Consider whether groceries or an easier meal plan would solve the same problem."
+            },
+            {
+              "title": "Check the actual product",
+              "text": "Look for [[third-party testing]], such as Informed Sport or NSF Certified for Sport. Verify the product in the certification directory, not just a logo in an advert. Check batch details where available. Certification reduces risk; it does not prove the promised benefit."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Before you buy",
+          "text": "Check with a doctor before using supplements if pregnant, breastfeeding, on medication or living with a medical condition. Teenagers need individual guidance; adult study doses are not teen instructions. Supplements can be contaminated. Choose third-party testing such as Informed Sport or NSF Certified for Sport, and verify the actual product. Testing cannot guarantee zero risk."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your Monday decision",
+          "text": "Write down the gap, the food-first option and the supplement's evidence. Then choose the simplest workable plan. Buying nothing is a perfectly valid result. You can revisit the decision when your needs change, rather than when an advert gets louder."
+        }
+      ],
+      "takeaways": [
+        "Food, training and recovery come first; supplements are optional add-ons.",
+        "Choose an ingredient for a clear need, not because it sits in a popular stack.",
+        "Prevent nutrient gaps where appropriate, but let a clinician guide testing and treatment.",
+        "Verify third-party certification; it reduces contamination risk without proving effectiveness."
+      ],
+      "quiz": [
+        {
+          "q": "You already meet your protein needs through meals. What is the sensible next purchase?",
+          "options": [
+            "A powder because every gym member needs a tub.",
+            "Nothing unless you identify a genuine new need.",
+            "BCAAs because meals cannot support muscle repair."
+          ],
+          "answer": 1,
+          "why": "Adequate meals already cover the protein job. Supplements are optional, not a condition of making progress."
+        },
+        {
+          "q": "An advert shows a testing logo. What should you do before buying?",
+          "options": [
+            "Verify the product in the certification directory.",
+            "Assume the logo confirms every performance claim.",
+            "Choose the largest tub to make the testing worthwhile."
+          ],
+          "answer": 0,
+          "why": "Check the actual product and available batch details. Testing helps with quality risk, not proof that you need the supplement."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Maughan et al. (2018), IOC consensus statement: dietary supplements and the high-performance athlete",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5867441/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Kreider et al. (2017), ISSN position stand: creatine safety and efficacy",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Jäger et al. (2017), ISSN position stand: protein and exercise",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Guest et al. (2021), ISSN position stand: caffeine and exercise performance",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7777221/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "EFSA, Caffeine: healthy-adult single-dose and daily safety levels",
+          "url": "https://www.efsa.europa.eu/en/topics/topic/caffeine",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Trexler et al. (2015), ISSN position stand: beta-alanine",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4501114/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Vitamin D: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Vitamin B12: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminB12-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Iron: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Omega-3 fatty acids: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Wolfe (2017), Branched-chain amino acids and muscle protein synthesis in humans: myth or reality?",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5568273/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Morgado et al. (2024; online 2023), Do testosterone boosters really increase serum total testosterone? Systematic review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37697053/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Dietary supplements for weight loss: health professional fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/WeightLoss-HealthProfessional/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Klein and Kiat (2015), Detox diets: critical review of the evidence",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25522674/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Informed Sport, About the testing and certification programme",
+          "url": "https://www.informed-sport.com/about",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NSF, Certified for Sport programme",
+          "url": "https://www.nsf.org/consumer-resources/articles/certified-for-sport-program",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "supp-creatine",
+      "title": "Creatine",
+      "summary": "Creatine monohydrate can help repeated hard efforts. A simple daily habit matters more than fancy forms, loading or perfect timing.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can decide whether plain creatine monohydrate fits your needs and use the evidence without turning it into a miracle. Creatine helps refill the ATP “battery” used in hard work."
+        },
+        {
+          "t": "p",
+          "text": "That bigger battery can help repeated short, hard efforts. Alongside regular training, creatine can support strength and muscle gains. It cannot replace the training signal. Keep the frame simple: **food first; supplements are small add-ons**. You can still make progress without buying it."
+        },
+        {
+          "t": "video",
+          "id": "Z9mlsyV7Hek",
+          "title": "Creatine: Everything You Need To Know",
+          "channel": "Jeff Nippard",
+          "why": "Watch: the basics of creatine use and evidence (Jeff Nippard)."
+        },
+        {
+          "t": "h",
+          "text": "Keep the plan boring"
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Choose the plain version",
+              "text": "Choose [[creatine monohydrate]], the best-studied form. More expensive names do not establish better results. Look at the ingredient list rather than the superhero on the packaging."
+            },
+            {
+              "title": "Use a daily habit",
+              "text": "The ISSN position stand supports 3–5 g daily. Take it on rest days too. Loading means using a larger initial amount to fill stores faster; it is optional. A regular daily dose also builds stores, just more slowly."
+            },
+            {
+              "title": "Fit it around your life",
+              "text": "Attach the habit to something you already do, such as a meal. Follow the product's measuring instructions. There is no need to turn supplement timing into another workout."
+            }
+          ]
+        },
+        {
+          "t": "h",
+          "text": "Tap the myths"
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "A higher scale reading means I gained fat.",
+              "back": "Creatine can increase water held in muscle, especially early on. Water is not fat. Longer-term water changes vary, so do not judge body-fat change from a new scale reading alone."
+            },
+            {
+              "front": "Creatine inevitably damages healthy kidneys.",
+              "back": "Studies reviewed by ISSN do not show kidney damage in healthy people at recommended doses. Existing kidney disease needs individual medical advice. Tell your clinician you use creatine when blood tests are interpreted."
+            },
+            {
+              "front": "The hair-loss claim is settled science.",
+              "back": "The concern came from a small 2009 study measuring a hormone, not hair loss. The 2021 review noted that finding had not been replicated. A 2025 trial directly assessed hair and found no difference from placebo. That is reassuring, not proof for every person over a lifetime."
+            },
+            {
+              "front": "If I do not load, it cannot work.",
+              "back": "Loading fills muscle stores faster, but it is not required. The normal daily approach takes longer. Choose the simpler routine if you prefer it."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Why the hair evidence is limited",
+          "text": "A placebo-controlled trial measured hair outcomes directly during 12 weeks of 5 g/day in healthy trained men and found no between-group effect. That is useful reassurance for that setting, not lifetime proof for everyone."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Healthy-person evidence has boundaries",
+          "text": "Check with a doctor before using creatine if pregnant, breastfeeding, on medication or living with a medical condition, especially kidney disease. Teenagers need individual guidance. Supplements can be contaminated. Choose third-party testing such as Informed Sport or NSF Certified for Sport, and verify the product. Certification reduces risk; it cannot guarantee zero risk."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your Monday plan",
+          "text": "If creatine suits you, put a plain, tested product beside an existing daily habit. Keep meals and training unchanged. Log your workouts, and note when you started. Do not mistake an early water-related scale change for instant muscle growth or fat gain."
+        }
+      ],
+      "takeaways": [
+        "Creatine monohydrate can support repeated hard efforts and training gains; it is optional.",
+        "A daily 3–5 g habit is enough; loading is optional and rest days still count.",
+        "Early water-related weight changes are not the same as fat gain.",
+        "Healthy-person safety evidence does not replace medical advice for kidney disease or other conditions."
+      ],
+      "quiz": [
+        {
+          "q": "You prefer a simple creatine routine without loading. Which approach fits the evidence?",
+          "options": [
+            "Take it only when your hardest workout feels tiring.",
+            "Buy a special form to make skipping loading work.",
+            "Use monohydrate daily and allow stores to build."
+          ],
+          "answer": 2,
+          "why": "Daily creatine builds muscle stores gradually. Loading speeds that process but is optional."
+        },
+        {
+          "q": "Your scale rises after starting creatine. What is the best interpretation?",
+          "options": [
+            "Water changes could explain it; watch the trend.",
+            "It proves you have built new muscle immediately.",
+            "It proves the supplement has increased your body fat."
+          ],
+          "answer": 0,
+          "why": "Creatine can change water held in muscle. A scale reading alone cannot identify new muscle or body fat."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Kreider et al. (2017), ISSN position stand: creatine safety and efficacy",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Antonio et al. (2021), Common questions and misconceptions about creatine supplementation",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7871530/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Lak et al. (2025), Does creatine cause hair loss? A 12-week randomized controlled trial",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12020143/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Maughan et al. (2018), IOC consensus: supplement assessment and quality risks",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5867441/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Informed Sport, About the testing and certification programme",
+          "url": "https://www.informed-sport.com/about",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NSF, Certified for Sport programme",
+          "url": "https://www.nsf.org/consumer-resources/articles/certified-for-sport-program",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "supp-protein-powder",
+      "title": "Protein powder",
+      "summary": "Protein powder is a convenience food, not a muscle shortcut. Use it only when useful, count its protein, and keep ordinary meals central.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can decide whether protein powder makes one meal easier. It is convenient food in powder form, not a gym entry ticket or a special type of muscle."
+        },
+        {
+          "t": "p",
+          "text": "Protein provides [[amino acids]], the building blocks used for repair and growth. Powder contributes to the same daily total as dal, curd, eggs, tofu or other foods. Use [[lesson:nut-protein|the protein lesson]] to work out your needs. Here, the question is convenience, not a new target."
+        },
+        {
+          "t": "h",
+          "text": "Whey or plant?"
+        },
+        {
+          "t": "compare",
+          "left": {
+            "title": "Whey: milk-based",
+            "items": [
+              "[[Whey]] is a protein from milk, also produced during cheese-making.",
+              "Provides all [[essential amino acids]], which your body must get from food.",
+              "Check milk allergy and [[lactose]] tolerance. Milk allergy is not solved by choosing a low-lactose product.",
+              "Compare protein per serving, price and what you enjoy drinking."
+            ]
+          },
+          "right": {
+            "title": "Plant: dairy-free options",
+            "items": [
+              "Soy or a suitable plant blend can be practical alternatives.",
+              "Protein quality varies by source; a blend can complement different amino-acid profiles.",
+              "Dairy-free does not mean allergy-free. Check the actual ingredients.",
+              "Adequate total protein and a varied diet matter more than declaring one powder the universal winner."
+            ]
+          }
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "Two authorities, different emphasis",
+          "text": "ICMR-NIN's 2024 Dietary Guidelines for Indians advise avoiding protein supplements to build muscle mass. They say most athletes can meet needs through food and caution against excess. The ISSN's 2017 position stand also supports whole foods, but considers supplementation practical when protein needs are difficult to meet. Neither makes a powder compulsory."
+        },
+        {
+          "t": "p",
+          "text": "Take the Indian guidance seriously: **food first; supplements are small add-ons**. Do not pile powder onto an already adequate diet or replace varied meals with shakes. ISSN's sports-focused view allows a convenience tool, not an unlimited licence to consume more. If you have a health condition, ask for individual guidance."
+        },
+        {
+          "t": "widget",
+          "w": "checklist",
+          "params": {
+            "title": "Does a powder solve a real problem?",
+            "groups": [
+              {
+                "title": "Need",
+                "items": [
+                  "I have checked my protein intake from normal meals.",
+                  "A food-first change would be inconvenient or impractical.",
+                  "The powder would fill a gap, not replace a varied diet."
+                ]
+              },
+              {
+                "title": "Product",
+                "items": [
+                  "I checked protein grams per serving, not just scoop weight.",
+                  "I checked allergies, ingredients and serving instructions.",
+                  "I verified third-party certification for this product."
+                ]
+              }
+            ],
+            "persistKey": "supp-protein-powder"
+          },
+          "caption": "A decision checklist, not a prescription. Unticked items are reasons to pause and check."
+        },
+        {
+          "t": "p",
+          "text": "Read **grams of protein**, not just grams of powder. A scoop also contains other ingredients, and scoop sizes differ between products. Use the label's serving information, and include the resulting protein in your daily total. The front-of-pack muscle photo is not a nutrition label."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Convenient does not mean suitable for everyone",
+          "text": "Check with a doctor before using protein supplements if pregnant, breastfeeding, on medication or living with a medical condition, particularly kidney disease. Teenagers need individual guidance. Check food allergies. Supplements can be contaminated. Choose third-party testing such as Informed Sport or NSF Certified for Sport, and verify the actual product. Testing cannot guarantee zero risk."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your Monday choice",
+          "text": "Plan the meal that usually leaves you short on protein. Try a practical food option first. If a powder genuinely makes that meal easier, choose one you tolerate and can afford. If meals already cover your needs, keep your money for groceries."
+        }
+      ],
+      "takeaways": [
+        "Protein powder counts toward the same daily protein total as food.",
+        "ICMR-NIN advises food-first eating and cautions against unnecessary protein supplements and excess.",
+        "ISSN accepts powder as a practical option when needed; it does not make powder mandatory.",
+        "Choose by protein content, tolerance, dietary preference and verified product quality."
+      ],
+      "quiz": [
+        {
+          "q": "Your meals already meet your protein needs. What does adding a shake guarantee?",
+          "options": [
+            "Extra muscle because powder works differently from food.",
+            "Nothing special; it is extra protein you may not need.",
+            "Better recovery because every workout requires a shaker."
+          ],
+          "answer": 1,
+          "why": "Powder is a convenience source of protein. Extra intake on top of an adequate diet is not automatically extra muscle."
+        },
+        {
+          "q": "You have a milk allergy. Which buying decision makes sense?",
+          "options": [
+            "Choose whey isolate because less lactose removes milk allergy.",
+            "Choose any plant tub because every plant product is allergy-free.",
+            "Check a suitable dairy-free option and its full ingredient list."
+          ],
+          "answer": 2,
+          "why": "Whey is milk-based. Lactose intolerance and milk allergy are different; a plant option still needs an ingredient check."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Jäger et al. (2017), ISSN position stand: protein and exercise",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "ICMR-NIN (2024), Dietary Guidelines for Indians, Guideline 8, printed pages 57–61",
+          "url": "https://www.nin.res.in/dietaryguidelines/pdfjs/locale/DGI_2024.pdf",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NHS, Food allergy: milk, plant allergens and the difference from intolerance",
+          "url": "https://www.nhs.uk/conditions/food-allergy/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Maughan et al. (2018), IOC consensus: food supplements and quality risks",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5867441/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Informed Sport, About the testing and certification programme",
+          "url": "https://www.informed-sport.com/about",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NSF, Certified for Sport programme",
+          "url": "https://www.nsf.org/consumer-resources/articles/certified-for-sport-program",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "supp-caffeine",
+      "title": "Caffeine",
+      "summary": "Caffeine can help performance, but the useful dose is individual. Research ranges are not prescriptions; count all sources and protect sleep.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can weigh a possible performance benefit against sleep and side effects. Caffeine can reduce perceived effort, but it cannot repay sleep debt."
+        },
+        {
+          "t": "p",
+          "text": "**Food first; supplements are small add-ons.** Coffee can provide caffeine without a complicated supplement blend. You can also train without caffeine at all. If the price of feeling lively now is lying awake later, that is not a bargain. Keep [[lesson:rec-sleep|sleep]] ahead of your pre-workout routine."
+        },
+        {
+          "t": "h",
+          "text": "Study doses are not your starting instructions"
+        },
+        {
+          "t": "callout",
+          "kind": "science",
+          "title": "What studies used—not a personal dose",
+          "text": "Adult studies commonly use 3–6 mg/kg about 60 minutes before exercise, and lower amounts may work. Responses vary. The slider shows published study arithmetic for example weights; it does not identify your ideal or safest amount."
+        },
+        {
+          "t": "widget",
+          "w": "slider-explainer",
+          "params": {
+            "label": "Adult study examples: body weight in kg",
+            "initial": 60,
+            "stops": [
+              {
+                "value": 50,
+                "title": "50 kg: 150–300 mg in studies",
+                "text": "50 × 3–6 mg/kg = 150–300 mg. This is research context, not a recommended serving. Even the upper end exceeds EFSA's 200 mg single-dose no-concern level. Avoid caffeine near bedtime.",
+                "tag": "Study range, not a prescription"
+              },
+              {
+                "value": 60,
+                "title": "60 kg: 180–360 mg in studies",
+                "text": "60 × 3–6 mg/kg = 180–360 mg. More is not automatically better. The upper end exceeds EFSA's 200 mg single-dose no-concern level. Count caffeine already consumed and protect sleep.",
+                "tag": "Study range, not a prescription"
+              },
+              {
+                "value": 70,
+                "title": "70 kg: 210–420 mg in studies",
+                "text": "70 × 3–6 mg/kg = 210–420 mg. This range exceeds EFSA's 200 mg single-dose no-concern level; the upper end also exceeds 400 mg across a day. Do not follow it as a dose. Protect sleep.",
+                "tag": "Study range can exceed safety guidance"
+              },
+              {
+                "value": 80,
+                "title": "80 kg: 240–480 mg in studies",
+                "text": "80 × 3–6 mg/kg = 240–480 mg. This exceeds EFSA's single-dose no-concern level; the upper end exceeds its daily level too. Research dosing is not permission to take more. Avoid late caffeine.",
+                "tag": "Study range can exceed safety guidance"
+              },
+              {
+                "value": 90,
+                "title": "90 kg: 270–540 mg in studies",
+                "text": "90 × 3–6 mg/kg = 270–540 mg. This exceeds EFSA's single-dose no-concern level; the upper end exceeds its daily level too. Do not choose a dose from this example. Protect sleep.",
+                "tag": "Study range can exceed safety guidance"
+              },
+              {
+                "value": 100,
+                "title": "100 kg: 300–600 mg in studies",
+                "text": "100 × 3–6 mg/kg = 300–600 mg. This exceeds EFSA's single-dose no-concern level; the upper end exceeds its daily level too. A heavier body is not a licence for larger servings. Avoid late caffeine.",
+                "tag": "Study range can exceed safety guidance"
+              }
+            ]
+          },
+          "caption": "Calculated from Guest et al. (2021), not a dose calculator. Read the healthy-adult safety guidance below before considering caffeine."
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "A safety level is not a target",
+          "text": "EFSA finds that up to 200 mg in a single dose and 400 mg across a day raise no safety concerns for healthy adults. Those are different limits, not a challenge. They do not establish personal suitability. Smaller amounts can still cause jitters, anxiety, palpitations or poor sleep. Count coffee, tea, energy drinks and supplements together."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Count the whole day",
+              "text": "Check labels where available. Coffee strength and cup sizes vary, so a cup is not a fixed dose. Do not accidentally combine a coffee, energy drink and supplement as if each starts a fresh allowance."
+            },
+            {
+              "title": "Protect bedtime",
+              "text": "Avoid caffeine near bedtime and move it earlier or skip it if sleep suffers. There is no universal cutoff that suits everyone. Feeling able to fall asleep does not prove your sleep was unaffected."
+            },
+            {
+              "title": "Do not chase the buzz",
+              "text": "[[Tolerance]] can develop with regular use, while research on the performance effect with habitual use is mixed. Do not respond by continually increasing the amount. If it causes unwanted symptoms, stop and seek advice."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Who needs individual guidance?",
+          "text": "Check with a doctor before using caffeine supplements if pregnant, breastfeeding, on medication or living with a medical condition. Adult performance doses are not teen instructions. Avoid pure bulk caffeine powder because measuring errors can be dangerous. Supplements can be contaminated. Choose verified third-party testing such as Informed Sport or NSF Certified for Sport. Testing cannot guarantee zero risk."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your Monday experiment",
+          "text": "First try arriving fed and rested, without adding a new supplement. If you later consider caffeine, review your current intake and suitability before choosing an amount. Notice both the workout and that night's sleep. A better session with a worse night is not an automatic win."
+        }
+      ],
+      "takeaways": [
+        "Caffeine can improve performance, but you do not need it to train effectively.",
+        "The 3–6 mg/kg research range is not a personal dose recommendation.",
+        "Healthy-adult safety guidance distinguishes 200 mg in one dose from 400 mg across a day.",
+        "Count every caffeine source and reduce or skip it if sleep or symptoms worsen."
+      ],
+      "quiz": [
+        {
+          "q": "The slider shows a study dose above healthy-adult safety guidance. What should you conclude?",
+          "options": [
+            "A study range does not establish my suitable dose.",
+            "A study dose overrides all general safety guidance.",
+            "My body weight makes larger servings automatically safe."
+          ],
+          "answer": 0,
+          "why": "The slider explains research, not personal dosing. Safety levels and individual suitability still matter."
+        },
+        {
+          "q": "You feel energetic after late caffeine but sleep poorly. What is the sensible adjustment?",
+          "options": [
+            "Keep the dose and make every workout harder to compensate.",
+            "Move caffeine earlier or skip it to protect recovery.",
+            "Add another serving tomorrow to cover the lost sleep."
+          ],
+          "answer": 1,
+          "why": "Caffeine does not replace sleep. Protecting recovery matters more than chasing a temporary feeling of energy."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Guest et al. (2021), ISSN position stand: caffeine and exercise performance",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7777221/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "EFSA, Caffeine: healthy-adult single-dose and daily safety levels",
+          "url": "https://www.efsa.europa.eu/en/topics/topic/caffeine",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "FDA, Pure and highly concentrated caffeine: measuring and toxicity risks",
+          "url": "https://www.fda.gov/food/information-select-dietary-supplement-ingredients-and-other-substances/fda-warns-consumers-about-pure-and-highly-concentrated-caffeine",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Maughan et al. (2018), IOC consensus: supplement safety and quality risks",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5867441/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Informed Sport, About the testing and certification programme",
+          "url": "https://www.informed-sport.com/about",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NSF, Certified for Sport programme",
+          "url": "https://www.nsf.org/consumer-resources/articles/certified-for-sport-program",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "supp-vitamins-omega",
+      "title": "Vitamin D, omega-3 and other basics",
+      "summary": "Correct a genuine nutrient gap, not an imaginary one. Use food first, targeted advice and sensible products rather than megadoses or supplement stacks.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can separate a named nutrient gap from a vague urge to buy more. Replacing a missing key can help; buying duplicate keys does not improve the lock."
+        },
+        {
+          "t": "p",
+          "text": "**Food first; supplements are small add-ons.** Build meals using [[lesson:nut-micros-water|the vitamins, minerals and water lesson]]. Here, focus on when a supplement makes sense. A [[deficiency]] is a real shortage; general tiredness alone cannot tell you which nutrient is missing, or whether one is missing at all."
+        },
+        {
+          "t": "widget",
+          "w": "tier-list",
+          "params": {
+            "tiers": [
+              {
+                "name": "Assess a possible gap",
+                "blurb": "Diet, symptoms and risk factors matter. Your clinician decides which tests are useful.",
+                "items": [
+                  {
+                    "name": "Vitamin D",
+                    "what": "Helps calcium absorption and supports bones and muscle function.",
+                    "note": "A blood test can assess status when appropriate. Ask whether you need a supplement and how much; do not copy someone else's treatment dose.",
+                    "caution": "Treatment doses are individual; ask a clinician before copying a dose."
+                  },
+                  {
+                    "name": "Vitamin B12",
+                    "what": "Supports nerves and healthy blood cells.",
+                    "note": "Vegetarians and vegans need a reliable source such as fortified foods or a suitable supplement. Prevention need not wait for deficiency.",
+                    "caution": "Prevention need not wait for deficiency if your diet lacks reliable B12."
+                  },
+                  {
+                    "name": "Iron",
+                    "what": "Helps carry oxygen in your blood.",
+                    "note": "Get assessed before self-supplementing. Tiredness has many possible causes, and excess iron can be harmful.",
+                    "caution": "Do not self-treat tiredness with iron; excess can be harmful."
+                  }
+                ]
+              },
+              {
+                "name": "Consider the diet first",
+                "blurb": "Useful for some needs; not guaranteed gym upgrades.",
+                "items": [
+                  {
+                    "name": "Omega-3",
+                    "what": "Fats involved in normal cell function; fish and some algae provide EPA and DHA.",
+                    "note": "General-health supplement benefits are mixed. If considering a product, read EPA and DHA amounts rather than just total oil. Discuss suitability and dose with a clinician.",
+                    "caution": "Discuss suitability if you use medication or have a medical condition."
+                  },
+                  {
+                    "name": "Multivitamin",
+                    "what": "Combines several vitamins and often minerals.",
+                    "note": "May help cover dietary gaps, but cannot replace a varied diet. Check whether it duplicates nutrients in other products.",
+                    "caution": "Check for duplicated nutrients across products."
+                  }
+                ]
+              },
+              {
+                "name": "Avoid the more-is-better trap",
+                "blurb": "An impressive-looking number is not proof of usefulness.",
+                "items": [
+                  {
+                    "name": "Megadoses and stacked products",
+                    "what": "Very high amounts, or overlapping supplements that add up unnoticed.",
+                    "note": "Vitamin D and iron can be harmful in excess. Treatment for an identified deficiency belongs with a clinician.",
+                    "caution": "Very high or overlapping doses can cause harm. Avoid the more-is-better trap."
+                  }
+                ]
+              }
+            ]
+          },
+          "caption": "Tap each nutrient for its role and a buying note. No treatment doses are given because needs and medical context differ."
+        },
+        {
+          "t": "p",
+          "text": "Omega-3 labels deserve a slow read. [[EPA and DHA]] are specific forms of omega-3 fat. Total fish-oil weight is not the same as the amount of those fats. Supplements are not established shortcuts to bigger muscles, and broad health claims should not be treated as guarantees."
+        },
+        {
+          "t": "video",
+          "id": "Ds0BN-vN4dE",
+          "title": "Are Multivitamins Worth It: Highlight from Sugar, Salt and Supplements Webcast",
+          "channel": "Harvard T.H. Chan School of Public Health",
+          "why": "Watch: when a multivitamin may or may not be useful (Harvard T.H. Chan)."
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "Everyone needs vitamin D blood tests before joining a gym.",
+              "back": "No. Discuss risk factors and symptoms with a clinician. Testing is useful in some situations, but not an automatic requirement for every healthy beginner."
+            },
+            {
+              "front": "Vegans should wait until they feel unwell before thinking about B12.",
+              "back": "No. A reliable B12 source matters before symptoms appear. Fortified foods or a suitable supplement can prevent a gap; clinical assessment guides suspected deficiency."
+            },
+            {
+              "front": "A multivitamin makes vegetables optional.",
+              "back": "No. A [[multivitamin]] cannot replace a varied diet. Food offers fibre and other useful components that a tablet does not reproduce."
+            },
+            {
+              "front": "A bigger vitamin dose always gives a bigger benefit.",
+              "back": "No. A [[megadose]] can cause harm, particularly for some nutrients. More is not a general strategy; targeted treatment is different from casual supplement stacking."
+            }
+          ]
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Describe your usual diet",
+              "text": "Bring a realistic account of meals and current supplements to a clinician. Mention dietary restrictions and any symptoms. An honest ordinary week is more useful than your imaginary perfect menu."
+            },
+            {
+              "title": "Choose a targeted plan",
+              "text": "Ask whether changing food, adding a fortified product, testing or supplementing fits your situation. Check all labels for duplicate nutrients. Do not treat a friend's result as your prescription."
+            },
+            {
+              "title": "Review rather than collect",
+              "text": "If a supplement is recommended, ask how long to use it and when to review the plan. Keep the container details. Do not keep adding products because an old bottle is still in the cupboard."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "Basic nutrients still need care",
+          "text": "Check with a doctor before using supplements if pregnant, breastfeeding, on medication or living with a medical condition. Omega-3 products can interact with medication, and iron needs particular care. Keep iron products away from children. Supplements can be contaminated. Choose verified third-party testing such as Informed Sport or NSF Certified for Sport. Testing cannot guarantee zero risk."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your Monday check",
+          "text": "List the nutrients in every product you already take. Look for overlap before buying anything new. If you avoid animal foods, check your reliable B12 source. If you suspect a deficiency, book an assessment instead of building a shopping basket from symptoms."
+        }
+      ],
+      "takeaways": [
+        "Food comes first; targeted supplements can help prevent or correct genuine nutrient gaps.",
+        "Vegetarians and vegans need a reliable B12 source without waiting for symptoms.",
+        "Let a clinician decide which tests and treatment doses fit your situation.",
+        "Avoid duplicate nutrients and megadoses; iron and vitamin D can be harmful in excess."
+      ],
+      "quiz": [
+        {
+          "q": "You eat a vegan diet but feel well. What is the best B12 plan?",
+          "options": [
+            "Wait for symptoms before considering your B12 intake.",
+            "Assume every ordinary plant food contains enough B12.",
+            "Ensure a reliable fortified-food or supplement source."
+          ],
+          "answer": 2,
+          "why": "Plant foods do not naturally provide reliable B12. Prevention is sensible before a deficiency or symptoms develop."
+        },
+        {
+          "q": "You feel unusually tired and want to buy iron. What should come first?",
+          "options": [
+            "Get assessed rather than assuming iron is the cause.",
+            "Copy a friend's treatment dose until you feel better.",
+            "Take several products so every possible cause is covered."
+          ],
+          "answer": 0,
+          "why": "Tiredness has many causes. Unnecessary iron can be harmful, so assessment should guide the decision."
+        }
+      ],
+      "sources": [
+        {
+          "label": "NIH ODS, Vitamin D: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Vitamin B12: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminB12-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Iron: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Omega-3 fatty acids: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Multivitamin/mineral supplements: consumer fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/MVMS-Consumer/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Maughan et al. (2018), IOC consensus: supplement assessment and quality risks",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5867441/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Informed Sport, About the testing and certification programme",
+          "url": "https://www.informed-sport.com/about",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NSF, Certified for Sport programme",
+          "url": "https://www.nsf.org/consumer-resources/articles/certified-for-sport-program",
+          "checked": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "supp-skip-list",
+      "title": "What to skip",
+      "summary": "Skip unnecessary BCAAs, herbal 'testosterone booster' blends, fat burners and detox products. Spend on food and habits, and assess product quality separately.",
+      "blocks": [
+        {
+          "t": "p",
+          "text": "By the end, you can reject a supplement that lacks a clear job or useful evidence. A louder advert does not earn a product space in your toolbox."
+        },
+        {
+          "t": "p",
+          "text": "**Food first; supplements are small add-ons.** Start with [[lesson:supp-do-you-need|the evidence tier list]]. This lesson explains the lower-priority purchases. Skipping a product does not mean ignoring nutrition or giving up on progress. It means reserving money and attention for something that earns them."
+        },
+        {
+          "t": "video",
+          "id": "fpm-Sg2kPZk",
+          "title": "These Supplements are a WASTE of Money",
+          "channel": "Renaissance Periodization",
+          "why": "Watch: spotting supplements that are poor value (Renaissance Periodization)."
+        },
+        {
+          "t": "widget",
+          "w": "tier-list",
+          "params": {
+            "tiers": [
+              {
+                "name": "Skip with adequate protein",
+                "blurb": "A repeated expense that usually fails to solve a new problem.",
+                "items": [
+                  {
+                    "name": "BCAAs",
+                    "what": "Only a subset of the amino acids used to build proteins.",
+                    "note": "Protein-rich foods already provide them. Prioritise enough complete protein instead of adding isolated BCAAs to an adequate diet.",
+                    "caution": "Skip when your total protein is already adequate."
+                  }
+                ]
+              },
+              {
+                "name": "Skip the shortcut promises",
+                "blurb": "Uncertain benefit does not cancel quality and side-effect risks.",
+                "items": [
+                  {
+                    "name": "Herbal 'testosterone booster' blends",
+                    "what": "Products marketed to beginners with muscle-gain promises.",
+                    "note": "A marketing promise does not establish a useful training benefit.",
+                    "caution": "Herbal 'testosterone booster' blends: little good evidence they raise muscle gain in healthy people; higher contamination risk. Skip."
+                  },
+                  {
+                    "name": "Fat burners",
+                    "what": "Blends claiming faster fat loss.",
+                    "note": "Effects are often small or unproven. Stimulant-containing blends can add side effects, and multiple ingredients complicate assessment.",
+                    "caution": "Effects are often small or unproven, and unclear blends can add side effects. Skip."
+                  },
+                  {
+                    "name": "Detox teas",
+                    "what": "Products selling a cleanse or toxin-removal story.",
+                    "note": "The critical review found no compelling evidence for commercial detox claims. A changing scale number does not establish lasting fat loss or detoxification.",
+                    "caution": "Evidence for commercial detox claims is poor. Skip."
+                  }
+                ]
+              }
+            ]
+          },
+          "caption": "Tap an item for the caution and reason to skip it. No product here is necessary for a beginner training naturally."
+        },
+        {
+          "t": "h",
+          "text": "Tap the sales pitch"
+        },
+        {
+          "t": "flip",
+          "cards": [
+            {
+              "front": "BCAAs are special muscle-building fuel.",
+              "back": "[[BCAAs]] are some [[amino acids]], not the full building kit. Your body needs the other [[essential amino acids]] too. With adequate protein, an extra BCAA product is not a useful priority."
+            },
+            {
+              "front": "A herbal “booster” advert proves extra muscle.",
+              "back": "No. There is little good evidence these blends raise muscle gain in healthy people, and contamination risk is higher. A marketing promise does not establish a useful training benefit."
+            },
+            {
+              "front": "A fat burner replaces a sustainable food plan.",
+              "back": "No. Evidence for these products is limited, and ingredients can cause unwanted effects. Use [[lesson:nut-goals|a sensible nutrition goal]] rather than gambling on a blend."
+            },
+            {
+              "front": "Detox means my body needed a commercial cleanse.",
+              "back": "A marketing word is not a diagnosis. Evidence for commercial detox claims is poor. Do not assume that a short-term scale change proves toxins disappeared or fat was lost."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "text": "The BCAA problem is like bringing only a few types of brick to a building site. Those bricks matter, but the missing materials still limit construction. Use [[lesson:nut-protein|adequate protein from meals]] or, when convenient, [[lesson:supp-protein-powder|a suitable protein powder]]. Buying separate pieces is not automatically an upgrade."
+        },
+        {
+          "t": "p",
+          "text": "Keep **effectiveness** and **quality** separate. Independent testing can reduce contamination risk, but a well-tested ineffective product is still ineffective. Testimonials, transformation photos and the word natural do not establish either question. Complex blends can also hide which ingredient is responsible for a benefit or an unwanted effect."
+        },
+        {
+          "t": "steps",
+          "items": [
+            {
+              "title": "Ask for the actual evidence",
+              "text": "Does the research study this ingredient, this amount and a comparable person? Evidence for one ingredient does not automatically prove an entire blend works. An influencer discount is not a study."
+            },
+            {
+              "title": "Check what is disclosed",
+              "text": "Look for named ingredients and their amounts. Be cautious when a blend hides amounts or makes sweeping promises. If you cannot tell what you would be taking, do not buy it."
+            },
+            {
+              "title": "Choose a better use for the money",
+              "text": "Try groceries, easier meal preparation or a routine you can repeat. You do not owe the supplement shelf a purchase. If a future need is clear, revisit the evidence rather than the advert."
+            }
+          ]
+        },
+        {
+          "t": "callout",
+          "kind": "safety",
+          "title": "A natural label is not a safety guarantee",
+          "text": "Check with a doctor before using supplements if pregnant, breastfeeding, on medication or living with a medical condition. Supplements can be contaminated, and blends can cause side effects. For any product you do choose, verify third-party testing such as Informed Sport or NSF Certified for Sport. Certification reduces risk; it does not guarantee safety or effectiveness."
+        },
+        {
+          "t": "callout",
+          "kind": "try",
+          "title": "Your Monday unsubscribe",
+          "text": "Pick the product you were tempted to buy. Write its promised benefit beside the evidence and the food-first alternative. If the evidence does not support a useful role for you, remove it from your basket. Put that attention back into the next meal or workout."
+        }
+      ],
+      "takeaways": [
+        "Extra BCAAs are not a priority when you already eat enough protein.",
+        "Herbal 'testosterone booster' blends have little good evidence for muscle gain and carry higher contamination risk.",
+        "Skip fat burners and detox promises in favour of a sustainable food and training plan.",
+        "Product testing reduces quality risks; it does not turn weak evidence into an effective supplement."
+      ],
+      "quiz": [
+        {
+          "q": "A fat-loss blend has verified independent testing. What does that establish?",
+          "options": [
+            "It reliably produces the body transformation in the advert.",
+            "It makes a food-first approach unnecessary for losing fat.",
+            "It reduces quality risks, not proof of fat-loss benefit."
+          ],
+          "answer": 2,
+          "why": "Testing and effectiveness answer different questions. Certification does not establish that a product causes meaningful fat loss."
+        },
+        {
+          "q": "You already eat enough protein and an advert recommends BCAAs. What is the useful response?",
+          "options": [
+            "Add BCAAs because individual building blocks always work better.",
+            "Skip them and keep the adequate protein habit you have.",
+            "Replace your protein foods with the isolated BCAA drink."
+          ],
+          "answer": 1,
+          "why": "Adequate protein already supplies BCAAs along with the other building blocks. Adding a separate product is not a necessary upgrade."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Wolfe (2017), Branched-chain amino acids and muscle protein synthesis in humans: myth or reality?",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5568273/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Morgado et al. (2024; online 2023), Do testosterone boosters really increase serum total testosterone? Systematic review",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37697053/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NIH ODS, Dietary supplements for weight loss: health professional fact sheet",
+          "url": "https://ods.od.nih.gov/factsheets/WeightLoss-HealthProfessional/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Klein and Kiat (2015), Detox diets: critical review of the evidence",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25522674/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Maughan et al. (2018), IOC consensus: supplement safety and quality risks",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5867441/",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "Informed Sport, About the testing and certification programme",
+          "url": "https://www.informed-sport.com/about",
+          "checked": "2026-10-10"
+        },
+        {
+          "label": "NSF, Certified for Sport programme",
+          "url": "https://www.nsf.org/consumer-resources/articles/certified-for-sport-program",
+          "checked": "2026-10-10"
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "deficiency",
+      "def": "A shortage of a nutrient that your body needs to work properly."
+    },
+    {
+      "term": "third-party testing",
+      "def": "Independent checks of supplement quality, such as contents and contamination; certification does not prove effectiveness or eliminate every risk."
+    },
+    {
+      "term": "creatine",
+      "def": "A substance your body makes and stores in muscle to help refill its rapid energy supply."
+    },
+    {
+      "term": "ATP",
+      "def": "The small energy-carrying molecule your cells use to power work, including muscle contraction."
+    },
+    {
+      "term": "creatine monohydrate",
+      "def": "The most studied form of supplemental creatine, with strong evidence for effectiveness and safety in healthy adults."
+    },
+    {
+      "term": "placebo",
+      "def": "A comparison product without the tested ingredient, used to help separate an ingredient's effect from expectation and other changes."
+    },
+    {
+      "term": "amino acids",
+      "def": "Small building blocks that your body joins together to make proteins."
+    },
+    {
+      "term": "essential amino acids",
+      "def": "Protein building blocks your body cannot make in enough amounts, so you need them from food."
+    },
+    {
+      "term": "whey",
+      "def": "A protein source from milk, often collected during cheese-making and sold as a powder."
+    },
+    {
+      "term": "lactose",
+      "def": "A sugar in milk; difficulty digesting it is different from a milk-protein allergy."
+    },
+    {
+      "term": "adenosine",
+      "def": "A chemical signal in your brain involved in sleepiness; caffeine blocks some of its receptors."
+    },
+    {
+      "term": "tolerance",
+      "def": "A reduced response to the same amount after repeated use; caffeine's performance response still varies between people."
+    },
+    {
+      "term": "EPA and DHA",
+      "def": "Forms of omega-3 fat found in fish and some algae; labels list their amounts separately from total oil."
+    },
+    {
+      "term": "multivitamin",
+      "def": "A product combining several vitamins and often minerals; ingredients and amounts vary between products."
+    },
+    {
+      "term": "megadose",
+      "def": "An amount far above ordinary nutrient needs; more is not automatically helpful and can be harmful."
+    },
+    {
+      "term": "BCAAs",
+      "def": "Branched-chain amino acids: a subset of protein building blocks, already present in protein-rich foods."
+    }
+  ]
+}
